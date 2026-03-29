@@ -109,6 +109,18 @@ struct DashboardView: View {
                             )
                         }
 
+                        // Cloud credits badge — show when low or empty
+                        if !revenueCatManager.isPremium {
+                            let credits = CloudIdentificationManager.shared.creditsRemaining
+                            if credits <= 3 {
+                                Badge(
+                                    label: "\(credits) cloud IDs",
+                                    icon: "cloud.fill",
+                                    color: credits == 0 ? AppColors.urgencyRed : .orange
+                                )
+                            }
+                        }
+
                         Spacer()
                     }
                     .padding(.horizontal, 20)

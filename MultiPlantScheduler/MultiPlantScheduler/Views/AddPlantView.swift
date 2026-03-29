@@ -566,9 +566,12 @@ struct AddPlantView: View {
             .photosPicker(isPresented: $showPhotoPicker, selection: $selectedPhotoItem, matching: .images)
             .onChange(of: selectedPhotoItem) { _, newValue in
                 Task {
-                    if let data = try? await newValue?.loadTransferable(type: Data.self) {
-                        photoData = data
-                        startScanningAnimation(photoData: data)
+                    if let data = try? await newValue?.loadTransferable(type: Data.self),
+                       let uiImage = UIImage(data: data) {
+                        // Compress to JPEG <1MB regardless of source format (HEIC, PNG, etc.)
+                        let compressed = uiImage.jpegData(compressionQuality: 0.7)
+                        photoData = compressed ?? data
+                        startScanningAnimation(photoData: photoData!)
                     }
                 }
             }

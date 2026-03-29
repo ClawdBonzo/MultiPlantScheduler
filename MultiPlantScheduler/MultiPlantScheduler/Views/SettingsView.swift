@@ -420,6 +420,22 @@ struct SettingsView: View {
                             .foregroundColor(AppColors.textSecondary)
                             .textSelection(.enabled)
                     }
+
+                    Button {
+                        CloudIdentificationManager.shared.resetCredits()
+                        debugCloudResult = "Credits reset to \(CloudIdentificationManager.maxFreeCredits)"
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "arrow.counterclockwise")
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(.yellow)
+
+                            Text("Reset Cloud Credits to \(CloudIdentificationManager.maxFreeCredits)")
+                                .font(.system(.body, design: .rounded))
+                                .fontWeight(.medium)
+                                .foregroundColor(AppColors.textPrimary)
+                        }
+                    }
                 }
                 .listRowBackground(Color(red: 0.118, green: 0.118, blue: 0.118))
                 #endif

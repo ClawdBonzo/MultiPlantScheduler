@@ -54,6 +54,14 @@ final class CloudIdentificationManager {
         !apiKey.isEmpty && apiKey != "YOUR_KEY_HERE"
     }
 
+    /// Reset credits to max (DEBUG only — for testing)
+    #if DEBUG
+    func resetCredits() {
+        UserDefaults.standard.set(Self.maxFreeCredits, forKey: creditsKey)
+        print("☁️ CloudID — credits reset to \(Self.maxFreeCredits)")
+    }
+    #endif
+
     /// Decrement credits (only for free users)
     private func decrementCredits() {
         let current = creditsRemaining

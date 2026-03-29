@@ -310,6 +310,25 @@ struct PlantDetailView: View {
                                     .transition(.scale.combined(with: .opacity))
                                 }
 
+                                // Cloud credits badge (always visible)
+                                HStack(spacing: 6) {
+                                    Image(systemName: "cloud.fill")
+                                        .font(.system(size: 11, weight: .semibold))
+                                        .foregroundColor(revenueCatManager.isPremium ? AppColors.limeGreen : .orange)
+                                    if revenueCatManager.isPremium {
+                                        Text("Cloud Credits: Unlimited")
+                                            .font(.system(.caption2, design: .rounded))
+                                            .fontWeight(.medium)
+                                            .foregroundColor(AppColors.textSecondary)
+                                    } else {
+                                        Text("Cloud Credits: \(CloudIdentificationManager.shared.creditsRemaining)/\(CloudIdentificationManager.maxFreeCredits) free")
+                                            .font(.system(.caption2, design: .rounded))
+                                            .fontWeight(.medium)
+                                            .foregroundColor(CloudIdentificationManager.shared.creditsRemaining <= 3 ? .orange : AppColors.textSecondary)
+                                    }
+                                }
+                                .padding(.vertical, 2)
+
                                 // Health check prompt
                                 if plant.isHealthCheckDue {
                                     Button {
