@@ -346,6 +346,16 @@ struct SettingsView: View {
             .scrollContentBackground(.hidden)
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarTrailing) {
+                    Button("Done") {
+                        dismiss()
+                    }
+                    .font(.system(.body, design: .rounded))
+                    .fontWeight(.semibold)
+                    .foregroundColor(AppColors.limeGreen)
+                }
+            }
         }
         .alert("Delete All Data?", isPresented: $showDeleteConfirmation) {
             Button("Cancel", role: .cancel) { }
