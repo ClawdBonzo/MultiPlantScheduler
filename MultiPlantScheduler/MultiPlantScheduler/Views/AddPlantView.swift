@@ -33,9 +33,11 @@ struct AddPlantView: View {
     @State private var scanProgress: CGFloat = 0
     @State private var scanPulse = false
     @State private var leafRotation: Double = 0
+    @State private var radarRotation: Double = 0
     @State private var showScanOverlay = false
     @State private var showAIResult = false
     @State private var formFieldsOpacity: Double = 1.0
+    @State private var dotCount = 0
 
     // Photo source
     @State private var showPhotoActionSheet = false
@@ -101,43 +103,70 @@ struct AddPlantView: View {
                                         if showScanOverlay {
                                             // Green tint overlay
                                             Circle()
-                                                .fill(AppColors.limeGreen.opacity(0.2))
+                                                .fill(AppColors.limeGreen.opacity(0.15))
                                                 .frame(width: 140, height: 140)
+
+                                            // Radar sweep gradient
+                                            Circle()
+                                                .fill(
+                                                    AngularGradient(
+                                                        gradient: Gradient(colors: [
+                                                            AppColors.limeGreen.opacity(0.0),
+                                                            AppColors.limeGreen.opacity(0.0),
+                                                            AppColors.limeGreen.opacity(0.25)
+                                                        ]),
+                                                        center: .center
+                                                    )
+                                                )
+                                                .frame(width: 140, height: 140)
+                                                .rotationEffect(.degrees(radarRotation))
 
                                             // Animated progress ring
                                             Circle()
                                                 .trim(from: 0, to: scanProgress)
                                                 .stroke(
-                                                    AppColors.limeGreen,
+                                                    LinearGradient(
+                                                        colors: [AppColors.limeGreen.opacity(0.3), AppColors.limeGreen],
+                                                        startPoint: .leading,
+                                                        endPoint: .trailing
+                                                    ),
                                                     style: StrokeStyle(lineWidth: 4, lineCap: .round)
                                                 )
                                                 .frame(width: 152, height: 152)
                                                 .rotationEffect(.degrees(-90))
-                                                .shadow(color: AppColors.limeGreen.opacity(0.6), radius: scanPulse ? 8 : 3)
+                                                .shadow(color: AppColors.limeGreen.opacity(0.6), radius: scanPulse ? 10 : 4)
 
                                             // Pulsing outer glow ring
                                             Circle()
-                                                .stroke(AppColors.limeGreen.opacity(scanPulse ? 0.4 : 0.1), lineWidth: 2)
-                                                .frame(width: 164, height: 164)
-                                                .scaleEffect(scanPulse ? 1.05 : 1.0)
+                                                .stroke(AppColors.limeGreen.opacity(scanPulse ? 0.35 : 0.08), lineWidth: 1.5)
+                                                .frame(width: 168, height: 168)
+                                                .scaleEffect(scanPulse ? 1.06 : 1.0)
+
+                                            // Second outer ring
+                                            Circle()
+                                                .stroke(AppColors.limeGreen.opacity(scanPulse ? 0.15 : 0.03), lineWidth: 1)
+                                                .frame(width: 184, height: 184)
+                                                .scaleEffect(scanPulse ? 1.04 : 0.98)
 
                                             // Orbiting leaf icons
                                             ForEach(0..<3, id: \.self) { index in
                                                 Image(systemName: "leaf.fill")
-                                                    .font(.system(size: 12, weight: .semibold))
-                                                    .foregroundStyle(AppColors.limeGreen)
-                                                    .offset(y: -88)
+                                                    .font(.system(size: 11, weight: .semibold))
+                                                    .foregroundStyle(AppColors.limeGreen.opacity(0.8))
+                                                    .shadow(color: AppColors.limeGreen.opacity(0.5), radius: 4)
+                                                    .offset(y: -90)
                                                     .rotationEffect(.degrees(leafRotation + Double(index) * 120))
                                             }
 
-                                            // Center analyzing text
+                                            // Center analyzing text with pulsing dots
                                             VStack(spacing: 4) {
                                                 Image(systemName: "sparkles")
-                                                    .font(.system(size: 18, weight: .semibold))
+                                                    .font(.system(size: 20, weight: .semibold))
                                                     .foregroundStyle(AppColors.limeGreen)
-                                                    .opacity(scanPulse ? 1 : 0.6)
+                                                    .opacity(scanPulse ? 1 : 0.5)
+                                                    .shadow(color: AppColors.limeGreen.opacity(0.4), radius: 6)
 
-                                                Text("Analyzing\nwith AI...")
+                                                Text("Analyzing\nwith AI\(String(repeating: ".", count: dotCount))")
                                                     .font(.system(size: 11, weight: .bold, design: .rounded))
                                                     .foregroundStyle(.white)
                                                     .multilineTextAlignment(.center)
@@ -455,6 +484,8 @@ struct AddPlantView: View {
         scanProgress = 0
         scanPulse = false
         leafRotation = 0
+        radarRotation = 0
+        dotCount = 0
         formFieldsOpacity = 0.5
 
         withAnimation(.easeIn(duration: 0.3)) {
@@ -462,28 +493,40 @@ struct AddPlantView: View {
             isIdentifying = true
         }
 
-        // Start pulsing
+        // Start pulsing glow
         withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
             scanPulse = true
         }
 
-        // Start leaf rotation
-        withAnimation(.linear(duration: 2.0).repeatForever(autoreverses: false)) {
+        // Start leaf orbit
+        withAnimation(.linear(duration: 2.2).repeatForever(autoreverses: false)) {
             leafRotation = 360
         }
 
+        // Radar sweep rotation
+        withAnimation(.linear(duration: 1.5).repeatForever(autoreverses: false)) {
+            radarRotation = 360
+        }
+
         // Animate progress ring
-        withAnimation(.easeInOut(duration: 1.6)) {
+        withAnimation(.easeInOut(duration: 1.8)) {
             scanProgress = 0.85
         }
+
+        // Pulsing dots animation
+        startDotAnimation()
+
+        // Haptic: light tap on scan start
+        let startImpact = UIImpactFeedbackGenerator(style: .light)
+        startImpact.impactOccurred()
 
         // Run actual AI identification in background
         Task {
             guard let uiImage = UIImage(data: photoData) else { return }
             let result = await PlantIdentifierService.shared.identifyPlant(from: uiImage)
 
-            // Ensure minimum 1.8s of animation for the "a-ha" feel
-            try? await Task.sleep(for: .milliseconds(400))
+            // Ensure minimum 2.0s of animation for the "a-ha" feel
+            try? await Task.sleep(for: .milliseconds(600))
 
             await MainActor.run {
                 // Complete the ring
@@ -514,9 +557,9 @@ struct AddPlantView: View {
                     aiSpeciesName = "Unknown plant"
                 }
 
-                // Dismiss overlay, show result
+                // Dismiss overlay, show result with spring pop
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
-                    withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                    withAnimation(.spring(response: 0.45, dampingFraction: 0.65)) {
                         showScanOverlay = false
                         scanPulse = false
                         isIdentifying = false
@@ -524,11 +567,20 @@ struct AddPlantView: View {
                         formFieldsOpacity = 1.0
                     }
 
-                    // Haptic feedback
-                    let impact = UINotificationFeedbackGenerator()
-                    impact.notificationOccurred(.success)
+                    // Success haptic
+                    let notification = UINotificationFeedbackGenerator()
+                    notification.notificationOccurred(.success)
                 }
             }
+        }
+    }
+
+    private func startDotAnimation() {
+        guard isIdentifying else { return }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+            guard self.isIdentifying else { return }
+            self.dotCount = (self.dotCount % 3) + 1
+            self.startDotAnimation()
         }
     }
 
