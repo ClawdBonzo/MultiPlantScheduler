@@ -23,6 +23,10 @@ final class Plant {
     var healthStatus: String?
     var lastHealthCheckDate: Date?
 
+    // AI identification
+    var aiConfidence: Double?
+    var lastIdentifiedDate: Date?
+
     // Custom notification time
     var preferredNotificationHour: Int?
     var preferredNotificationMinute: Int?

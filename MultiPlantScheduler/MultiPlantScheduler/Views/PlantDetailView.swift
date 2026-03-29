@@ -12,6 +12,8 @@ struct PlantDetailView: View {
     @State private var showPaywall = false
     @State private var showCheckmark = false
     @State private var showHealthCheck = false
+    @State private var isReidentifying = false
+    @State private var reidentifyResult: String?
 
     var adjustedWateringInterval: Int {
         SeasonalAdjuster.adjustedInterval(baseInterval: plant.wateringIntervalDays)
@@ -105,6 +107,62 @@ struct PlantDetailView: View {
                                     }
                                 }
                                 .padding(.vertical, 8)
+                            }
+
+                            // AI confidence badge
+                            if let confidence = plant.aiConfidence {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "brain")
+                                        .font(.system(size: 12, weight: .semibold))
+                                        .foregroundStyle(AppColors.limeGreen)
+                                    Text("AI Identified: \(Int(confidence * 100))% confidence")
+                                        .font(.system(.caption, design: .rounded))
+                                        .fontWeight(.medium)
+                                        .foregroundColor(AppColors.textSecondary)
+                                    if let date = plant.lastIdentifiedDate {
+                                        Spacer()
+                                        Text(date.formatted(date: .abbreviated, time: .omitted))
+                                            .font(.system(.caption2, design: .rounded))
+                                            .foregroundColor(AppColors.textSecondary.opacity(0.7))
+                                    }
+                                }
+                                .padding(.vertical, 4)
+                            }
+
+                            // Re-identify with AI
+                            if plant.photoData != nil {
+                                Button {
+                                    reidentifyPlant()
+                                } label: {
+                                    HStack(spacing: 8) {
+                                        if isReidentifying {
+                                            ProgressView()
+                                                .tint(AppColors.limeGreen)
+                                                .scaleEffect(0.8)
+                                        } else {
+                                            Image(systemName: "brain")
+                                                .foregroundStyle(AppColors.limeGreen)
+                                        }
+                                        Text(isReidentifying ? "Identifying…" : "Re-identify with AI")
+                                            .font(.caption)
+                                            .foregroundStyle(AppColors.textSecondary)
+                                        Spacer()
+                                        if let result = reidentifyResult {
+                                            Text(result)
+                                                .font(.caption2)
+                                                .fontWeight(.medium)
+                                                .foregroundStyle(AppColors.limeGreen)
+                                        } else {
+                                            Image(systemName: "chevron.right")
+                                                .font(.caption)
+                                                .foregroundStyle(AppColors.textSecondary)
+                                        }
+                                    }
+                                    .padding(10)
+                                    .background(AppColors.limeGreen.opacity(0.1))
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                }
+                                .disabled(isReidentifying)
                             }
 
                             // Health check prompt
@@ -359,6 +417,34 @@ struct PlantDetailView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
             withAnimation {
                 showCheckmark = false
+            }
+        }
+    }
+
+    private func reidentifyPlant() {
+        guard let data = plant.photoData, let uiImage = UIImage(data: data) else { return }
+        isReidentifying = true
+        reidentifyResult = nil
+
+        Task {
+            let result = await PlantIdentifierService.shared.identifyPlant(from: uiImage)
+            await MainActor.run {
+                isReidentifying = false
+                if let speciesName = result.species {
+                    plant.species = speciesName
+                    plant.aiConfidence = result.confidence
+                    plant.lastIdentifiedDate = Date.now
+                    if let dbSpecies = PlantSpeciesDatabase.species(named: speciesName) {
+                        plant.wateringIntervalDays = dbSpecies.defaultWateringDays
+                    }
+                    reidentifyResult = "\(Int(result.confidence * 100))% \(speciesName)"
+                    try? modelContext.save()
+
+                    let impact = UIImpactFeedbackGenerator(style: .light)
+                    impact.impactOccurred()
+                } else {
+                    reidentifyResult = "Could not identify"
+                }
             }
         }
     }

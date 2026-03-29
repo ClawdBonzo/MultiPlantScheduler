@@ -21,6 +21,11 @@ struct AddPlantView: View {
 
     @State private var speciesSearchText = ""
 
+    // AI identification state
+    @State private var isIdentifying = false
+    @State private var aiConfidence: Double?
+    @State private var aiSpeciesName: String?
+
     let rooms = ["Living Room", "Bedroom", "Kitchen", "Bathroom", "Office", "Balcony", "Other"]
 
     var filteredSpecies: [PlantSpecies] {
@@ -57,15 +62,33 @@ struct AddPlantView: View {
                                 ZStack {
                                     if let photoData = photoData,
                                        let uiImage = UIImage(data: photoData) {
-                                        Image(uiImage: uiImage)
-                                            .resizable()
-                                            .scaledToFill()
-                                            .frame(width: 120, height: 120)
-                                            .clipShape(Circle())
-                                            .overlay(
-                                                Circle()
-                                                    .stroke(AppColors.limeGreen, lineWidth: 3)
-                                            )
+                                        ZStack(alignment: .topTrailing) {
+                                            Image(uiImage: uiImage)
+                                                .resizable()
+                                                .scaledToFill()
+                                                .frame(width: 120, height: 120)
+                                                .clipShape(Circle())
+                                                .overlay(
+                                                    Circle()
+                                                        .stroke(AppColors.limeGreen, lineWidth: 3)
+                                                )
+
+                                            // AI Identified badge
+                                            if aiConfidence != nil {
+                                                HStack(spacing: 3) {
+                                                    Image(systemName: "brain")
+                                                        .font(.system(size: 8, weight: .bold))
+                                                    Text("AI")
+                                                        .font(.system(size: 9, weight: .bold))
+                                                }
+                                                .foregroundStyle(.black)
+                                                .padding(.horizontal, 6)
+                                                .padding(.vertical, 3)
+                                                .background(AppColors.limeGreen)
+                                                .clipShape(Capsule())
+                                                .offset(x: 4, y: -2)
+                                            }
+                                        }
                                     } else {
                                         ZStack {
                                             Circle()
@@ -99,11 +122,55 @@ struct AddPlantView: View {
                                 }
                             }
 
+                            // AI identification progress
+                            if isIdentifying {
+                                HStack(spacing: 8) {
+                                    ProgressView()
+                                        .tint(AppColors.limeGreen)
+                                    Text("Identifying with AI…")
+                                        .font(.system(.caption, design: .rounded))
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(AppColors.limeGreen)
+                                }
+                                .padding(.vertical, 4)
+                            }
+
+                            // AI result badge
+                            if let confidence = aiConfidence, let speciesName = aiSpeciesName {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "brain")
+                                        .font(.system(size: 12, weight: .semibold))
+                                        .foregroundStyle(AppColors.limeGreen)
+
+                                    Text("\(Int(confidence * 100))% \(speciesName)")
+                                        .font(.system(.caption, design: .rounded))
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(AppColors.textPrimary)
+                                        .lineLimit(1)
+
+                                    if confidence < 0.70 {
+                                        Text("Best guess")
+                                            .font(.system(size: 9, weight: .medium))
+                                            .foregroundStyle(.black)
+                                            .padding(.horizontal, 5)
+                                            .padding(.vertical, 2)
+                                            .background(Color.yellow)
+                                            .clipShape(Capsule())
+                                    }
+                                }
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(AppColors.limeGreen.opacity(0.12))
+                                .clipShape(Capsule())
+                            }
+
                             if photoData != nil {
                                 Button(role: .destructive) {
                                     withAnimation {
                                         photoData = nil
                                         selectedPhotoItem = nil
+                                        aiConfidence = nil
+                                        aiSpeciesName = nil
                                     }
                                 } label: {
                                     Text("Remove Photo")
@@ -256,17 +323,66 @@ struct AddPlantView: View {
                     if let photoData = plant.photoData {
                         self.photoData = photoData
                     }
+                    if let confidence = plant.aiConfidence {
+                        aiConfidence = confidence
+                        aiSpeciesName = plant.species
+                    }
                 }
             }
             .onChange(of: selectedPhotoItem) { _, newValue in
                 Task {
                     if let data = try? await newValue?.loadTransferable(type: Data.self) {
                         photoData = data
+                        // Auto-identify with AI after photo is loaded
+                        await identifyPlantFromPhoto(data: data)
                     }
                 }
             }
         }
     }
+
+    // MARK: - AI Identification
+
+    private func identifyPlantFromPhoto(data: Data) async {
+        guard let uiImage = UIImage(data: data) else { return }
+
+        await MainActor.run { isIdentifying = true }
+
+        let result = await PlantIdentifierService.shared.identifyPlant(from: uiImage)
+
+        await MainActor.run {
+            isIdentifying = false
+
+            if let matchedSpecies = result.species {
+                aiConfidence = result.confidence
+                aiSpeciesName = matchedSpecies
+
+                // Auto-fill species picker with AI suggestion
+                if let dbSpecies = PlantSpeciesDatabase.species(named: matchedSpecies) {
+                    species = dbSpecies
+                    wateringIntervalDays = dbSpecies.defaultWateringDays
+
+                    // Auto-fill name if empty (use short species name)
+                    if name.isEmpty {
+                        let shortName = matchedSpecies.components(separatedBy: " - ").last ?? matchedSpecies
+                        name = shortName
+                    }
+                }
+
+                let impact = UIImpactFeedbackGenerator(style: .light)
+                impact.impactOccurred()
+            } else if result.confidence > 0 {
+                // Detected a plant but couldn't identify species
+                aiConfidence = result.confidence
+                aiSpeciesName = "Unknown plant"
+            } else {
+                aiConfidence = nil
+                aiSpeciesName = nil
+            }
+        }
+    }
+
+    // MARK: - Save
 
     private func savePlant() {
         let impact = UIImpactFeedbackGenerator(style: .medium)
@@ -283,6 +399,10 @@ struct AddPlantView: View {
             if let photoData = photoData {
                 plantToEdit.photoData = photoData
             }
+            if let confidence = aiConfidence {
+                plantToEdit.aiConfidence = confidence
+                plantToEdit.lastIdentifiedDate = Date.now
+            }
         } else {
             // Create new plant
             let newPlant = Plant(
@@ -294,6 +414,10 @@ struct AddPlantView: View {
                 fertilizerType: fertilizerType.isEmpty ? nil : fertilizerType,
                 photoData: photoData
             )
+            if let confidence = aiConfidence {
+                newPlant.aiConfidence = confidence
+                newPlant.lastIdentifiedDate = Date.now
+            }
 
             modelContext.insert(newPlant)
 
