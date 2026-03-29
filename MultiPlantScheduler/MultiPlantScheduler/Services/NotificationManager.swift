@@ -184,10 +184,3 @@ class NotificationManager {
         await UNUserNotificationCenter.current().pendingNotificationRequests()
     }
 }
-
-// MARK: - Badge Management
-extension NotificationManager {
-    func clearBadgeCount() {
-        UNUserNotificationCenter.current().setBadgeCount(0)
-    }
-}
