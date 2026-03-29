@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 import RevenueCat
 
 /// Manages subscription and premium features via RevenueCat
@@ -92,8 +93,8 @@ class RevenueCatManager: ObservableObject {
                 self.isPremium = isPremium
             }
             return isPremium
-        } catch let error as PurchasesErrorCode {
-            if error == .purchaseCancelledError {
+        } catch {
+            if let rcError = error as? RevenueCat.ErrorCode, rcError == .purchaseCancelledError {
                 print("Purchase cancelled by user")
             } else {
                 print("Purchase error: \(error)")
