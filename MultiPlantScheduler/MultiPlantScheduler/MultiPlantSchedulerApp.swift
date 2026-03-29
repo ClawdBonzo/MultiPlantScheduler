@@ -1,6 +1,5 @@
 import SwiftUI
 import SwiftData
-import WidgetKit
 import os.log
 
 private let logger = Logger(subsystem: "com.clawdbonzo.MultiPlantScheduler", category: "AppLaunch")
@@ -19,10 +18,20 @@ struct MultiPlantSchedulerApp: App {
     init() {
         logger.notice("App init starting")
 
-        // Configure SwiftData container
-        let container = Self.createModelContainer()
+        // Configure SwiftData container — use simplest possible approach
+        let schema = Schema([Plant.self, CareLog.self, HealthEntry.self, PhotoEntry.self])
+        var container: ModelContainer
+        do {
+            let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false, cloudKitDatabase: .none)
+            container = try ModelContainer(for: schema, configurations: config)
+            logger.notice("Persistent ModelContainer created")
+        } catch {
+            logger.error("Persistent store failed: \(error.localizedDescription). Using in-memory.")
+            // Fall back to in-memory — app will work but data won't persist across launches
+            let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+            container = try! ModelContainer(for: schema, configurations: config)
+        }
         self.modelContainer = container
-        logger.notice("ModelContainer created successfully")
 
         // Seed sample data on first launch
         if FirstLaunchService.isFirstLaunch {
@@ -35,42 +44,6 @@ struct MultiPlantSchedulerApp: App {
         _showOnboarding = State(initialValue: !hasSeenOnboarding)
 
         logger.notice("App init complete")
-    }
-
-    /// Create a ModelContainer with aggressive fallback chain
-    private static func createModelContainer() -> ModelContainer {
-        // Attempt 1: Open existing store with full schema
-        do {
-            return try SharedContainer.makeModelContainer()
-        } catch {
-            print("⚠️ Container failed: \(error)")
-        }
-
-        // Attempt 2: Delete corrupt store and retry
-        do {
-            let storeURL = URL.applicationSupportDirectory.appendingPathComponent("default.store")
-            for ext in ["", "-shm", "-wal"] {
-                let fileURL = storeURL.appendingPathExtension(ext.isEmpty ? "" : String(ext.dropFirst()))
-                let url = ext.isEmpty ? storeURL : URL(fileURLWithPath: storeURL.path + ext)
-                try? FileManager.default.removeItem(at: url)
-            }
-            print("🗑️ Deleted old store, creating fresh one...")
-            return try SharedContainer.makeModelContainer()
-        } catch {
-            print("⚠️ Fresh store failed: \(error)")
-        }
-
-        // Attempt 3: In-memory store (app works but data won't persist)
-        do {
-            let config = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
-            return try ModelContainer(for: SharedContainer.schema, configurations: config)
-        } catch {
-            print("❌ In-memory store failed: \(error)")
-        }
-
-        // Attempt 4: Absolute minimum — just Plant and CareLog, in memory
-        let config = ModelConfiguration(isStoredInMemoryOnly: true)
-        return try! ModelContainer(for: Plant.self, CareLog.self, configurations: config)
     }
 
     var body: some Scene {
@@ -113,8 +86,6 @@ struct MultiPlantSchedulerApp: App {
                 if newPhase == .active {
                     // Clear badge count when app becomes active
                     NotificationManager.shared.clearBadgeCount()
-                    // Refresh widgets
-                    WidgetCenter.shared.reloadAllTimelines()
                 }
             }
         }

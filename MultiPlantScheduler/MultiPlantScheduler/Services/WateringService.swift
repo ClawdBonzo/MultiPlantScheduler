@@ -1,5 +1,5 @@
 import SwiftData
-import WidgetKit
+import Foundation
 
 /// Shared watering and care logic used by views, notification actions, and Siri intents
 enum WateringService {
@@ -18,8 +18,6 @@ enum WateringService {
         Task {
             await NotificationManager.shared.scheduleReminder(for: plant)
         }
-
-        WidgetCenter.shared.reloadAllTimelines()
     }
 
     /// Perform any care action on a plant
@@ -38,7 +36,5 @@ enum WateringService {
         plant.careLogs.append(careLog)
 
         try? context.save()
-
-        WidgetCenter.shared.reloadAllTimelines()
     }
 }
