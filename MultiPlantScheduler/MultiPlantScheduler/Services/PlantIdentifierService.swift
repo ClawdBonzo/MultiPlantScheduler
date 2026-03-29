@@ -19,6 +19,14 @@ final class PlantIdentifierService {
         let confidence: Double       // 0.0–1.0
         let defaultInterval: Int     // Suggested watering days
         let isLowConfidence: Bool    // True if confidence < 0.70
+        let topSuggestions: [Suggestion]  // Top 3 alternatives for user to pick from
+    }
+
+    struct Suggestion: Identifiable {
+        let id = UUID()
+        let species: String
+        let confidence: Double
+        let defaultInterval: Int
     }
 
     // MARK: - Model Loading
@@ -41,7 +49,7 @@ final class PlantIdentifierService {
     /// Identify a plant from a UIImage using the on-device CoreML model
     func identifyPlant(from image: UIImage) async -> IdentificationResult {
         guard let cgImage = image.cgImage else {
-            return IdentificationResult(species: nil, confidence: 0, defaultInterval: 7, isLowConfidence: true)
+            return IdentificationResult(species: nil, confidence: 0, defaultInterval: 7, isLowConfidence: true, topSuggestions: [])
         }
 
         // Use CoreML model if available, otherwise fall back to Vision classifier
@@ -61,7 +69,7 @@ final class PlantIdentifierService {
                       let results = request.results as? [VNClassificationObservation],
                       let top = results.first else {
                     continuation.resume(returning: IdentificationResult(
-                        species: nil, confidence: 0, defaultInterval: 7, isLowConfidence: true
+                        species: nil, confidence: 0, defaultInterval: 7, isLowConfidence: true, topSuggestions: []
                     ))
                     return
                 }
@@ -73,11 +81,24 @@ final class PlantIdentifierService {
                 let mapped = Self.mapToAppSpecies(rawLabel)
                 let interval = PlantSpeciesDatabase.species(named: mapped)?.defaultWateringDays ?? Self.defaultInterval(for: rawLabel)
 
+                // Build top 3 suggestions from results
+                let topResults = Array(results.prefix(3))
+                let suggestions: [Suggestion] = topResults.map { obs in
+                    let mappedName = Self.mapToAppSpecies(obs.identifier)
+                    let sugInterval = PlantSpeciesDatabase.species(named: mappedName)?.defaultWateringDays ?? Self.defaultInterval(for: obs.identifier)
+                    return Suggestion(
+                        species: mappedName,
+                        confidence: Double(obs.confidence),
+                        defaultInterval: sugInterval
+                    )
+                }
+
                 continuation.resume(returning: IdentificationResult(
                     species: mapped,
                     confidence: confidence,
                     defaultInterval: interval,
-                    isLowConfidence: confidence < 0.70
+                    isLowConfidence: confidence < 0.70,
+                    topSuggestions: suggestions
                 ))
             }
 
@@ -89,7 +110,7 @@ final class PlantIdentifierService {
             } catch {
                 print("CoreML request failed: \(error)")
                 continuation.resume(returning: IdentificationResult(
-                    species: nil, confidence: 0, defaultInterval: 7, isLowConfidence: true
+                    species: nil, confidence: 0, defaultInterval: 7, isLowConfidence: true, topSuggestions: []
                 ))
             }
         }
@@ -103,7 +124,7 @@ final class PlantIdentifierService {
                 guard error == nil,
                       let observations = request.results as? [VNClassificationObservation] else {
                     continuation.resume(returning: IdentificationResult(
-                        species: nil, confidence: 0, defaultInterval: 7, isLowConfidence: true
+                        species: nil, confidence: 0, defaultInterval: 7, isLowConfidence: true, topSuggestions: []
                     ))
                     return
                 }
@@ -118,7 +139,7 @@ final class PlantIdentifierService {
             } catch {
                 print("Vision request failed: \(error)")
                 continuation.resume(returning: IdentificationResult(
-                    species: nil, confidence: 0, defaultInterval: 7, isLowConfidence: true
+                    species: nil, confidence: 0, defaultInterval: 7, isLowConfidence: true, topSuggestions: []
                 ))
             }
         }
@@ -135,36 +156,36 @@ final class PlantIdentifierService {
             "Aloe Vera": "Aloe Vera",
             "Anthurium (Anthurium andraeanum)": "Anthurium",
             "Areca Palm (Dypsis lutescens)": "Areca Palm",
-            "Asparagus Fern (Asparagus setaceus)": "Boston Fern",
+            "Asparagus Fern (Asparagus setaceus)": "Asparagus Fern",
             "Begonia (Begonia spp.)": "Begonia",
             "Bird of Paradise (Strelitzia reginae)": "Bird of Paradise",
-            "Birds Nest Fern (Asplenium nidus)": "Boston Fern",
+            "Birds Nest Fern (Asplenium nidus)": "Asplenium - Bird's Nest Fern",
             "Boston Fern (Nephrolepis exaltata)": "Boston Fern",
             "Calathea": "Calathea",
-            "Cast Iron Plant (Aspidistra elatior)": "Cast Iron Plant",
-            "Chinese Money Plant (Pilea peperomioides)": "Chinese Money Plant",
+            "Cast Iron Plant (Aspidistra elatior)": "Aspidistra - Cast Iron Plant",
+            "Chinese Money Plant (Pilea peperomioides)": "Pilea Peperomioides - Chinese Money Plant",
             "Chinese evergreen (Aglaonema)": "Aglaonema - Chinese Evergreen",
-            "Christmas Cactus (Schlumbergera bridgesii)": "Christmas Cactus",
+            "Christmas Cactus (Schlumbergera bridgesii)": "Schlumbergera - Christmas Cactus",
             "Chrysanthemum": "Chrysanthemum",
             "Ctenanthe": "Calathea",
             "Daffodils (Narcissus spp.)": "Daffodil",
             "Dracaena": "Dracaena",
             "Dumb Cane (Dieffenbachia spp.)": "Dieffenbachia",
             "Elephant Ear (Alocasia spp.)": "Alocasia - Elephant Ear",
-            "English Ivy (Hedera helix)": "Hedera - Ivy",
+            "English Ivy (Hedera helix)": "Hedera - English Ivy",
             "Hyacinth (Hyacinthus orientalis)": "Hyacinth",
             "Iron Cross begonia (Begonia masoniana)": "Begonia",
-            "Jade plant (Crassula ovata)": "Crassula - Jade Plant",
+            "Jade plant (Crassula ovata)": "Jade Plant",
             "Kalanchoe": "Kalanchoe",
             "Lilium (Hemerocallis)": "Lilium - Lily",
             "Lily of the valley (Convallaria majalis)": "Lilium - Lily",
-            "Money Tree (Pachira aquatica)": "Money Tree",
+            "Money Tree (Pachira aquatica)": "Money Tree (Pachira)",
             "Monstera Deliciosa (Monstera deliciosa)": "Monstera Deliciosa",
             "Orchid": "Orchid - Phalaenopsis",
             "Parlor Palm (Chamaedorea elegans)": "Parlor Palm",
             "Peace lily": "Peace Lily",
             "Poinsettia (Euphorbia pulcherrima)": "Poinsettia",
-            "Polka Dot Plant (Hypoestes phyllostachya)": "Polka Dot Plant",
+            "Polka Dot Plant (Hypoestes phyllostachya)": "Hypoestes - Polka Dot Plant",
             "Ponytail Palm (Beaucarnea recurvata)": "Ponytail Palm",
             "Pothos (Ivy arum)": "Epipremnum - Pothos",
             "Prayer Plant (Maranta leuconeura)": "Prayer Plant",
@@ -172,7 +193,7 @@ final class PlantIdentifierService {
             "Rubber Plant (Ficus elastica)": "Ficus Elastica - Rubber Plant",
             "Sago Palm (Cycas revoluta)": "Sago Palm",
             "Schefflera": "Schefflera",
-            "Snake plant (Sanseviera)": "Sansevieria - Snake Plant",
+            "Snake plant (Sanseviera)": "Snake Plant",
             "Tradescantia": "Tradescantia",
             "Tulip": "Tulip",
             "Venus Flytrap": "Venus Flytrap",
@@ -236,7 +257,8 @@ final class PlantIdentifierService {
                         species: speciesName,
                         confidence: min(confidence * 1.2, 1.0),
                         defaultInterval: dbSpecies?.defaultWateringDays ?? 7,
-                        isLowConfidence: confidence < 0.50
+                        isLowConfidence: confidence < 0.50,
+                        topSuggestions: []
                     )
                 }
             }
@@ -252,11 +274,12 @@ final class PlantIdentifierService {
                     species: nil,
                     confidence: Double(observation.confidence) * 0.5,
                     defaultInterval: 7,
-                    isLowConfidence: true
+                    isLowConfidence: true,
+                    topSuggestions: []
                 )
             }
         }
 
-        return IdentificationResult(species: nil, confidence: 0, defaultInterval: 7, isLowConfidence: true)
+        return IdentificationResult(species: nil, confidence: 0, defaultInterval: 7, isLowConfidence: true, topSuggestions: [])
     }
 }

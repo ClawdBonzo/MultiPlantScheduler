@@ -28,6 +28,7 @@ struct AddPlantView: View {
     @State private var isIdentifying = false
     @State private var aiConfidence: Double?
     @State private var aiSpeciesName: String?
+    @State private var aiSuggestions: [PlantIdentifierService.Suggestion] = []
 
     // Scanning animation state
     @State private var scanProgress: CGFloat = 0
@@ -237,34 +238,97 @@ struct AddPlantView: View {
                             .frame(height: 170)
 
                             // AI result banner (appears after scan)
-                            if showAIResult, let confidence = aiConfidence, let speciesName = aiSpeciesName {
-                                HStack(spacing: 6) {
-                                    Image(systemName: confidence >= 0.70 ? "checkmark.circle.fill" : "questionmark.circle.fill")
-                                        .font(.system(size: 14, weight: .semibold))
-                                        .foregroundStyle(confidence >= 0.70 ? AppColors.limeGreen : .yellow)
+                            if showAIResult, let confidence = aiConfidence {
+                                VStack(spacing: 8) {
+                                    // Top result
+                                    if let speciesName = aiSpeciesName {
+                                        HStack(spacing: 6) {
+                                            Image(systemName: confidence >= 0.80 ? "checkmark.circle.fill" : "questionmark.circle.fill")
+                                                .font(.system(size: 14, weight: .semibold))
+                                                .foregroundStyle(confidence >= 0.80 ? AppColors.limeGreen : .yellow)
 
-                                    Text("\(Int(confidence * 100))% \(speciesName)")
-                                        .font(.system(.caption, design: .rounded))
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(AppColors.textPrimary)
-                                        .lineLimit(1)
+                                            Text("\(Int(confidence * 100))% \(speciesName)")
+                                                .font(.system(.caption, design: .rounded))
+                                                .fontWeight(.semibold)
+                                                .foregroundColor(AppColors.textPrimary)
+                                                .lineLimit(1)
 
-                                    if confidence < 0.70 {
-                                        Text("Best guess")
-                                            .font(.system(size: 9, weight: .medium))
-                                            .foregroundStyle(.black)
-                                            .padding(.horizontal, 5)
-                                            .padding(.vertical, 2)
-                                            .background(Color.yellow)
-                                            .clipShape(Capsule())
+                                            if confidence < 0.80 {
+                                                Text("Best guess")
+                                                    .font(.system(size: 9, weight: .medium))
+                                                    .foregroundStyle(.black)
+                                                    .padding(.horizontal, 5)
+                                                    .padding(.vertical, 2)
+                                                    .background(Color.yellow)
+                                                    .clipShape(Capsule())
+                                            }
+                                        }
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
+                                        .background(
+                                            (confidence >= 0.80 ? AppColors.limeGreen : Color.yellow).opacity(0.12)
+                                        )
+                                        .clipShape(Capsule())
+                                    }
+
+                                    // Alternative suggestions (show when low confidence)
+                                    if confidence < 0.80 && aiSuggestions.count > 1 {
+                                        VStack(alignment: .leading, spacing: 4) {
+                                            Text("Not right? Tap to select:")
+                                                .font(.system(size: 11, weight: .medium, design: .rounded))
+                                                .foregroundColor(AppColors.textSecondary)
+
+                                            ForEach(aiSuggestions.dropFirst().prefix(2)) { suggestion in
+                                                HStack(spacing: 6) {
+                                                    Image(systemName: "leaf.fill")
+                                                        .font(.system(size: 10))
+                                                        .foregroundStyle(AppColors.limeGreen.opacity(0.6))
+
+                                                    Text(suggestion.species)
+                                                        .font(.system(.caption, design: .rounded))
+                                                        .fontWeight(.medium)
+                                                        .foregroundColor(AppColors.textPrimary)
+
+                                                    Text("\(Int(suggestion.confidence * 100))%")
+                                                        .font(.system(size: 10, weight: .medium, design: .rounded))
+                                                        .foregroundColor(AppColors.textSecondary)
+
+                                                    Spacer()
+                                                }
+                                                .padding(.horizontal, 10)
+                                                .padding(.vertical, 6)
+                                                .background(Color.white.opacity(0.05))
+                                                .cornerRadius(6)
+                                                .contentShape(Rectangle())
+                                                .onTapGesture {
+                                                    selectAISuggestion(suggestion)
+                                                }
+                                            }
+
+                                            // "None of these" option
+                                            HStack(spacing: 6) {
+                                                Image(systemName: "xmark.circle")
+                                                    .font(.system(size: 10))
+                                                    .foregroundStyle(.red.opacity(0.6))
+
+                                                Text("None of these — I'll pick manually")
+                                                    .font(.system(.caption, design: .rounded))
+                                                    .fontWeight(.medium)
+                                                    .foregroundColor(AppColors.textSecondary)
+
+                                                Spacer()
+                                            }
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 6)
+                                            .background(Color.white.opacity(0.03))
+                                            .cornerRadius(6)
+                                            .contentShape(Rectangle())
+                                            .onTapGesture {
+                                                clearAISuggestions()
+                                            }
+                                        }
                                     }
                                 }
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 8)
-                                .background(
-                                    (confidence >= 0.70 ? AppColors.limeGreen : Color.yellow).opacity(0.12)
-                                )
-                                .clipShape(Capsule())
                                 .transition(.scale.combined(with: .opacity))
                             }
 
@@ -275,6 +339,7 @@ struct AddPlantView: View {
                                         selectedPhotoItem = nil
                                         aiConfidence = nil
                                         aiSpeciesName = nil
+                                        aiSuggestions = []
                                         showAIResult = false
                                         showScanOverlay = false
                                     }
@@ -539,23 +604,29 @@ struct AddPlantView: View {
                 }
 
                 // Process AI result
+                aiSuggestions = result.topSuggestions
+
                 if let matchedSpecies = result.species {
                     aiConfidence = result.confidence
                     aiSpeciesName = matchedSpecies
 
-                    if let dbSpecies = PlantSpeciesDatabase.species(named: matchedSpecies) {
-                        species = dbSpecies
-                        wateringIntervalDays = dbSpecies.defaultWateringDays
-                        if name.isEmpty {
-                            let shortName = matchedSpecies.components(separatedBy: " - ").last ?? matchedSpecies
-                            name = shortName
+                    // Only auto-fill name and species when confidence is high
+                    if result.confidence >= 0.80 {
+                        if let dbSpecies = PlantSpeciesDatabase.species(named: matchedSpecies) {
+                            species = dbSpecies
+                            wateringIntervalDays = dbSpecies.defaultWateringDays
+                            if name.isEmpty {
+                                let shortName = matchedSpecies.components(separatedBy: " - ").last ?? matchedSpecies
+                                name = shortName
+                            }
+                        } else {
+                            if name.isEmpty {
+                                name = matchedSpecies
+                            }
+                            wateringIntervalDays = result.defaultInterval
                         }
-                    } else {
-                        if name.isEmpty {
-                            name = matchedSpecies
-                        }
-                        wateringIntervalDays = result.defaultInterval
                     }
+                    // Low confidence: show suggestions but don't auto-fill
                 } else if result.confidence > 0 {
                     aiConfidence = result.confidence
                     aiSpeciesName = "Unknown plant"
@@ -585,6 +656,42 @@ struct AddPlantView: View {
             guard self.isIdentifying else { return }
             self.dotCount = (self.dotCount % 3) + 1
             self.startDotAnimation()
+        }
+    }
+
+    // MARK: - AI Suggestion Helpers
+
+    private func selectAISuggestion(_ suggestion: PlantIdentifierService.Suggestion) {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+            aiSpeciesName = suggestion.species
+            aiConfidence = suggestion.confidence
+            aiSuggestions = []
+
+            if let dbSpecies = PlantSpeciesDatabase.species(named: suggestion.species) {
+                species = dbSpecies
+                wateringIntervalDays = dbSpecies.defaultWateringDays
+                if name.isEmpty {
+                    let shortName = suggestion.species.components(separatedBy: " - ").last ?? suggestion.species
+                    name = shortName
+                }
+            } else {
+                if name.isEmpty {
+                    name = suggestion.species
+                }
+                wateringIntervalDays = suggestion.defaultInterval
+            }
+        }
+
+        let impact = UIImpactFeedbackGenerator(style: .light)
+        impact.impactOccurred()
+    }
+
+    private func clearAISuggestions() {
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+            aiSuggestions = []
+            aiConfidence = nil
+            aiSpeciesName = nil
+            showAIResult = false
         }
     }
 
@@ -731,7 +838,7 @@ struct SearchableSpeciesPicker: View {
                     .font(.system(size: 14))
                     .foregroundColor(AppColors.textSecondary)
 
-                TextField("Search 143 species...", text: $searchText)
+                TextField("Search \(PlantSpeciesDatabase.database.count) species...", text: $searchText)
                     .font(.system(.body, design: .rounded))
 
                 if !searchText.isEmpty {
