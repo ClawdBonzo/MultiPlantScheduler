@@ -28,10 +28,14 @@ class RevenueCatManager: ObservableObject {
         guard !isConfigured else { return }
         let apiKey = Constants.RevenueCat.apiKey
         guard apiKey != "YOUR_REVENUECAT_API_KEY_HERE" && !apiKey.isEmpty else {
+            #if DEBUG
             print("⚠️ RevenueCat: Skipping configuration — API key not set. Running in free mode.")
+            #endif
             return
         }
+        #if DEBUG
         Purchases.logLevel = .debug
+        #endif
         Purchases.configure(withAPIKey: apiKey)
         isConfigured = true
         checkSubscriptionStatus()
@@ -48,9 +52,13 @@ class RevenueCatManager: ObservableObject {
                         Constants.RevenueCat.premiumEntitlementID
                     ]?.isActive ?? false
                 }
+                #if DEBUG
                 print("Premium status: \(isPremium)")
+                #endif
             } catch {
+                #if DEBUG
                 print("Error checking subscription status: \(error)")
+                #endif
                 await MainActor.run {
                     self.error = error
                 }
@@ -67,7 +75,9 @@ class RevenueCatManager: ObservableObject {
                 self.offerings = offerings
             }
         } catch {
+            #if DEBUG
             print("Error fetching offerings: \(error)")
+            #endif
             await MainActor.run {
                 self.error = error
             }
@@ -101,11 +111,13 @@ class RevenueCatManager: ObservableObject {
             }
             return isPremium
         } catch {
+            #if DEBUG
             if let rcError = error as? RevenueCat.ErrorCode, rcError == .purchaseCancelledError {
                 print("Purchase cancelled by user")
             } else {
                 print("Purchase error: \(error)")
             }
+            #endif
             throw error
         }
     }
@@ -136,7 +148,9 @@ class RevenueCatManager: ObservableObject {
             }
             return isPremium
         } catch {
+            #if DEBUG
             print("Error restoring purchases: \(error)")
+            #endif
             throw error
         }
     }

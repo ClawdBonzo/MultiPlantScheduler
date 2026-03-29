@@ -8,10 +8,8 @@ final class CloudIdentificationManager {
     static let shared = CloudIdentificationManager()
 
     // MARK: - Plant.id API Configuration
-    // Get your free API key at https://web.plant.id/api-access-request/
-    // Free tier: 100 identifications/day — more than enough for testing.
-    // Replace this placeholder with your real key:
-    private let apiKey = "YOUR_PLANT_ID_API_KEY_HERE"
+    // Get your API key at https://admin.kindwise.com/signup
+    private let apiKey = "YOUR_PLANT_ID_API_KEY_HERE" // ← PASTE YOUR PLANT.ID API KEY HERE
     private let apiURL = "https://plant.id/api/v3/identification"
 
     // MARK: - Credit Tracking (UserDefaults)
@@ -83,7 +81,9 @@ final class CloudIdentificationManager {
 
         // Check API key
         guard isAPIKeyConfigured else {
+            #if DEBUG
             print("Cloud ID: API key not configured — using placeholder")
+            #endif
             return nil
         }
 
@@ -117,7 +117,9 @@ final class CloudIdentificationManager {
             guard let httpResponse = response as? HTTPURLResponse,
                   httpResponse.statusCode == 200 || httpResponse.statusCode == 201 else {
                 let statusCode = (response as? HTTPURLResponse)?.statusCode ?? -1
+                #if DEBUG
                 print("Cloud ID: API returned status \(statusCode)")
+                #endif
                 return nil
             }
 
@@ -126,7 +128,9 @@ final class CloudIdentificationManager {
                   let result = json["result"] as? [String: Any],
                   let classification = result["classification"] as? [String: Any],
                   let suggestions = classification["suggestions"] as? [[String: Any]] else {
+                #if DEBUG
                 print("Cloud ID: Failed to parse response")
+                #endif
                 return nil
             }
 
@@ -182,7 +186,9 @@ final class CloudIdentificationManager {
             )
 
         } catch {
+            #if DEBUG
             print("Cloud ID: Network error — \(error.localizedDescription)")
+            #endif
             return nil
         }
     }

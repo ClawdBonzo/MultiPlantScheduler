@@ -233,7 +233,9 @@ struct PaywallView: View {
             let fetchedOfferings = try await Purchases.shared.offerings()
             await MainActor.run { self.offerings = fetchedOfferings }
         } catch {
+            #if DEBUG
             print("Failed to load offerings: \(error)")
+            #endif
         }
     }
 
