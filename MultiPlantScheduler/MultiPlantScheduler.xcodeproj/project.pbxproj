@@ -43,7 +43,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 13;
 			files = (
-				AA000031AAAA000000000001 /* MultiPlantWidgetExtension.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -127,6 +126,7 @@
 				446B4B4D2F7859F00049E80F /* MultiPlantSchedulerUITests */,
 				AA000060AAAA000000000001 /* Frameworks */,
 				446B4B322F7859EF0049E80F /* Products */,
+				446B4FE12F79E11C0049E80F /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -139,6 +139,14 @@
 				AA000021AAAA000000000001 /* MultiPlantWidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		446B4FE12F79E11C0049E80F /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				CC000001BBBB000000000001 /* Config.xcconfig */,
+			);
+			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 		AA000060AAAA000000000001 /* Frameworks */ = {
@@ -510,8 +518,8 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleIconName = AppIcon;
-				INFOPLIST_KEY_NSCameraUsageDescription = "Multi Plant needs camera access to take photos of your plants for tracking their growth.";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Multi Plant needs camera access to take photos of your plants for tracking their growth.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Multi Plant needs photo library access so you can add photos of your plants.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -558,8 +566,8 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleIconName = AppIcon;
-				INFOPLIST_KEY_NSCameraUsageDescription = "Multi Plant needs camera access to take photos of your plants for tracking their growth.";
 				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_NSCameraUsageDescription = "Multi Plant needs camera access to take photos of your plants for tracking their growth.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Multi Plant needs photo library access so you can add photos of your plants.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;

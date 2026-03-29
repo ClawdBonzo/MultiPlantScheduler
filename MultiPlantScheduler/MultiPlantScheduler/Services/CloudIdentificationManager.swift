@@ -8,9 +8,9 @@ final class CloudIdentificationManager {
     static let shared = CloudIdentificationManager()
 
     // MARK: - Plant.id API Configuration
-    // API key loaded from Config.xcconfig — never commit real keys
+    // API key loaded from APIKeys.generated.swift — never commit real keys
     // See Config.example.xcconfig for setup instructions
-    private let apiKey: String = Bundle.main.object(forInfoDictionaryKey: "PLANT_ID_API_KEY") as? String ?? ""
+    private let apiKey: String = APIKeys.plantIDAPIKey
     private let apiURL = "https://plant.id/api/v3/identification"
 
     // MARK: - Credit Tracking (UserDefaults)

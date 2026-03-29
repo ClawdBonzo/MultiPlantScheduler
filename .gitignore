@@ -5,6 +5,7 @@ xcuserdata/
 
 # API keys — never commit real keys
 MultiPlantScheduler/Config.xcconfig
+MultiPlantScheduler/MultiPlantScheduler/APIKeys.generated.swift
 
 # Build artifacts
 MultiPlantScheduler/build/
