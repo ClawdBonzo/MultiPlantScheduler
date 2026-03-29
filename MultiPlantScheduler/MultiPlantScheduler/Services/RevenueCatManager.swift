@@ -20,11 +20,12 @@ class RevenueCatManager: ObservableObject {
     private var isConfigured = false
 
     private init() {
-        configure()
+        // Don't configure RevenueCat in init — defer to avoid crash during app launch
     }
 
-    /// Configure RevenueCat with the API key
+    /// Configure RevenueCat with the API key — safe to call multiple times
     func configure() {
+        guard !isConfigured else { return }
         let apiKey = Constants.RevenueCat.apiKey
         guard apiKey != "YOUR_REVENUECAT_API_KEY_HERE" && !apiKey.isEmpty else {
             print("⚠️ RevenueCat: Skipping configuration — API key not set. Running in free mode.")

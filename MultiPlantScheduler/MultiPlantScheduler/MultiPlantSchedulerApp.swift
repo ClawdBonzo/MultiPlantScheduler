@@ -1,6 +1,9 @@
 import SwiftUI
 import SwiftData
 import WidgetKit
+import os.log
+
+private let logger = Logger(subsystem: "com.clawdbonzo.MultiPlantScheduler", category: "AppLaunch")
 
 @main
 struct MultiPlantSchedulerApp: App {
@@ -8,31 +11,18 @@ struct MultiPlantSchedulerApp: App {
     @StateObject private var revenueCatManager = RevenueCatManager.shared
     @State private var showOnboarding: Bool
     @State private var showSoftPaywall = false
+    @State private var hasAppeared = false
     @Environment(\.scenePhase) private var scenePhase
 
     let modelContainer: ModelContainer
 
     init() {
-        // Configure SwiftData container using default store location
-        var container: ModelContainer
+        logger.notice("App init starting")
 
-        do {
-            container = try SharedContainer.makeModelContainer()
-        } catch {
-            print("⚠️ Container failed: \(error). Using in-memory store.")
-            // In-memory fallback — app works but data won't persist
-            let schema = SharedContainer.schema
-            let fallbackConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
-            do {
-                container = try ModelContainer(for: schema, configurations: [fallbackConfig])
-            } catch {
-                // This should never happen, but if it does, create the simplest possible container
-                print("❌ In-memory store also failed: \(error)")
-                container = try! ModelContainer(for: Plant.self, CareLog.self)
-            }
-        }
-
+        // Configure SwiftData container
+        let container = Self.createModelContainer()
         self.modelContainer = container
+        logger.notice("ModelContainer created successfully")
 
         // Seed sample data on first launch
         if FirstLaunchService.isFirstLaunch {
@@ -44,12 +34,43 @@ struct MultiPlantSchedulerApp: App {
         let hasSeenOnboarding = UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
         _showOnboarding = State(initialValue: !hasSeenOnboarding)
 
-        // Delay notification permission request until app is fully launched
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            Task {
-                let _ = await NotificationManager.shared.requestPermission()
-            }
+        logger.notice("App init complete")
+    }
+
+    /// Create a ModelContainer with aggressive fallback chain
+    private static func createModelContainer() -> ModelContainer {
+        // Attempt 1: Open existing store with full schema
+        do {
+            return try SharedContainer.makeModelContainer()
+        } catch {
+            print("⚠️ Container failed: \(error)")
         }
+
+        // Attempt 2: Delete corrupt store and retry
+        do {
+            let storeURL = URL.applicationSupportDirectory.appendingPathComponent("default.store")
+            for ext in ["", "-shm", "-wal"] {
+                let fileURL = storeURL.appendingPathExtension(ext.isEmpty ? "" : String(ext.dropFirst()))
+                let url = ext.isEmpty ? storeURL : URL(fileURLWithPath: storeURL.path + ext)
+                try? FileManager.default.removeItem(at: url)
+            }
+            print("🗑️ Deleted old store, creating fresh one...")
+            return try SharedContainer.makeModelContainer()
+        } catch {
+            print("⚠️ Fresh store failed: \(error)")
+        }
+
+        // Attempt 3: In-memory store (app works but data won't persist)
+        do {
+            let config = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+            return try ModelContainer(for: SharedContainer.schema, configurations: config)
+        } catch {
+            print("❌ In-memory store failed: \(error)")
+        }
+
+        // Attempt 4: Absolute minimum — just Plant and CareLog, in memory
+        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        return try! ModelContainer(for: Plant.self, CareLog.self, configurations: config)
     }
 
     var body: some Scene {
@@ -77,6 +98,17 @@ struct MultiPlantSchedulerApp: App {
             .modelContainer(modelContainer)
             .environmentObject(revenueCatManager)
             .preferredColorScheme(.dark)
+            .onAppear {
+                guard !hasAppeared else { return }
+                hasAppeared = true
+                logger.notice("App body appeared — configuring RevenueCat")
+                // Configure RevenueCat after UI is loaded to avoid init crash
+                revenueCatManager.configure()
+                // Request notification permission
+                Task {
+                    let _ = await NotificationManager.shared.requestPermission()
+                }
+            }
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {
                     // Clear badge count when app becomes active
