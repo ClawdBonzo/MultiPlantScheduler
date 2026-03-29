@@ -101,19 +101,20 @@ struct AddPlantView: View {
 
                                         // Scanning overlay
                                         if showScanOverlay {
-                                            // Green tint overlay
+                                            // Pulsing green tint overlay
                                             Circle()
-                                                .fill(AppColors.limeGreen.opacity(0.15))
+                                                .fill(AppColors.limeGreen.opacity(scanPulse ? 0.22 : 0.10))
                                                 .frame(width: 140, height: 140)
 
-                                            // Radar sweep gradient
+                                            // Fast radar sweep gradient
                                             Circle()
                                                 .fill(
                                                     AngularGradient(
                                                         gradient: Gradient(colors: [
                                                             AppColors.limeGreen.opacity(0.0),
                                                             AppColors.limeGreen.opacity(0.0),
-                                                            AppColors.limeGreen.opacity(0.25)
+                                                            AppColors.limeGreen.opacity(0.0),
+                                                            AppColors.limeGreen.opacity(0.35)
                                                         ]),
                                                         center: .center
                                                     )
@@ -121,55 +122,58 @@ struct AddPlantView: View {
                                                 .frame(width: 140, height: 140)
                                                 .rotationEffect(.degrees(radarRotation))
 
-                                            // Animated progress ring
+                                            // Thick glowing progress ring
                                             Circle()
                                                 .trim(from: 0, to: scanProgress)
                                                 .stroke(
                                                     LinearGradient(
-                                                        colors: [AppColors.limeGreen.opacity(0.3), AppColors.limeGreen],
+                                                        colors: [AppColors.limeGreen.opacity(0.2), AppColors.limeGreen],
                                                         startPoint: .leading,
                                                         endPoint: .trailing
                                                     ),
-                                                    style: StrokeStyle(lineWidth: 4, lineCap: .round)
+                                                    style: StrokeStyle(lineWidth: 5, lineCap: .round)
                                                 )
-                                                .frame(width: 152, height: 152)
+                                                .frame(width: 154, height: 154)
                                                 .rotationEffect(.degrees(-90))
-                                                .shadow(color: AppColors.limeGreen.opacity(0.6), radius: scanPulse ? 10 : 4)
+                                                .shadow(color: AppColors.limeGreen.opacity(0.8), radius: scanPulse ? 14 : 6)
 
-                                            // Pulsing outer glow ring
+                                            // Pulsing outer glow ring 1
                                             Circle()
-                                                .stroke(AppColors.limeGreen.opacity(scanPulse ? 0.35 : 0.08), lineWidth: 1.5)
-                                                .frame(width: 168, height: 168)
-                                                .scaleEffect(scanPulse ? 1.06 : 1.0)
+                                                .stroke(AppColors.limeGreen.opacity(scanPulse ? 0.45 : 0.1), lineWidth: 2)
+                                                .frame(width: 170, height: 170)
+                                                .scaleEffect(scanPulse ? 1.08 : 1.0)
 
-                                            // Second outer ring
+                                            // Pulsing outer glow ring 2
                                             Circle()
-                                                .stroke(AppColors.limeGreen.opacity(scanPulse ? 0.15 : 0.03), lineWidth: 1)
-                                                .frame(width: 184, height: 184)
-                                                .scaleEffect(scanPulse ? 1.04 : 0.98)
+                                                .stroke(AppColors.limeGreen.opacity(scanPulse ? 0.2 : 0.04), lineWidth: 1.5)
+                                                .frame(width: 190, height: 190)
+                                                .scaleEffect(scanPulse ? 1.06 : 0.96)
 
-                                            // Orbiting leaf icons
-                                            ForEach(0..<3, id: \.self) { index in
+                                            // Orbiting leaf icons — larger, with spin
+                                            ForEach(0..<4, id: \.self) { index in
                                                 Image(systemName: "leaf.fill")
-                                                    .font(.system(size: 11, weight: .semibold))
-                                                    .foregroundStyle(AppColors.limeGreen.opacity(0.8))
-                                                    .shadow(color: AppColors.limeGreen.opacity(0.5), radius: 4)
-                                                    .offset(y: -90)
-                                                    .rotationEffect(.degrees(leafRotation + Double(index) * 120))
+                                                    .font(.system(size: 14, weight: .semibold))
+                                                    .foregroundStyle(AppColors.limeGreen)
+                                                    .shadow(color: AppColors.limeGreen.opacity(0.7), radius: 6)
+                                                    .rotationEffect(.degrees(leafRotation * 2))
+                                                    .offset(y: -92)
+                                                    .rotationEffect(.degrees(leafRotation + Double(index) * 90))
                                             }
 
-                                            // Center analyzing text with pulsing dots
+                                            // Center analyzing text with pulsing dots + scale
                                             VStack(spacing: 4) {
                                                 Image(systemName: "sparkles")
-                                                    .font(.system(size: 20, weight: .semibold))
+                                                    .font(.system(size: 22, weight: .semibold))
                                                     .foregroundStyle(AppColors.limeGreen)
-                                                    .opacity(scanPulse ? 1 : 0.5)
-                                                    .shadow(color: AppColors.limeGreen.opacity(0.4), radius: 6)
+                                                    .opacity(scanPulse ? 1 : 0.4)
+                                                    .scaleEffect(scanPulse ? 1.15 : 0.85)
+                                                    .shadow(color: AppColors.limeGreen.opacity(0.6), radius: 8)
 
                                                 Text("Analyzing\nwith AI\(String(repeating: ".", count: dotCount))")
-                                                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                                                    .font(.system(size: 12, weight: .bold, design: .rounded))
                                                     .foregroundStyle(.white)
                                                     .multilineTextAlignment(.center)
+                                                    .scaleEffect(scanPulse ? 1.04 : 0.96)
                                             }
                                         }
 
@@ -493,18 +497,18 @@ struct AddPlantView: View {
             isIdentifying = true
         }
 
-        // Start pulsing glow
-        withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
+        // Start pulsing glow — faster, more noticeable
+        withAnimation(.easeInOut(duration: 0.6).repeatForever(autoreverses: true)) {
             scanPulse = true
         }
 
-        // Start leaf orbit
-        withAnimation(.linear(duration: 2.2).repeatForever(autoreverses: false)) {
+        // Start leaf orbit — faster
+        withAnimation(.linear(duration: 1.6).repeatForever(autoreverses: false)) {
             leafRotation = 360
         }
 
-        // Radar sweep rotation
-        withAnimation(.linear(duration: 1.5).repeatForever(autoreverses: false)) {
+        // Radar sweep rotation — fast 1.2s
+        withAnimation(.linear(duration: 1.2).repeatForever(autoreverses: false)) {
             radarRotation = 360
         }
 
@@ -577,7 +581,7 @@ struct AddPlantView: View {
 
     private func startDotAnimation() {
         guard isIdentifying else { return }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
             guard self.isIdentifying else { return }
             self.dotCount = (self.dotCount % 3) + 1
             self.startDotAnimation()
