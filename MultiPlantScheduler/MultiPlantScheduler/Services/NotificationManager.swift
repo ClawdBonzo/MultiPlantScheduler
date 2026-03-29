@@ -1,4 +1,3 @@
-import UIKit
 import UserNotifications
 import Foundation
 
@@ -28,13 +27,18 @@ class NotificationManager {
 
     /// Schedule a watering reminder notification for a plant
     /// - Parameter plant: The plant to schedule a reminder for
-    func scheduleReminder(for plant: Plant) {
+    func scheduleReminder(for plant: Plant) async {
         let content = UNMutableNotificationContent()
         content.title = Constants.Notifications.wateringReminderTitle
         content.body = "\(plant.name) needs watering today"
         content.sound = .default
-        content.badge = NSNumber(value: UIApplication.shared.applicationIconBadgeNumber + 1)
         content.categoryIdentifier = Constants.Notifications.wateringReminderCategory
+
+        // Safely read badge count on main thread
+        let currentBadge: Int = await MainActor.run {
+            UIApplication.shared.applicationIconBadgeNumber
+        }
+        content.badge = NSNumber(value: currentBadge + 1)
 
         // Add action to the notification
         let waterAction = UNNotificationAction(
@@ -71,12 +75,11 @@ class NotificationManager {
             trigger: trigger
         )
 
-        UNUserNotificationCenter.current().add(request) { error in
-            if let error = error {
-                print("Error scheduling notification for \(plant.name): \(error)")
-            } else {
-                print("Scheduled watering reminder for \(plant.name) on \(plant.nextWateringDate)")
-            }
+        do {
+            try await UNUserNotificationCenter.current().add(request)
+            print("Scheduled watering reminder for \(plant.name) on \(plant.nextWateringDate)")
+        } catch {
+            print("Error scheduling notification for \(plant.name): \(error)")
         }
     }
 
@@ -91,13 +94,13 @@ class NotificationManager {
 
     /// Cancel all pending notifications and reschedule for all plants
     /// - Parameter plants: Array of plants to reschedule reminders for
-    func rescheduleAllReminders(plants: [Plant]) {
+    func rescheduleAllReminders(plants: [Plant]) async {
         // Cancel all pending notifications
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
 
         // Reschedule for each plant
         for plant in plants {
-            scheduleReminder(for: plant)
+            await scheduleReminder(for: plant)
         }
         print("Rescheduled reminders for all \(plants.count) plants")
     }

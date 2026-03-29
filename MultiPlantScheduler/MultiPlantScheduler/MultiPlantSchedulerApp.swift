@@ -9,31 +9,42 @@ struct MultiPlantSchedulerApp: App {
     let modelContainer: ModelContainer
 
     init() {
-        // Configure SwiftData container
+        // Configure SwiftData container with fallback to in-memory if persistent store fails
         let schema = Schema([Plant.self, CareLog.self])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+        var container: ModelContainer
 
         do {
-            let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
-            self.modelContainer = container
-
-            // Seed sample data on first launch (before onboarding shows)
-            if FirstLaunchService.isFirstLaunch {
-                FirstLaunchService.seedSamplePlants(context: container.mainContext)
-                FirstLaunchService.markLaunchComplete()
-            }
+            let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+            container = try ModelContainer(for: schema, configurations: [config])
         } catch {
-            fatalError("Could not initialize ModelContainer: \(error)")
+            print("⚠️ Persistent store failed: \(error). Falling back to in-memory store.")
+            do {
+                let fallbackConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
+                container = try ModelContainer(for: schema, configurations: [fallbackConfig])
+            } catch {
+                // Last resort — this should never fail, but guard against it
+                print("❌ Even in-memory store failed: \(error)")
+                container = try! ModelContainer(for: schema)
+            }
         }
 
-        // Show onboarding if this is the first launch (check before markComplete resets it)
-        // We use a separate UserDefaults key for onboarding
+        self.modelContainer = container
+
+        // Seed sample data on first launch
+        if FirstLaunchService.isFirstLaunch {
+            FirstLaunchService.seedSamplePlants(context: container.mainContext)
+            FirstLaunchService.markLaunchComplete()
+        }
+
+        // Show onboarding if this is the first launch
         let hasSeenOnboarding = UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
         _showOnboarding = State(initialValue: !hasSeenOnboarding)
 
-        // Request notification permissions
-        Task {
-            let _ = await NotificationManager.shared.requestPermission()
+        // Delay notification permission request until app is fully launched
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            Task {
+                let _ = await NotificationManager.shared.requestPermission()
+            }
         }
     }
 
