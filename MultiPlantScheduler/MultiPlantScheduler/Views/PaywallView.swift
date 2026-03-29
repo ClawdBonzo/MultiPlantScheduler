@@ -1,171 +1,196 @@
 import SwiftUI
 import RevenueCat
 
+/// Dashboard paywall — Home AI style with hero, 3-tier pricing, and urgency elements
 struct PaywallView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var revenueCatManager: RevenueCatManager
 
+    @State private var selectedPlan: PlanType = .yearly
     @State private var isLoading = false
     @State private var showError = false
     @State private var errorMessage = ""
+    @State private var offerings: Offerings?
+    @State private var countdown: TimeInterval = 15 * 60
+    @State private var timer: Timer?
 
-    var monthlyPackage: Package? {
-        revenueCatManager.offerings?.current?.monthly
+    enum PlanType { case monthly, yearly, lifetime }
+
+    private var monthlyPackage: Package? { offerings?.current?.monthly }
+    private var annualPackage: Package? { offerings?.current?.annual }
+    private var lifetimePackage: Package? { offerings?.current?.lifetime }
+
+    private var monthlyPrice: String { monthlyPackage?.storeProduct.localizedPriceString ?? "$3.99" }
+    private var yearlyPrice: String { annualPackage?.storeProduct.localizedPriceString ?? "$29.99" }
+    private var lifetimePrice: String { lifetimePackage?.storeProduct.localizedPriceString ?? "$49.99" }
+
+    private var yearlyMonthlyEquivalent: String {
+        if let product = annualPackage?.storeProduct {
+            let monthly = product.price as Decimal / 12
+            let formatter = NumberFormatter()
+            formatter.numberStyle = .currency
+            formatter.locale = product.priceFormatter?.locale ?? .current
+            return formatter.string(from: monthly as NSDecimalNumber) ?? "$2.50"
+        }
+        return "$2.50"
     }
 
-    var annualPackage: Package? {
-        revenueCatManager.offerings?.current?.annual
+    private var savingsPercent: Int {
+        guard let monthly = monthlyPackage?.storeProduct.price as Decimal?,
+              let yearly = annualPackage?.storeProduct.price as Decimal? else { return 37 }
+        let monthlyAnnual = monthly * 12
+        guard monthlyAnnual > 0 else { return 0 }
+        let savings = ((monthlyAnnual - yearly) / monthlyAnnual) * 100
+        return Int(truncating: savings as NSDecimalNumber)
     }
+
+    private var countdownMinutes: Int { Int(countdown) / 60 }
+    private var countdownSeconds: Int { Int(countdown) % 60 }
 
     var body: some View {
         ZStack {
-            AppColors.background.ignoresSafeArea()
+            Color.white.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Header with gradient
-                VStack(spacing: 20) {
-                    Text("🌿")
-                        .font(.system(size: 64))
-
-                    VStack(spacing: 8) {
-                        Text("Unlock Unlimited Plants")
-                            .font(.system(.title2, design: .rounded))
-                            .fontWeight(.bold)
-                            .foregroundColor(AppColors.textPrimary)
-
-                        Text("Premium features for the plant lover in you")
-                            .font(.system(.body, design: .rounded))
-                            .foregroundColor(AppColors.textSecondary)
-                            .multilineTextAlignment(.center)
-                    }
-                }
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 32)
-                .padding(.horizontal, 20)
-                .background(
+                // MARK: - Hero Section
+                ZStack(alignment: .topLeading) {
+                    // Hero gradient — replace with Image("paywall_hero") for real photography
                     LinearGradient(
-                        gradient: Gradient(colors: [
-                            AppColors.forestGreen.opacity(0.3),
-                            AppColors.background
-                        ]),
-                        startPoint: .top,
-                        endPoint: .bottom
+                        colors: [
+                            Color(red: 0.05, green: 0.25, blue: 0.08),
+                            Color(red: 0.12, green: 0.50, blue: 0.15),
+                            Color(red: 0.20, green: 0.65, blue: 0.25)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
                     )
-                )
+                    .overlay {
+                        VStack(spacing: 10) {
+                            Image(systemName: "leaf.circle.fill")
+                                .font(.system(size: 56, weight: .light))
+                                .foregroundStyle(.white.opacity(0.9))
+                            Text("Go Premium")
+                                .font(.system(size: 26, weight: .bold, design: .rounded))
+                                .foregroundStyle(.white)
+                            Text("Unlimited plants, AI identification & more")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundStyle(.white.opacity(0.8))
+                        }
+                    }
+                    .frame(height: 220)
 
-                ScrollView {
-                    VStack(spacing: 24) {
-                        // Benefits
-                        VStack(spacing: 12) {
-                            BenefitRow(
-                                icon: "leaf.fill",
-                                title: "Unlimited Plants",
-                                subtitle: "Track as many plants as you want"
-                            )
+                    // Close button
+                    Button { dismiss() } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(.white)
+                            .frame(width: 32, height: 32)
+                            .background(.black.opacity(0.4))
+                            .clipShape(Circle())
+                    }
+                    .padding(.leading, 16)
+                    .padding(.top, 12)
 
-                            BenefitRow(
-                                icon: "calendar",
-                                title: "Seasonal Auto-Adjust",
-                                subtitle: "Smart watering intervals by season"
-                            )
+                    // Sale badge
+                    VStack(spacing: 1) {
+                        Text("50%")
+                            .font(.system(size: 18, weight: .black))
+                        Text("OFF")
+                            .font(.system(size: 10, weight: .bold))
+                        HStack(spacing: 2) {
+                            Image(systemName: "hourglass")
+                                .font(.system(size: 7))
+                            Text(String(format: "%d:%02d", countdownMinutes, countdownSeconds))
+                                .font(.system(size: 9, weight: .bold, design: .monospaced))
+                        }
+                    }
+                    .foregroundStyle(.white)
+                    .frame(width: 60, height: 60)
+                    .background(Circle().fill(Color.red))
+                    .frame(maxWidth: .infinity, alignment: .trailing)
+                    .padding(.trailing, 16)
+                    .padding(.top, 160)
+                }
 
-                            BenefitRow(
-                                icon: "square.and.arrow.up",
-                                title: "Export Care History",
-                                subtitle: "Download your plant care logs"
-                            )
-
-                            BenefitRow(
-                                icon: "sparkles",
-                                title: "Priority Features",
-                                subtitle: "Early access to new features"
-                            )
+                // MARK: - Content Card
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 20) {
+                        // Feature benefits — clean icons
+                        VStack(spacing: 14) {
+                            PaywallBenefitRow(icon: "leaf.fill", title: "Unlimited Plants", subtitle: "Track your entire collection")
+                            PaywallBenefitRow(icon: "camera.viewfinder", title: "AI Plant Identifier", subtitle: "Snap a photo, know your plant")
+                            PaywallBenefitRow(icon: "calendar", title: "Seasonal Auto-Adjust", subtitle: "Smart watering by season")
+                            PaywallBenefitRow(icon: "square.and.arrow.up", title: "Export Care History", subtitle: "Download your care logs")
                         }
                         .padding(16)
-                        .background(Color(red: 0.118, green: 0.118, blue: 0.118))
-                        .cornerRadius(12)
+                        .background(Color(red: 0.97, green: 0.97, blue: 0.97))
+                        .clipShape(RoundedRectangle(cornerRadius: 14))
 
-                        // Pricing options
-                        VStack(spacing: 12) {
-                            if let monthlyPackage = monthlyPackage {
-                                PricingOptionButton(
-                                    package: monthlyPackage,
-                                    isSelected: false,
-                                    badge: nil,
-                                    action: {
-                                        purchasePackage(monthlyPackage)
-                                    }
-                                )
-                            }
+                        // 3-tier pricing
+                        VStack(spacing: 8) {
+                            PaywallPlanRow(
+                                title: "Lifetime",
+                                price: lifetimePrice,
+                                period: "once",
+                                detail: "Pay once, own forever",
+                                badge: "BEST VALUE",
+                                isSelected: selectedPlan == .lifetime
+                            ) { selectedPlan = .lifetime }
 
-                            if let annualPackage = annualPackage {
-                                PricingOptionButton(
-                                    package: annualPackage,
-                                    isSelected: true,
-                                    badge: "Save 33%",
-                                    action: {
-                                        purchasePackage(annualPackage)
-                                    }
-                                )
-                            }
+                            PaywallPlanRow(
+                                title: "Yearly",
+                                price: yearlyPrice,
+                                period: "/year",
+                                detail: "\(yearlyMonthlyEquivalent)/mo",
+                                badge: "SAVE \(savingsPercent)%",
+                                isSelected: selectedPlan == .yearly
+                            ) { selectedPlan = .yearly }
+
+                            PaywallPlanRow(
+                                title: "Monthly",
+                                price: monthlyPrice,
+                                period: "/month",
+                                detail: nil,
+                                badge: nil,
+                                isSelected: selectedPlan == .monthly
+                            ) { selectedPlan = .monthly }
                         }
 
-                        // CTA buttons
-                        VStack(spacing: 12) {
-                            Button(action: {
-                                Task {
-                                    await startFreeTrial()
-                                }
-                            }) {
-                                Text("Start 14-Day Free Trial")
-                                    .font(.system(.headline, design: .rounded))
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(AppColors.background)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 14)
-                                    .background(AppColors.limeGreen)
-                                    .cornerRadius(10)
-                            }
-                            .disabled(isLoading)
-                            .opacity(isLoading ? 0.6 : 1)
+                        // CTA
+                        Button(action: { purchase() }) {
+                            Text(selectedPlan == .lifetime ? "Buy Lifetime Access" : "Subscribe Now")
+                                .font(.system(size: 18, weight: .bold))
+                                .foregroundStyle(.white)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(RoundedRectangle(cornerRadius: 14).fill(.black))
+                        }
+                        .disabled(isLoading)
+                        .opacity(isLoading ? 0.6 : 1)
 
-                            Button(action: { dismiss() }) {
-                                Text("Continue with Free (5 plants)")
-                                    .font(.system(.body, design: .rounded))
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(AppColors.limeGreen)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 12)
-                                    .background(AppColors.forestGreen.opacity(0.2))
-                                    .cornerRadius(10)
-                            }
-
-                            Button(action: {
-                                Task {
-                                    let _ = try? await revenueCatManager.restorePurchases()
-                                    if revenueCatManager.isPremium {
-                                        dismiss()
-                                    }
-                                }
-                            }) {
-                                Text("Restore Purchases")
-                                    .font(.system(.body, design: .rounded))
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(AppColors.textSecondary)
-                            }
+                        Button(action: { dismiss() }) {
+                            Text("Continue with Free (5 plants)")
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundStyle(.gray)
                         }
 
-                        // Legal note
+                        // Legal
                         VStack(spacing: 4) {
-                            Text("By purchasing, you agree to our Terms of Service")
-                                .font(.system(.caption2, design: .rounded))
-                                .foregroundColor(AppColors.textSecondary)
-                                .multilineTextAlignment(.center)
+                            Text(selectedPlan == .lifetime
+                                 ? "One-time purchase. No subscription."
+                                 : "Auto-renewable. Cancel anytime in Settings.")
+                                .font(.system(size: 11))
+                                .foregroundStyle(.gray)
 
-                            Text("All subscriptions auto-renew. Cancel anytime in Settings.")
-                                .font(.system(.caption2, design: .rounded))
-                                .foregroundColor(AppColors.textSecondary)
-                                .multilineTextAlignment(.center)
+                            HStack(spacing: 4) {
+                                Link("Privacy Policy", destination: URL(string: "https://www.apple.com/legal/privacy/")!)
+                                Text("•").foregroundStyle(.gray)
+                                Link("Terms of Service", destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
+                                Text("•").foregroundStyle(.gray)
+                                Button("Restore") { restorePurchases() }
+                            }
+                            .font(.system(size: 11))
+                            .foregroundStyle(.gray)
                         }
                     }
                     .padding(20)
@@ -173,21 +198,20 @@ struct PaywallView: View {
             }
 
             if isLoading {
-                ZStack {
-                    AppColors.background.opacity(0.9)
-                        .ignoresSafeArea()
-
-                    VStack(spacing: 16) {
-                        ProgressView()
-                            .tint(AppColors.limeGreen)
-
-                        Text("Processing...")
-                            .font(.system(.body, design: .rounded))
-                            .foregroundColor(AppColors.textPrimary)
-                    }
+                Color.black.opacity(0.5).ignoresSafeArea()
+                VStack(spacing: 16) {
+                    ProgressView()
+                        .tint(.white)
+                        .scaleEffect(1.3)
+                    Text("Processing...")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundStyle(.white)
                 }
             }
         }
+        .task { await loadOfferings() }
+        .onAppear { startTimer() }
+        .onDisappear { timer?.invalidate() }
         .alert("Error", isPresented: $showError) {
             Button("OK") { }
         } message: {
@@ -195,40 +219,68 @@ struct PaywallView: View {
         }
     }
 
-    private func purchasePackage(_ package: Package) {
-        Task {
-            isLoading = true
-
-            do {
-                _ = try await revenueCatManager.purchase(package: package)
-                isLoading = false
-                dismiss()
-            } catch {
-                isLoading = false
-                errorMessage = error.localizedDescription
-                showError = true
-            }
+    private func startTimer() {
+        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+            if countdown > 0 { countdown -= 1 } else { countdown = 15 * 60 }
         }
     }
 
-    private func startFreeTrial() async {
-        isLoading = true
+    private func loadOfferings() async {
+        do {
+            let fetchedOfferings = try await Purchases.shared.offerings()
+            await MainActor.run { self.offerings = fetchedOfferings }
+        } catch {
+            print("Failed to load offerings: \(error)")
+        }
+    }
 
-        if let monthlyPackage = monthlyPackage {
+    private func purchase() {
+        let package: Package?
+        switch selectedPlan {
+        case .monthly: package = monthlyPackage
+        case .yearly: package = annualPackage
+        case .lifetime: package = lifetimePackage
+        }
+        guard let package else {
+            errorMessage = "No subscription available. Please try again later."
+            showError = true
+            return
+        }
+        isLoading = true
+        Task {
             do {
-                _ = try await revenueCatManager.purchase(package: monthlyPackage)
-                isLoading = false
-                dismiss()
+                let success = try await revenueCatManager.purchase(package: package)
+                if success { dismiss() }
             } catch {
-                isLoading = false
+                if let rcError = error as? RevenueCat.ErrorCode, rcError == .purchaseCancelledError {
+                    // cancelled
+                } else {
+                    errorMessage = error.localizedDescription
+                    showError = true
+                }
+            }
+            isLoading = false
+        }
+    }
+
+    private func restorePurchases() {
+        isLoading = true
+        Task {
+            do {
+                let restored = try await revenueCatManager.restorePurchases()
+                if restored { dismiss() }
+            } catch {
                 errorMessage = error.localizedDescription
                 showError = true
             }
+            isLoading = false
         }
     }
 }
 
-struct BenefitRow: View {
+// MARK: - Subviews
+
+private struct PaywallBenefitRow: View {
     let icon: String
     let title: String
     let subtitle: String
@@ -236,81 +288,77 @@ struct BenefitRow: View {
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
-                .font(.system(size: 20, weight: .semibold))
-                .foregroundColor(AppColors.limeGreen)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(Color(red: 0.133, green: 0.545, blue: 0.133))
                 .frame(width: 32, height: 32)
-                .background(AppColors.limeGreen.opacity(0.2))
-                .cornerRadius(8)
+                .background(Color(red: 0.133, green: 0.545, blue: 0.133).opacity(0.12))
+                .clipShape(RoundedRectangle(cornerRadius: 8))
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(.body, design: .rounded))
-                    .fontWeight(.semibold)
-                    .foregroundColor(AppColors.textPrimary)
-
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(.black)
                 Text(subtitle)
-                    .font(.system(.caption, design: .rounded))
-                    .foregroundColor(AppColors.textSecondary)
+                    .font(.system(size: 12))
+                    .foregroundStyle(.gray)
             }
-
             Spacer()
         }
     }
 }
 
-struct PricingOptionButton: View {
-    let package: Package
-    let isSelected: Bool
+private struct PaywallPlanRow: View {
+    let title: String
+    let price: String
+    let period: String
+    let detail: String?
     let badge: String?
-    let action: () -> Void
+    let isSelected: Bool
+    let onTap: () -> Void
 
     var body: some View {
-        Button(action: action) {
-            ZStack(alignment: .topTrailing) {
-                VStack(alignment: .leading, spacing: 8) {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(package.packageType == .monthly ? "Monthly" : "Yearly")
-                                .font(.system(.body, design: .rounded))
-                                .fontWeight(.semibold)
-                                .foregroundColor(AppColors.textPrimary)
-
-                            if let price = package.localizedPriceString as String? {
-                                Text("\(price)/month")
-                                    .font(.system(.caption, design: .rounded))
-                                    .foregroundColor(AppColors.textSecondary)
-                            }
+        Button(action: onTap) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    HStack(spacing: 6) {
+                        Text(title)
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundStyle(.black)
+                        if let badge {
+                            Text(badge)
+                                .font(.system(size: 9, weight: .bold))
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Color(red: 0.133, green: 0.545, blue: 0.133))
+                                .clipShape(RoundedRectangle(cornerRadius: 4))
                         }
-
-                        Spacer()
-
-                        Text(package.localizedPriceString)
-                            .font(.system(.headline, design: .rounded))
-                            .fontWeight(.bold)
-                            .foregroundColor(AppColors.limeGreen)
+                    }
+                    if let detail {
+                        Text(detail)
+                            .font(.system(size: 12))
+                            .foregroundStyle(.gray)
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(16)
-                .background(isSelected ? AppColors.forestGreen.opacity(0.3) : Color(red: 0.118, green: 0.118, blue: 0.118))
-                .cornerRadius(12)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(isSelected ? AppColors.limeGreen : Color.clear, lineWidth: 2)
-                )
-
-                if let badge = badge {
-                    Text(badge)
-                        .font(.system(.caption2, design: .rounded))
-                        .fontWeight(.bold)
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(AppColors.urgencyYellow)
-                        .cornerRadius(6)
-                        .padding(8)
+                Spacer()
+                HStack(alignment: .firstTextBaseline, spacing: 2) {
+                    Text(price)
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundStyle(.black)
+                    Text(period)
+                        .font(.system(size: 12))
+                        .foregroundStyle(.gray)
                 }
             }
+            .padding(14)
+            .background(
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(isSelected ? Color(red: 0.133, green: 0.545, blue: 0.133).opacity(0.08) : Color(red: 0.97, green: 0.97, blue: 0.97))
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(isSelected ? Color(red: 0.133, green: 0.545, blue: 0.133) : .clear, lineWidth: 2)
+            )
         }
     }
 }

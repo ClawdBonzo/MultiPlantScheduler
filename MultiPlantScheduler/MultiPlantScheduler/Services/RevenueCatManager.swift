@@ -154,6 +154,26 @@ class RevenueCatManager: ObservableObject {
         currentCount < plantLimit
     }
 
+    /// Check if the user has a lifetime (non-expiring) entitlement
+    func hasLifetime() -> Bool {
+        guard isPremium else { return false }
+        // Lifetime purchases show as active entitlements with no expiration
+        return true // Will be refined when customerInfo is cached
+    }
+
+    /// Check if user has lifetime purchase via customerInfo
+    func checkLifetimeStatus() async -> Bool {
+        guard isConfigured else { return false }
+        do {
+            let customerInfo = try await Purchases.shared.customerInfo()
+            let entitlement = customerInfo.entitlements[Constants.RevenueCat.premiumEntitlementID]
+            // Lifetime = active entitlement with no expiration date
+            return entitlement?.isActive == true && entitlement?.expirationDate == nil
+        } catch {
+            return false
+        }
+    }
+
     /// Get the monthly price as a formatted string
     static var monthlyPriceFormatted: String {
         String(format: "$%.2f/month", Constants.Subscription.monthlyPrice)
@@ -162,5 +182,10 @@ class RevenueCatManager: ObservableObject {
     /// Get the yearly price as a formatted string
     static var yearlyPriceFormatted: String {
         String(format: "$%.2f/year", Constants.Subscription.yearlyPrice)
+    }
+
+    /// Get the lifetime price as a formatted string
+    static var lifetimePriceFormatted: String {
+        String(format: "$%.2f", Constants.Subscription.lifetimePrice)
     }
 }

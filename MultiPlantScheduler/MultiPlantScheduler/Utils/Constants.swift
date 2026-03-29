@@ -25,8 +25,9 @@ enum Constants {
     // MARK: - Subscription Limits
     enum Subscription {
         static let freeTierPlantLimit = 5
-        static let monthlyPrice = 4.99
-        static let yearlyPrice = 39.99
+        static let monthlyPrice = 3.99
+        static let yearlyPrice = 29.99
+        static let lifetimePrice = 49.99
         static let freeTierDescription = "Track up to \(freeTierPlantLimit) plants"
         static let premiumDescription = "Unlimited plants, advanced features"
     }

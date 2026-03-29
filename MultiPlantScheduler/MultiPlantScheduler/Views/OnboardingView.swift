@@ -29,14 +29,23 @@ struct OnboardingView: View {
                 TabView(selection: $currentPage) {
                     // Page 1
                     OnboardingPage(
-                        title: "Welcome to Multi Plant 🌿",
+                        title: "Welcome to MultiPlant AI",
                         subtitle: "Track 30+ plants in one place",
-                        emoji: "🌱",
+                        icon: "leaf.fill",
+                        iconColor: AppColors.limeGreen,
                         content: {
-                            HStack(spacing: 16) {
-                                ForEach(["🌿", "🌵", "🌸", "🌻"], id: \.self) { emoji in
-                                    Text(emoji)
-                                        .font(.system(size: 44))
+                            HStack(spacing: 20) {
+                                ForEach(
+                                    [("leaf.fill", Color.green), ("camera.viewfinder", Color.blue),
+                                     ("drop.fill", Color.cyan), ("sun.max.fill", Color.yellow)],
+                                    id: \.0
+                                ) { icon, color in
+                                    Image(systemName: icon)
+                                        .font(.system(size: 32, weight: .semibold))
+                                        .foregroundStyle(color)
+                                        .frame(width: 56, height: 56)
+                                        .background(color.opacity(0.15))
+                                        .clipShape(RoundedRectangle(cornerRadius: 14))
                                 }
                             }
                             .padding(.vertical, 20)
@@ -46,9 +55,10 @@ struct OnboardingView: View {
 
                     // Page 2
                     OnboardingPage(
-                        title: "Never Forget to Water 💧",
+                        title: "Never Forget to Water",
                         subtitle: "Smart reminders that adjust by season",
-                        emoji: "💧",
+                        icon: "bell.badge.fill",
+                        iconColor: AppColors.limeGreen,
                         content: {
                             VStack(spacing: 12) {
                                 Image(systemName: "bell.badge.fill")
@@ -67,9 +77,10 @@ struct OnboardingView: View {
 
                     // Page 3
                     OnboardingPage(
-                        title: "Your Garden Awaits 🌳",
+                        title: "Your Garden Awaits",
                         subtitle: "Let's get started!",
-                        emoji: "🌳",
+                        icon: "sparkles",
+                        iconColor: .yellow,
                         content: {
                             VStack(spacing: 16) {
                                 Button(action: { isPresented = false }) {
@@ -123,7 +134,8 @@ struct OnboardingView: View {
 struct OnboardingPage<Content: View>: View {
     let title: String
     let subtitle: String
-    let emoji: String
+    let icon: String
+    let iconColor: Color
     @ViewBuilder let content: () -> Content
 
     var body: some View {
@@ -131,9 +143,9 @@ struct OnboardingPage<Content: View>: View {
             Spacer()
 
             VStack(spacing: 16) {
-                Text(emoji)
-                    .font(.system(size: 72))
-                    .minimumScaleFactor(0.7)
+                Image(systemName: icon)
+                    .font(.system(size: 64, weight: .light))
+                    .foregroundStyle(iconColor)
 
                 VStack(spacing: 8) {
                     Text(title)

@@ -90,8 +90,9 @@ struct TodayPlantRow: View {
                     .fill(AppColors.forestGreen.opacity(0.3))
                     .frame(width: 40, height: 40)
                     .overlay {
-                        Text("🌿")
-                            .font(.system(size: 18))
+                        Image(systemName: "leaf.fill")
+                            .font(.system(size: 14, weight: .light))
+                            .foregroundStyle(.white.opacity(0.6))
                     }
             }
 

@@ -35,11 +35,10 @@ struct PlantCardView: View {
                         .scaledToFill()
                         .clipped()
                 } else {
-                    VStack {
-                        Text("🌿")
-                            .font(.system(size: 44))
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    Image(systemName: "leaf.fill")
+                        .font(.system(size: 36, weight: .light))
+                        .foregroundStyle(.white.opacity(0.6))
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
             .frame(height: 120)

@@ -52,7 +52,11 @@ struct DashboardView: View {
                 // Header
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Text("My Garden 🌿")
+                        HStack(spacing: 8) {
+                            Image(systemName: "leaf.fill")
+                                .foregroundColor(AppColors.limeGreen)
+                            Text("My Garden")
+                        }
                             .font(.system(.title, design: .rounded))
                             .fontWeight(.bold)
                             .foregroundColor(AppColors.textPrimary)
@@ -114,7 +118,11 @@ struct DashboardView: View {
                 // Watering streak banner
                 if maxWateringStreak > 0 {
                     HStack(spacing: 8) {
-                        Text("🔥 \(maxWateringStreak) day streak!")
+                        HStack(spacing: 4) {
+                            Image(systemName: "flame.fill")
+                                .foregroundColor(.orange)
+                            Text("\(maxWateringStreak) day streak!")
+                        }
                             .font(.system(.callout, design: .rounded))
                             .fontWeight(.semibold)
                             .foregroundColor(AppColors.textPrimary)
@@ -148,7 +156,7 @@ struct DashboardView: View {
                                 .fontWeight(.semibold)
                                 .foregroundColor(AppColors.textPrimary)
 
-                            Text("Unlimited plants + more features")
+                            Text("From $3.99/mo or $49.99 lifetime")
                                 .font(.system(.caption2, design: .rounded))
                                 .foregroundColor(AppColors.textSecondary)
                         }
@@ -175,8 +183,9 @@ struct DashboardView: View {
                         Spacer()
 
                         VStack(spacing: 16) {
-                            Text("🌱")
-                                .font(.system(size: 64))
+                            Image(systemName: "leaf.circle")
+                                .font(.system(size: 64, weight: .light))
+                                .foregroundColor(AppColors.limeGreen)
 
                             Text("Your Garden Is Empty")
                                 .font(.system(.title2, design: .rounded))

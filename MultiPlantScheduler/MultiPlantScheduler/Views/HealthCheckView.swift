@@ -28,7 +28,11 @@ struct HealthCheckView: View {
                                 Circle()
                                     .fill(AppColors.forestGreen.opacity(0.3))
                                     .frame(width: 80, height: 80)
-                                    .overlay { Text("🌿").font(.largeTitle) }
+                                    .overlay {
+                                        Image(systemName: "leaf.fill")
+                                            .font(.system(size: 28, weight: .light))
+                                            .foregroundStyle(.white.opacity(0.6))
+                                    }
                             }
                             Text(plant.name)
                                 .font(.title2)

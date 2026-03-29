@@ -46,10 +46,9 @@ struct PlantDetailView: View {
                                 .scaledToFill()
                                 .clipped()
                         } else {
-                            VStack {
-                                Text("🌿")
-                                    .font(.system(size: 80))
-                            }
+                            Image(systemName: "leaf.fill")
+                                .font(.system(size: 56, weight: .light))
+                                .foregroundStyle(.white.opacity(0.5))
                         }
                     }
                     .frame(height: 250)

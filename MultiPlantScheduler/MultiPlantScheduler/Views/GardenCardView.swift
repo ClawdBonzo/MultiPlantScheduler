@@ -39,7 +39,11 @@ struct GardenCardView: View {
                             Circle()
                                 .fill(AppColors.forestGreen.opacity(0.3))
                                 .frame(width: 80, height: 80)
-                                .overlay { Text("🌿").font(.title) }
+                                .overlay {
+                                    Image(systemName: "leaf.fill")
+                                        .font(.system(size: 24, weight: .light))
+                                        .foregroundStyle(.white.opacity(0.6))
+                                }
                         }
                         Text(plant.name)
                             .font(.caption)
@@ -89,8 +93,9 @@ struct GardenCardView: View {
                     .font(.caption2)
                     .fontWeight(.semibold)
                     .foregroundStyle(AppColors.limeGreen.opacity(0.7))
-                Text("🌿")
+                Image(systemName: "leaf.fill")
                     .font(.caption2)
+                    .foregroundStyle(AppColors.limeGreen.opacity(0.7))
             }
         }
         .padding(30)
