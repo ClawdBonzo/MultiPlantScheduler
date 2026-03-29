@@ -407,7 +407,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "Multi Plant needs camera access to take photos of your plants for tracking their growth.";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; INFOPLIST_KEY_CFBundleIconName = AppIcon; INFOPLIST_KEY_NSCameraUsageDescription = "Multi Plant needs camera access to take photos of your plants for tracking their growth.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Multi Plant needs photo library access so you can add photos of your plants.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -453,7 +453,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "Multi Plant needs camera access to take photos of your plants for tracking their growth.";
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon; INFOPLIST_KEY_CFBundleIconName = AppIcon; INFOPLIST_KEY_NSCameraUsageDescription = "Multi Plant needs camera access to take photos of your plants for tracking their growth.";
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Multi Plant needs photo library access so you can add photos of your plants.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;

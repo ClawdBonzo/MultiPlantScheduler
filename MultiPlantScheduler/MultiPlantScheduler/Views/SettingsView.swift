@@ -145,7 +145,7 @@ struct SettingsView: View {
                     }
 
                     Link(
-                        destination: URL(string: "https://apps.apple.com/app/multi-plant-watering-schedule/id123456789")!
+                        destination: URL(string: "https://apps.apple.com/app/id6761313595")!
                     ) {
                         HStack(spacing: 8) {
                             Image(systemName: "star.fill")
@@ -166,7 +166,7 @@ struct SettingsView: View {
                     }
 
                     ShareLink(
-                        item: URL(string: "https://apps.apple.com/app/multi-plant-watering-schedule/id123456789")!,
+                        item: URL(string: "https://apps.apple.com/app/id6761313595")!,
                         subject: Text("Multi Plant Watering Schedule"),
                         message: Text("Check out this awesome plant care tracker!"),
                         preview: SharePreview("Multi Plant App", image: Image(systemName: "leaf.fill"))
@@ -213,7 +213,7 @@ struct SettingsView: View {
                     }
 
                     Link(
-                        destination: URL(string: "https://example.com/privacy")!
+                        destination: URL(string: "https://github.com/ClawdBonzo/MultiPlantScheduler/blob/main/PRIVACY_POLICY.md")!
                     ) {
                         HStack(spacing: 8) {
                             Image(systemName: "hand.raised")

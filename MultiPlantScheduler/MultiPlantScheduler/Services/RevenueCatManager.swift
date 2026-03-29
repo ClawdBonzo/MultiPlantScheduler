@@ -1,5 +1,4 @@
 import Foundation
-import Combine
 import RevenueCat
 
 /// Manages subscription and premium features via RevenueCat
@@ -11,19 +10,28 @@ class RevenueCatManager: ObservableObject {
     @Published var isLoading: Bool = false
     @Published var error: Error?
 
+    private var isConfigured = false
+
     private init() {
         configure()
     }
 
     /// Configure RevenueCat with the API key
     func configure() {
+        let apiKey = Constants.RevenueCat.apiKey
+        guard apiKey != "YOUR_REVENUECAT_API_KEY_HERE" && !apiKey.isEmpty else {
+            print("⚠️ RevenueCat: Skipping configuration — API key not set. Running in free mode.")
+            return
+        }
         Purchases.logLevel = .debug
-        Purchases.configure(withAPIKey: Constants.RevenueCat.apiKey)
+        Purchases.configure(withAPIKey: apiKey)
+        isConfigured = true
         checkSubscriptionStatus()
     }
 
     /// Check the current subscription status
     func checkSubscriptionStatus() {
+        guard isConfigured else { return }
         Task {
             do {
                 let customerInfo = try await Purchases.shared.customerInfo()
@@ -44,6 +52,7 @@ class RevenueCatManager: ObservableObject {
 
     /// Fetch the available offerings
     private func fetchOfferings() async {
+        guard isConfigured else { return }
         do {
             let offerings = try await Purchases.shared.offerings()
             await MainActor.run {
@@ -83,8 +92,8 @@ class RevenueCatManager: ObservableObject {
                 self.isPremium = isPremium
             }
             return isPremium
-        } catch {
-            if let rcError = error as? RevenueCat.ErrorCode, rcError == .purchaseCancelledError {
+        } catch let error as PurchasesErrorCode {
+            if error == .purchaseCancelledError {
                 print("Purchase cancelled by user")
             } else {
                 print("Purchase error: \(error)")
