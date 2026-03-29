@@ -6,9 +6,11 @@ private let logger = Logger(subsystem: "com.clawdbonzo.MultiPlantScheduler", cat
 
 @main
 struct MultiPlantSchedulerApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var revenueCatManager = RevenueCatManager.shared
     @State private var showOnboarding: Bool
-    @State private var showSoftPaywall = false
+    @State private var showAddPlantFromOnboarding = false
+    @State private var showCelebratory = false
     @State private var hasAppeared = false
     @Environment(\.scenePhase) private var scenePhase
 
@@ -17,9 +19,9 @@ struct MultiPlantSchedulerApp: App {
     init() {
         logger.notice("App init starting")
 
-        let schema = Schema([Plant.self, CareLog.self])
+        // Configure SwiftData container
+        let schema = Schema([Plant.self, CareLog.self, HealthEntry.self, PhotoEntry.self])
         var container: ModelContainer
-
         do {
             let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false, cloudKitDatabase: .none)
             container = try ModelContainer(for: schema, configurations: config)
@@ -29,14 +31,14 @@ struct MultiPlantSchedulerApp: App {
             let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
             container = try! ModelContainer(for: schema, configurations: config)
         }
-
         self.modelContainer = container
 
+        // Mark first launch (no sample seeding)
         if FirstLaunchService.isFirstLaunch {
-            FirstLaunchService.seedSamplePlants(context: container.mainContext)
             FirstLaunchService.markLaunchComplete()
         }
 
+        // Show onboarding if this is the first launch
         let hasSeenOnboarding = UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
         _showOnboarding = State(initialValue: !hasSeenOnboarding)
 
@@ -47,22 +49,20 @@ struct MultiPlantSchedulerApp: App {
         WindowGroup {
             Group {
                 if showOnboarding {
-                    OnboardingView(isPresented: $showOnboarding)
-                        .onChange(of: showOnboarding) { _, newValue in
-                            if !newValue {
-                                UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                    showSoftPaywall = true
-                                }
-                            }
-                        }
+                    OnboardingView(
+                        isPresented: $showOnboarding,
+                        launchAddPlant: $showAddPlantFromOnboarding
+                    )
                 } else {
                     ContentView()
                 }
             }
-            .sheet(isPresented: $showSoftPaywall) {
-                SoftPaywallView()
-                    .environmentObject(revenueCatManager)
+            .sheet(isPresented: $showAddPlantFromOnboarding) {
+                AddPlantView(isFromOnboarding: true, showCelebratory: $showCelebratory)
+                    .presentationDetents([.large])
+            }
+            .fullScreenCover(isPresented: $showCelebratory) {
+                CelebratoryView()
             }
             .modelContainer(modelContainer)
             .environmentObject(revenueCatManager)

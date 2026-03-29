@@ -41,6 +41,7 @@ struct AppStoreMetadata {
     • Export care history as CSV
     • Priority features and early access
     • Full seasonal adjustments
+    • $3.99/month, $29.99/year (save 37%), or $49.99 lifetime
 
     Your plants deserve the best care. Start tracking with Multi Plant Watering Schedule today!
 

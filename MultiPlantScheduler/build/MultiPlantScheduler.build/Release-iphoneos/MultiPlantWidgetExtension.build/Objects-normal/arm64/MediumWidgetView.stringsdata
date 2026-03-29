@@ -1,0 +1,64 @@
+{
+  "source": "/Users/robgoldstein/Desktop/MultiPlantScheduler/MultiPlantScheduler/.claude/worktrees/elegant-ride/MultiPlantScheduler/MultiPlantWidget/MediumWidgetView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Garden Overview",
+        "location": {
+          "startingColumn": 35,
+          "startingLine": 15
+        }
+      },
+      {
+        "comment": "",
+        "key": "See your top plants needing water",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 16
+        }
+      },
+      {
+        "comment": "",
+        "key": "Unlock Widgets",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 31
+        }
+      },
+      {
+        "comment": "",
+        "key": "Upgrade to Premium to see your plants here",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 34
+        }
+      },
+      {
+        "comment": "",
+        "key": "🌱",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 42
+        }
+      },
+      {
+        "comment": "",
+        "key": "My Garden",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 45
+        }
+      },
+      {
+        "comment": "",
+        "key": "Add plants to see them here",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 48
+        }
+      }
+    ]
+  },
+  "version": 1
+}

@@ -25,8 +25,9 @@ enum Constants {
     // MARK: - Subscription Limits
     enum Subscription {
         static let freeTierPlantLimit = 5
-        static let monthlyPrice = 4.99
-        static let yearlyPrice = 39.99
+        static let monthlyPrice = 3.99
+        static let yearlyPrice = 29.99
+        static let lifetimePrice = 49.99
         static let freeTierDescription = "Track up to \(freeTierPlantLimit) plants"
         static let premiumDescription = "Unlimited plants, advanced features"
     }
@@ -47,6 +48,10 @@ enum Constants {
         static let notificationHour = 9          // 9 AM daily reminders
         static let jpegCompressionQuality: CGFloat = 0.7
         static let freePlantLimit = Subscription.freeTierPlantLimit
+
+        // UserDefaults keys for custom notification time
+        static let globalNotificationHourKey = "globalNotificationHour"
+        static let globalNotificationMinuteKey = "globalNotificationMinute"
     }
 }
 

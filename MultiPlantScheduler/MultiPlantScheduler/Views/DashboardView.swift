@@ -9,6 +9,7 @@ struct DashboardView: View {
     @State private var showAddPlant = false
     @State private var showSettings = false
     @State private var showPaywall = false
+    @State private var showShareGarden = false
     @State private var refreshTrigger = UUID()
 
     let columns = [
@@ -51,7 +52,11 @@ struct DashboardView: View {
                 // Header
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
-                        Text("My Garden 🌿")
+                        HStack(spacing: 8) {
+                            Image(systemName: "leaf.fill")
+                                .foregroundColor(AppColors.limeGreen)
+                            Text("My Garden")
+                        }
                             .font(.system(.title, design: .rounded))
                             .fontWeight(.bold)
                             .foregroundColor(AppColors.textPrimary)
@@ -59,6 +64,14 @@ struct DashboardView: View {
                         Spacer()
 
                         HStack(spacing: 12) {
+                            if !plants.isEmpty {
+                                Button(action: { showShareGarden = true }) {
+                                    Image(systemName: "square.and.arrow.up")
+                                        .font(.system(size: 16, weight: .semibold))
+                                        .foregroundColor(AppColors.limeGreen)
+                                }
+                            }
+
                             Button(action: { showSettings = true }) {
                                 Image(systemName: "gear")
                                     .font(.system(size: 18, weight: .semibold))
@@ -105,7 +118,11 @@ struct DashboardView: View {
                 // Watering streak banner
                 if maxWateringStreak > 0 {
                     HStack(spacing: 8) {
-                        Text("🔥 \(maxWateringStreak) day streak!")
+                        HStack(spacing: 4) {
+                            Image(systemName: "flame.fill")
+                                .foregroundColor(.orange)
+                            Text("\(maxWateringStreak) day streak!")
+                        }
                             .font(.system(.callout, design: .rounded))
                             .fontWeight(.semibold)
                             .foregroundColor(AppColors.textPrimary)
@@ -120,6 +137,13 @@ struct DashboardView: View {
                     .padding(.bottom, 16)
                 }
 
+                // Today's watering checklist
+                if !plants.isEmpty {
+                    TodayChecklistView(plants: plants)
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 16)
+                }
+
                 // Free plan upgrade banner
                 if !revenueCatManager.isPremium && plants.count >= AppConfig.freePlantLimit {
                     HStack(spacing: 8) {
@@ -132,7 +156,7 @@ struct DashboardView: View {
                                 .fontWeight(.semibold)
                                 .foregroundColor(AppColors.textPrimary)
 
-                            Text("Unlimited plants + more features")
+                            Text("From $3.99/mo or $49.99 lifetime")
                                 .font(.system(.caption2, design: .rounded))
                                 .foregroundColor(AppColors.textSecondary)
                         }
@@ -154,34 +178,38 @@ struct DashboardView: View {
                 }
 
                 if plants.isEmpty {
-                    // Empty state
-                    VStack(spacing: 20) {
+                    // Empty state — invites user to AI-identify their first plant
+                    VStack(spacing: 24) {
                         Spacer()
 
                         VStack(spacing: 16) {
-                            Text("🌱")
-                                .font(.system(size: 64))
+                            Image(systemName: "camera.viewfinder")
+                                .font(.system(size: 56, weight: .ultraLight))
+                                .foregroundColor(AppColors.limeGreen)
 
                             Text("Your Garden Is Empty")
                                 .font(.system(.title2, design: .rounded))
                                 .fontWeight(.bold)
                                 .foregroundColor(AppColors.textPrimary)
 
-                            Text("Add your first plant to get started")
+                            Text("Snap a photo of a plant and let AI\nidentify it and set up care reminders")
                                 .font(.system(.subheadline, design: .rounded))
                                 .foregroundColor(AppColors.textSecondary)
                                 .multilineTextAlignment(.center)
                         }
 
                         Button(action: { showAddPlant = true }) {
-                            Text("Add Your First Plant")
+                            HStack(spacing: 8) {
+                                Image(systemName: "camera.fill")
+                                Text("Add Your First Plant")
+                            }
                                 .font(.system(.headline, design: .rounded))
                                 .fontWeight(.semibold)
                                 .foregroundColor(AppColors.background)
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 12)
+                                .padding(.vertical, 14)
                                 .background(AppColors.limeGreen)
-                                .cornerRadius(10)
+                                .cornerRadius(12)
                         }
                         .padding(.horizontal, 40)
 
@@ -224,6 +252,9 @@ struct DashboardView: View {
         .sheet(isPresented: $showPaywall) {
             PaywallView()
                 .presentationDetents([.medium, .large])
+        }
+        .sheet(isPresented: $showShareGarden) {
+            ShareGardenView(plants: plants)
         }
     }
 }

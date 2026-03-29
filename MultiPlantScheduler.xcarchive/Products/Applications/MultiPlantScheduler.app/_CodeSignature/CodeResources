@@ -6,19 +6,27 @@
 	<dict>
 		<key>AppIcon60x60@2x.png</key>
 		<data>
-		5au6nbGld0wihyrzWUHoHh2yMPY=
+		umLuDV1sPR4fddjcxBJxvqUHxAM=
 		</data>
 		<key>AppIcon76x76@2x~ipad.png</key>
 		<data>
-		E0GgT01sIfl/JntRDmhSX0RoqJs=
+		5sgXpqxTs0zM3iAyytGfFbtrKs0=
 		</data>
 		<key>Assets.car</key>
 		<data>
-		aEiGoWnn9NzX3/N1HJUokXrxirQ=
+		2VzRvCJrwWOglUD8dW5tBYDDFRI=
 		</data>
 		<key>Info.plist</key>
 		<data>
-		dzEl3R+h5YmG1XKdJesSNhI2RRk=
+		y/f0aacTy+vS5Qv9VGhqXd6dBIY=
+		</data>
+		<key>Metadata.appintents/extract.actionsdata</key>
+		<data>
+		wXexI7BEKUWQbKUAnYuS/1yeDyY=
+		</data>
+		<key>Metadata.appintents/version.json</key>
+		<data>
+		7w1Ll5l26LJ1LppWC0B6iejWorY=
 		</data>
 		<key>PkgInfo</key>
 		<data>
@@ -32,25 +40,9 @@
 		<data>
 		uqRDkW3s33psRj8H+jal4YSzsvk=
 		</data>
-		<key>RevenueCat_RevenueCat.bundle/_CodeSignature/CodeDirectory</key>
-		<data>
-		7GJcelnsFBx3nlIuFZ7VXivvUIY=
-		</data>
-		<key>RevenueCat_RevenueCat.bundle/_CodeSignature/CodeRequirements</key>
-		<data>
-		vSo54Pc/A+gQuaTwSLnnfXIC4BU=
-		</data>
-		<key>RevenueCat_RevenueCat.bundle/_CodeSignature/CodeResources</key>
-		<data>
-		oFOxfHDOU+qpP5Ci5TAu8PO8dn0=
-		</data>
-		<key>RevenueCat_RevenueCat.bundle/_CodeSignature/CodeSignature</key>
-		<data>
-		G/v3Lqn9H9yMGf4uAMOEW9aYQa8=
-		</data>
 		<key>embedded.mobileprovision</key>
 		<data>
-		b3lysE9FgEDGqCbNYMPLUc3gc3c=
+		hh7m8N9VB661W7vB5W+h9HhomNs=
 		</data>
 	</dict>
 	<key>files2</key>
@@ -59,21 +51,35 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			tcA5rSTkkXs63vaCVHZjWi3EUB63+Q8Z8tVnl5mj7uk=
+			4zBiG/usXu9r117RZLwZ4bgN3Odc4wYvniK55MLezOQ=
 			</data>
 		</dict>
 		<key>AppIcon76x76@2x~ipad.png</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			VBaN6EnJSoluSnZ/5FClZR8nEMluLsSODgp2f1wDyJU=
+			FBE0/dU9gfOyH8bgi4bmWp2IQcCQNFa7gTyxUk6akoc=
 			</data>
 		</dict>
 		<key>Assets.car</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			3oZkATRQFq4bt2Hcf5DpPIiY4tteu2Bl2GT950YxR4g=
+			WwCpdoSAwjKRA1aKZr3221AmkWL/y9kYmB1Qzv81fOk=
+			</data>
+		</dict>
+		<key>Metadata.appintents/extract.actionsdata</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			HFKBi4yGsm9aJm3l2NxLeS3mUjr5ds7efvEE5akmsQw=
+			</data>
+		</dict>
+		<key>Metadata.appintents/version.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			y1TAcXNcDbD2aIxNWsc0P2Vcl711IsZl2N4OtFadFYc=
 			</data>
 		</dict>
 		<key>RevenueCat_RevenueCat.bundle/Info.plist</key>
@@ -90,39 +96,11 @@
 			dsh2xzvzfWOylE0EkeTZpD1CDeeLZlEvzKJ6SErpLnk=
 			</data>
 		</dict>
-		<key>RevenueCat_RevenueCat.bundle/_CodeSignature/CodeDirectory</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			1u6T/PJy6kvZPcldM7tWWMBaGHqkcu/sLAW6V8AjsdU=
-			</data>
-		</dict>
-		<key>RevenueCat_RevenueCat.bundle/_CodeSignature/CodeRequirements</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			WpFH3Xszz5/pdGT+VodpP4ndNoqLXDrTGfGzL6AdBFQ=
-			</data>
-		</dict>
-		<key>RevenueCat_RevenueCat.bundle/_CodeSignature/CodeResources</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			pkIcoWRFcX7yxRswOUbQlRxAvZkKeQzH2Fs17uLLXxI=
-			</data>
-		</dict>
-		<key>RevenueCat_RevenueCat.bundle/_CodeSignature/CodeSignature</key>
-		<dict>
-			<key>hash2</key>
-			<data>
-			4y6YMaMyjqb1i5ap/HT/oBU4ze4d53XLKeF7ty2u1gg=
-			</data>
-		</dict>
 		<key>embedded.mobileprovision</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			uVK4f0UUvyBZ1dhMY1GbnW01ymt1kk0DBLXvpWBY8hg=
+			qPcJMbaAVH0nPRsdkromE8kouAtHMw+WKaUalruxE08=
 			</data>
 		</dict>
 	</dict>

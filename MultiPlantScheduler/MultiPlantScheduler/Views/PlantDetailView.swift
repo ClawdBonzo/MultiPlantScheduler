@@ -11,6 +11,9 @@ struct PlantDetailView: View {
     @State private var showDeleteConfirmation = false
     @State private var showPaywall = false
     @State private var showCheckmark = false
+    @State private var showHealthCheck = false
+    @State private var isReidentifying = false
+    @State private var reidentifyResult: String?
 
     var adjustedWateringInterval: Int {
         SeasonalAdjuster.adjustedInterval(baseInterval: plant.wateringIntervalDays)
@@ -43,10 +46,9 @@ struct PlantDetailView: View {
                                 .scaledToFill()
                                 .clipped()
                         } else {
-                            VStack {
-                                Text("🌿")
-                                    .font(.system(size: 80))
-                            }
+                            Image(systemName: "leaf.fill")
+                                .font(.system(size: 56, weight: .light))
+                                .foregroundStyle(.white.opacity(0.5))
                         }
                     }
                     .frame(height: 250)
@@ -85,6 +87,103 @@ struct PlantDetailView: View {
                                 if let createdDate = plant.createdAt.formatted(date: .abbreviated, time: .omitted) as String? {
                                     InfoRow(label: "Added", value: plant.createdAt.formatted(date: .abbreviated, time: .omitted))
                                 }
+
+                                // Health status
+                                HStack {
+                                    Text("Health")
+                                        .font(.system(.body, design: .rounded))
+                                        .fontWeight(.semibold)
+                                        .foregroundColor(AppColors.textSecondary)
+                                    Spacer()
+                                    HStack(spacing: 6) {
+                                        Circle()
+                                            .fill(plant.currentHealth.color)
+                                            .frame(width: 10, height: 10)
+                                        Text(plant.currentHealth.displayName)
+                                            .font(.system(.body, design: .rounded))
+                                            .fontWeight(.medium)
+                                            .foregroundColor(AppColors.textPrimary)
+                                    }
+                                }
+                                .padding(.vertical, 8)
+                            }
+
+                            // AI confidence badge
+                            if let confidence = plant.aiConfidence {
+                                HStack(spacing: 6) {
+                                    Image(systemName: "brain")
+                                        .font(.system(size: 12, weight: .semibold))
+                                        .foregroundStyle(AppColors.limeGreen)
+                                    Text("AI Identified: \(Int(confidence * 100))% confidence")
+                                        .font(.system(.caption, design: .rounded))
+                                        .fontWeight(.medium)
+                                        .foregroundColor(AppColors.textSecondary)
+                                    if let date = plant.lastIdentifiedDate {
+                                        Spacer()
+                                        Text(date.formatted(date: .abbreviated, time: .omitted))
+                                            .font(.system(.caption2, design: .rounded))
+                                            .foregroundColor(AppColors.textSecondary.opacity(0.7))
+                                    }
+                                }
+                                .padding(.vertical, 4)
+                            }
+
+                            // Re-identify with AI
+                            if plant.photoData != nil {
+                                Button {
+                                    reidentifyPlant()
+                                } label: {
+                                    HStack(spacing: 8) {
+                                        if isReidentifying {
+                                            ProgressView()
+                                                .tint(AppColors.limeGreen)
+                                                .scaleEffect(0.8)
+                                        } else {
+                                            Image(systemName: "brain")
+                                                .foregroundStyle(AppColors.limeGreen)
+                                        }
+                                        Text(isReidentifying ? "Identifying…" : "Re-identify with AI")
+                                            .font(.caption)
+                                            .foregroundStyle(AppColors.textSecondary)
+                                        Spacer()
+                                        if let result = reidentifyResult {
+                                            Text(result)
+                                                .font(.caption2)
+                                                .fontWeight(.medium)
+                                                .foregroundStyle(AppColors.limeGreen)
+                                        } else {
+                                            Image(systemName: "chevron.right")
+                                                .font(.caption)
+                                                .foregroundStyle(AppColors.textSecondary)
+                                        }
+                                    }
+                                    .padding(10)
+                                    .background(AppColors.limeGreen.opacity(0.1))
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                }
+                                .disabled(isReidentifying)
+                            }
+
+                            // Health check prompt
+                            if plant.isHealthCheckDue {
+                                Button {
+                                    showHealthCheck = true
+                                } label: {
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "heart.text.clipboard")
+                                            .foregroundStyle(AppColors.limeGreen)
+                                        Text("Time for a health check!")
+                                            .font(.caption)
+                                            .foregroundStyle(AppColors.textSecondary)
+                                        Spacer()
+                                        Image(systemName: "chevron.right")
+                                            .font(.caption)
+                                            .foregroundStyle(AppColors.textSecondary)
+                                    }
+                                    .padding(10)
+                                    .background(AppColors.limeGreen.opacity(0.1))
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                }
                             }
                         }
                         .padding(.horizontal, 20)
@@ -119,6 +218,23 @@ struct PlantDetailView: View {
                                         .cornerRadius(10)
                                     }
                                 }
+                                // Health check button
+                                Button(action: { showHealthCheck = true }) {
+                                    VStack(spacing: 6) {
+                                        Image(systemName: "heart.fill")
+                                            .font(.system(size: 18, weight: .semibold))
+
+                                        Text("Health")
+                                            .font(.system(.caption2, design: .rounded))
+                                            .fontWeight(.semibold)
+                                            .lineLimit(1)
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .foregroundColor(.white)
+                                    .padding(.vertical, 12)
+                                    .background(Color.pink)
+                                    .cornerRadius(10)
+                                }
                             }
                             .padding(.horizontal, 20)
                         }
@@ -128,6 +244,71 @@ struct PlantDetailView: View {
                             HStack(spacing: 16) {
                                 StatCard(label: "Streak", value: "\(plant.wateringStreak)", icon: "🔥")
                                 StatCard(label: "Care Logs", value: "\(plant.careLogs.count)", icon: "📋")
+                            }
+                        }
+                        .padding(.horizontal, 20)
+
+                        // Feature links
+                        VStack(spacing: 10) {
+                            NavigationLink {
+                                HealthTimelineView(plant: plant)
+                            } label: {
+                                HStack {
+                                    Image(systemName: "heart.text.clipboard")
+                                        .foregroundStyle(.pink)
+                                    Text("Health History")
+                                        .foregroundStyle(AppColors.textPrimary)
+                                    Spacer()
+                                    Text("\(plant.healthEntries.count)")
+                                        .foregroundStyle(AppColors.textSecondary)
+                                    Image(systemName: "chevron.right")
+                                        .foregroundStyle(AppColors.textSecondary)
+                                }
+                                .padding()
+                                .background(Color(red: 0.118, green: 0.118, blue: 0.118))
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                            }
+
+                            if revenueCatManager.isPremium {
+                                NavigationLink {
+                                    PhotoTimelineView(plant: plant)
+                                } label: {
+                                    HStack {
+                                        Image(systemName: "photo.on.rectangle.angled")
+                                            .foregroundStyle(AppColors.limeGreen)
+                                        Text("Photo Timeline")
+                                            .foregroundStyle(AppColors.textPrimary)
+                                        Spacer()
+                                        Text("\(plant.photoEntries.count)")
+                                            .foregroundStyle(AppColors.textSecondary)
+                                        Image(systemName: "chevron.right")
+                                            .foregroundStyle(AppColors.textSecondary)
+                                    }
+                                    .padding()
+                                    .background(Color(red: 0.118, green: 0.118, blue: 0.118))
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                }
+                            } else {
+                                Button {
+                                    showPaywall = true
+                                } label: {
+                                    HStack {
+                                        Image(systemName: "photo.on.rectangle.angled")
+                                            .foregroundStyle(AppColors.textSecondary)
+                                        Text("Photo Timeline")
+                                            .foregroundStyle(AppColors.textSecondary)
+                                        Spacer()
+                                        Image(systemName: "lock.fill")
+                                            .foregroundStyle(.yellow)
+                                            .font(.caption)
+                                        Text("Premium")
+                                            .font(.caption)
+                                            .foregroundStyle(.yellow)
+                                    }
+                                    .padding()
+                                    .background(Color(red: 0.118, green: 0.118, blue: 0.118))
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                }
                             }
                         }
                         .padding(.horizontal, 20)
@@ -216,38 +397,17 @@ struct PlantDetailView: View {
             PaywallView()
                 .presentationDetents([.medium, .large])
         }
+        .sheet(isPresented: $showHealthCheck) {
+            HealthCheckView(plant: plant)
+                .presentationDetents([.medium, .large])
+        }
     }
 
     private func performCareAction(_ careType: CareType) {
         let impact = UIImpactFeedbackGenerator(style: .medium)
         impact.impactOccurred()
 
-        let careLog = CareLog(
-            careType: careType.rawValue,
-            plant: plant
-        )
-
-        plant.careLogs.append(careLog)
-
-        if careType == .water {
-            // Check streak before updating lastWateredDate
-            let wasOnTime = !plant.isOverdue
-            plant.lastWateredDate = Date.now
-
-            if wasOnTime {
-                plant.wateringStreak += 1
-            } else {
-                plant.wateringStreak = 1
-            }
-        } else if careType == .fertilize {
-            plant.lastFertilizedDate = Date.now
-        }
-
-        try? modelContext.save()
-
-        Task {
-            await NotificationManager.shared.rescheduleAllReminders(plants: [plant])
-        }
+        WateringService.performCare(type: careType, plant: plant, context: modelContext)
 
         withAnimation {
             showCheckmark = true
@@ -256,6 +416,34 @@ struct PlantDetailView: View {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
             withAnimation {
                 showCheckmark = false
+            }
+        }
+    }
+
+    private func reidentifyPlant() {
+        guard let data = plant.photoData, let uiImage = UIImage(data: data) else { return }
+        isReidentifying = true
+        reidentifyResult = nil
+
+        Task {
+            let result = await PlantIdentifierService.shared.identifyPlant(from: uiImage)
+            await MainActor.run {
+                isReidentifying = false
+                if let speciesName = result.species {
+                    plant.species = speciesName
+                    plant.aiConfidence = result.confidence
+                    plant.lastIdentifiedDate = Date.now
+                    if let dbSpecies = PlantSpeciesDatabase.species(named: speciesName) {
+                        plant.wateringIntervalDays = dbSpecies.defaultWateringDays
+                    }
+                    reidentifyResult = "\(Int(result.confidence * 100))% \(speciesName)"
+                    try? modelContext.save()
+
+                    let impact = UIImpactFeedbackGenerator(style: .light)
+                    impact.impactOccurred()
+                } else {
+                    reidentifyResult = "Could not identify"
+                }
             }
         }
     }

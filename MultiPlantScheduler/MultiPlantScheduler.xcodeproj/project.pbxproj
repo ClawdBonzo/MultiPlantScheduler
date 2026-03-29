@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		446B4BDC2F7869540049E80F /* RevenueCat in Frameworks */ = {isa = PBXBuildFile; productRef = 446B4BDB2F7869540049E80F /* RevenueCat */; };
+		AA000001AAAA000000000001 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000002AAAA000000000001 /* WidgetKit.framework */; };
+		AA000003AAAA000000000001 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA000004AAAA000000000001 /* SwiftUI.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -25,12 +27,36 @@
 			remoteGlobalIDString = 446B4B302F7859EF0049E80F;
 			remoteInfo = MultiPlantScheduler;
 		};
+		AA000010AAAA000000000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 446B4B292F7859EF0049E80F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA000020AAAA000000000001;
+			remoteInfo = MultiPlantWidgetExtension;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		AA000030AAAA000000000001 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				AA000031AAAA000000000001 /* MultiPlantWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		446B4B312F7859EF0049E80F /* MultiPlantScheduler.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MultiPlantScheduler.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		446B4B402F7859F00049E80F /* MultiPlantSchedulerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MultiPlantSchedulerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		446B4B4A2F7859F00049E80F /* MultiPlantSchedulerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MultiPlantSchedulerUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA000002AAAA000000000001 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		AA000004AAAA000000000001 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		AA000021AAAA000000000001 /* MultiPlantWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MultiPlantWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -47,6 +73,11 @@
 		446B4B4D2F7859F00049E80F /* MultiPlantSchedulerUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = MultiPlantSchedulerUITests;
+			sourceTree = "<group>";
+		};
+		AA000040AAAA000000000001 /* MultiPlantWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = MultiPlantWidget;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -74,6 +105,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AA000050AAAA000000000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA000003AAAA000000000001 /* SwiftUI.framework in Frameworks */,
+				AA000001AAAA000000000001 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -81,8 +121,10 @@
 			isa = PBXGroup;
 			children = (
 				446B4B332F7859EF0049E80F /* MultiPlantScheduler */,
+				AA000040AAAA000000000001 /* MultiPlantWidget */,
 				446B4B432F7859F00049E80F /* MultiPlantSchedulerTests */,
 				446B4B4D2F7859F00049E80F /* MultiPlantSchedulerUITests */,
+				AA000060AAAA000000000001 /* Frameworks */,
 				446B4B322F7859EF0049E80F /* Products */,
 			);
 			sourceTree = "<group>";
@@ -93,8 +135,18 @@
 				446B4B312F7859EF0049E80F /* MultiPlantScheduler.app */,
 				446B4B402F7859F00049E80F /* MultiPlantSchedulerTests.xctest */,
 				446B4B4A2F7859F00049E80F /* MultiPlantSchedulerUITests.xctest */,
+				AA000021AAAA000000000001 /* MultiPlantWidgetExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		AA000060AAAA000000000001 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AA000002AAAA000000000001 /* WidgetKit.framework */,
+				AA000004AAAA000000000001 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -107,10 +159,12 @@
 				446B4B2D2F7859EF0049E80F /* Sources */,
 				446B4B2E2F7859EF0049E80F /* Frameworks */,
 				446B4B2F2F7859EF0049E80F /* Resources */,
+				AA000030AAAA000000000001 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				AA000011AAAA000000000001 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				446B4B332F7859EF0049E80F /* MultiPlantScheduler */,
@@ -169,6 +223,28 @@
 			productReference = 446B4B4A2F7859F00049E80F /* MultiPlantSchedulerUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		AA000020AAAA000000000001 /* MultiPlantWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA000070AAAA000000000001 /* Build configuration list for PBXNativeTarget "MultiPlantWidgetExtension" */;
+			buildPhases = (
+				AA000051AAAA000000000001 /* Sources */,
+				AA000050AAAA000000000001 /* Frameworks */,
+				AA000052AAAA000000000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				AA000040AAAA000000000001 /* MultiPlantWidget */,
+			);
+			name = MultiPlantWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = MultiPlantWidgetExtension;
+			productReference = AA000021AAAA000000000001 /* MultiPlantWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -189,6 +265,9 @@
 					446B4B492F7859F00049E80F = {
 						CreatedOnToolsVersion = 26.4;
 						TestTargetID = 446B4B302F7859EF0049E80F;
+					};
+					AA000020AAAA000000000001 = {
+						CreatedOnToolsVersion = 26.4;
 					};
 				};
 			};
@@ -212,6 +291,7 @@
 				446B4B302F7859EF0049E80F /* MultiPlantScheduler */,
 				446B4B3F2F7859F00049E80F /* MultiPlantSchedulerTests */,
 				446B4B492F7859F00049E80F /* MultiPlantSchedulerUITests */,
+				AA000020AAAA000000000001 /* MultiPlantWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -232,6 +312,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		446B4B482F7859F00049E80F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AA000052AAAA000000000001 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -262,6 +349,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AA000051AAAA000000000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -274,6 +368,11 @@
 			isa = PBXTargetDependency;
 			target = 446B4B302F7859EF0049E80F /* MultiPlantScheduler */;
 			targetProxy = 446B4B4B2F7859F00049E80F /* PBXContainerItemProxy */;
+		};
+		AA000011AAAA000000000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA000020AAAA000000000001 /* MultiPlantWidgetExtension */;
+			targetProxy = AA000010AAAA000000000001 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -400,7 +499,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = 3N9RY9EG8V;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -409,6 +508,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleIconName = AppIcon;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Multi Plant needs camera access to take photos of your plants for tracking their growth.";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Multi Plant needs photo library access so you can add photos of your plants.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -425,7 +525,6 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.3;
 				MARKETING_VERSION = 1.0;
-				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.clawdbonzo.MultiPlantScheduler;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -448,7 +547,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = 3N9RY9EG8V;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
@@ -457,6 +556,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleIconName = AppIcon;
 				INFOPLIST_KEY_NSCameraUsageDescription = "Multi Plant needs camera access to take photos of your plants for tracking their growth.";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Multi Plant needs photo library access so you can add photos of your plants.";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
@@ -473,7 +573,6 @@
 				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 26.3;
 				MARKETING_VERSION = 1.0;
-				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.clawdbonzo.MultiPlantScheduler;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				REGISTER_APP_GROUPS = YES;
@@ -495,13 +594,12 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = 3N9RY9EG8V;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
 				MACOSX_DEPLOYMENT_TARGET = 26.3;
 				MARKETING_VERSION = 1.0;
-				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.clawdbonzo.MultiPlantSchedulerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -522,13 +620,12 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = 3N9RY9EG8V;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
 				MACOSX_DEPLOYMENT_TARGET = 26.3;
 				MARKETING_VERSION = 1.0;
-				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.clawdbonzo.MultiPlantSchedulerTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -548,13 +645,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = 3N9RY9EG8V;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
 				MACOSX_DEPLOYMENT_TARGET = 26.3;
 				MARKETING_VERSION = 1.0;
-				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.clawdbonzo.MultiPlantSchedulerUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -574,13 +670,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 8;
+				CURRENT_PROJECT_VERSION = 9;
 				DEVELOPMENT_TEAM = 3N9RY9EG8V;
 				GENERATE_INFOPLIST_FILE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
 				MACOSX_DEPLOYMENT_TARGET = 26.3;
 				MARKETING_VERSION = 1.0;
-				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.clawdbonzo.MultiPlantSchedulerUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = auto;
@@ -593,6 +688,74 @@
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_TARGET_NAME = MultiPlantScheduler;
 				XROS_DEPLOYMENT_TARGET = 26.4;
+			};
+			name = Release;
+		};
+		AA000071AAAA000000000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = MultiPlantWidget/MultiPlantWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 9;
+				DEVELOPMENT_TEAM = 3N9RY9EG8V;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = MultiPlantWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.clawdbonzo.MultiPlantScheduler.MultiPlantWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AA000072AAAA000000000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = MultiPlantWidget/MultiPlantWidget.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 9;
+				DEVELOPMENT_TEAM = 3N9RY9EG8V;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = MultiPlantWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.4;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.clawdbonzo.MultiPlantScheduler.MultiPlantWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -631,6 +794,15 @@
 			buildConfigurations = (
 				446B4B5B2F7859F00049E80F /* Debug */,
 				446B4B5C2F7859F00049E80F /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AA000070AAAA000000000001 /* Build configuration list for PBXNativeTarget "MultiPlantWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA000071AAAA000000000001 /* Debug */,
+				AA000072AAAA000000000001 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
