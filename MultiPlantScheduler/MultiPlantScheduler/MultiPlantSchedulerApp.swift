@@ -58,7 +58,7 @@ struct MultiPlantSchedulerApp: App {
                 }
             }
             .sheet(isPresented: $showAddPlantFromOnboarding) {
-                AddPlantView(isFromOnboarding: true, showCelebratory: $showCelebratory)
+                AddPlantView(isFromOnboarding: true, openCameraOnAppear: true, showCelebratory: $showCelebratory)
                     .presentationDetents([.large])
             }
             .fullScreenCover(isPresented: $showCelebratory) {
