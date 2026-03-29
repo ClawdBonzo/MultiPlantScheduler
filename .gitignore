@@ -2,3 +2,6 @@
 *.bak*
 *.xcuserstate
 xcuserdata/
+
+# API keys — never commit real keys
+MultiPlantScheduler/Config.xcconfig

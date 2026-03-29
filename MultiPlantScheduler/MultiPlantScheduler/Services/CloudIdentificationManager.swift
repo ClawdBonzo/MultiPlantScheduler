@@ -8,8 +8,9 @@ final class CloudIdentificationManager {
     static let shared = CloudIdentificationManager()
 
     // MARK: - Plant.id API Configuration
-    // Get your API key at https://admin.kindwise.com/signup
-    private let apiKey = "REDACTED_KEY_ROTATED"
+    // Never commit a real key to GitHub — always use xcconfig
+    // See Config.example.xcconfig for setup instructions
+    private let apiKey: String = Bundle.main.object(forInfoDictionaryKey: "PLANT_ID_API_KEY") as? String ?? ""
     private let apiURL = "https://plant.id/api/v3/identification"
 
     // MARK: - Credit Tracking (UserDefaults)
@@ -39,9 +40,9 @@ final class CloudIdentificationManager {
         return isPremium || creditsRemaining > 0
     }
 
-    /// Whether the API key is configured (not placeholder)
+    /// Whether the API key is configured (loaded from xcconfig via Info.plist)
     var isAPIKeyConfigured: Bool {
-        apiKey != "YOUR_PLANT_ID_API_KEY_HERE" && !apiKey.isEmpty
+        !apiKey.isEmpty && apiKey != "YOUR_KEY_HERE"
     }
 
     /// Decrement credits (only for free users)
