@@ -12,6 +12,10 @@ struct SettingsView: View {
     @State private var showNotificationError = false
     @State private var notificationsEnabled = false
     @State private var showShareGarden = false
+    @State private var showPaywall = false
+    @State private var isRestoringPurchases = false
+    @State private var showRestoreResult = false
+    @State private var restoreResultMessage = ""
     #if DEBUG
     @State private var debugCloudResult = ""
     @State private var isTestingCloudAPI = false
@@ -60,6 +64,61 @@ struct SettingsView: View {
                     }
                     .padding(.vertical, 4)
 
+                    // Upgrade / Restore buttons
+                    if !revenueCatManager.isPremium {
+                        Button {
+                            showPaywall = true
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: "star.fill")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.yellow)
+
+                                Text("Upgrade to Premium")
+                                    .font(.system(.body, design: .rounded))
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(AppColors.limeGreen)
+
+                                Spacer()
+
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 12, weight: .semibold))
+                                    .foregroundColor(AppColors.textSecondary)
+                            }
+                        }
+                    }
+
+                    Button {
+                        isRestoringPurchases = true
+                        Task {
+                            do {
+                                let restored = try await revenueCatManager.restorePurchases()
+                                restoreResultMessage = restored ? "Premium restored!" : "No previous purchases found."
+                            } catch {
+                                restoreResultMessage = "Restore failed: \(error.localizedDescription)"
+                            }
+                            isRestoringPurchases = false
+                            showRestoreResult = true
+                        }
+                    } label: {
+                        HStack(spacing: 8) {
+                            if isRestoringPurchases {
+                                ProgressView()
+                                    .tint(AppColors.limeGreen)
+                                    .scaleEffect(0.7)
+                            } else {
+                                Image(systemName: "arrow.clockwise.circle")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(AppColors.limeGreen)
+                            }
+
+                            Text("Restore Purchases")
+                                .font(.system(.body, design: .rounded))
+                                .fontWeight(.medium)
+                                .foregroundColor(AppColors.textPrimary)
+                        }
+                    }
+                    .disabled(isRestoringPurchases)
 
                     // Cloud ID Credits
                     HStack {
@@ -496,6 +555,15 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $showShareGarden) {
             ShareGardenView(plants: plants)
+        }
+        .sheet(isPresented: $showPaywall) {
+            PaywallView()
+                .presentationDetents([.medium, .large])
+        }
+        .alert("Restore Purchases", isPresented: $showRestoreResult) {
+            Button("OK") { }
+        } message: {
+            Text(restoreResultMessage)
         }
     }
 

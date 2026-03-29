@@ -129,25 +129,27 @@ struct PaywallView: View {
                         .background(Color(red: 0.97, green: 0.97, blue: 0.97))
                         .clipShape(RoundedRectangle(cornerRadius: 14))
 
-                        // 3-tier pricing
+                        // 3-tier pricing — Annual first (default selected)
                         VStack(spacing: 8) {
+                            PaywallPlanRow(
+                                title: "Yearly",
+                                price: yearlyPrice,
+                                period: "/year",
+                                detail: "\(yearlyMonthlyEquivalent)/mo · Save \(savingsPercent)%",
+                                badge: "MOST POPULAR",
+                                badgeColor: Color(red: 0.133, green: 0.545, blue: 0.133),
+                                isSelected: selectedPlan == .yearly
+                            ) { selectedPlan = .yearly }
+
                             PaywallPlanRow(
                                 title: "Lifetime",
                                 price: lifetimePrice,
                                 period: "once",
                                 detail: "Pay once, own forever",
-                                badge: "BEST VALUE",
+                                badge: "BEST LONG-TERM VALUE",
+                                badgeColor: Color(red: 0.55, green: 0.42, blue: 0.15),
                                 isSelected: selectedPlan == .lifetime
                             ) { selectedPlan = .lifetime }
-
-                            PaywallPlanRow(
-                                title: "Yearly",
-                                price: yearlyPrice,
-                                period: "/year",
-                                detail: "\(yearlyMonthlyEquivalent)/mo",
-                                badge: "SAVE \(savingsPercent)%",
-                                isSelected: selectedPlan == .yearly
-                            ) { selectedPlan = .yearly }
 
                             PaywallPlanRow(
                                 title: "Monthly",
@@ -155,6 +157,7 @@ struct PaywallView: View {
                                 period: "/month",
                                 detail: nil,
                                 badge: nil,
+                                badgeColor: nil,
                                 isSelected: selectedPlan == .monthly
                             ) { selectedPlan = .monthly }
                         }
@@ -171,9 +174,22 @@ struct PaywallView: View {
                         .disabled(isLoading)
                         .opacity(isLoading ? 0.6 : 1)
 
+                        // Restore Purchases button — App Store requirement
+                        Button(action: { restorePurchases() }) {
+                            Text("Restore Purchases")
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundStyle(Color(red: 0.133, green: 0.545, blue: 0.133))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 12)
+                                .background(
+                                    RoundedRectangle(cornerRadius: 12)
+                                        .stroke(Color(red: 0.133, green: 0.545, blue: 0.133), lineWidth: 1.5)
+                                )
+                        }
+
                         Button(action: { dismiss() }) {
                             Text("Continue with Free (5 plants, 10 cloud IDs)")
-                                .font(.system(size: 15, weight: .semibold))
+                                .font(.system(size: 14, weight: .medium))
                                 .foregroundStyle(.gray)
                         }
 
@@ -189,8 +205,6 @@ struct PaywallView: View {
                                 Link("Privacy Policy", destination: URL(string: "https://www.apple.com/legal/privacy/")!)
                                 Text("•").foregroundStyle(.gray)
                                 Link("Terms of Service", destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
-                                Text("•").foregroundStyle(.gray)
-                                Button("Restore") { restorePurchases() }
                             }
                             .font(.system(size: 11))
                             .foregroundStyle(.gray)
@@ -318,8 +332,11 @@ private struct PaywallPlanRow: View {
     let period: String
     let detail: String?
     let badge: String?
+    let badgeColor: Color?
     let isSelected: Bool
     let onTap: () -> Void
+
+    private let green = Color(red: 0.133, green: 0.545, blue: 0.133)
 
     var body: some View {
         Button(action: onTap) {
@@ -335,7 +352,7 @@ private struct PaywallPlanRow: View {
                                 .foregroundStyle(.white)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
-                                .background(Color(red: 0.133, green: 0.545, blue: 0.133))
+                                .background(badgeColor ?? green)
                                 .clipShape(RoundedRectangle(cornerRadius: 4))
                         }
                     }
@@ -358,11 +375,11 @@ private struct PaywallPlanRow: View {
             .padding(14)
             .background(
                 RoundedRectangle(cornerRadius: 12)
-                    .fill(isSelected ? Color(red: 0.133, green: 0.545, blue: 0.133).opacity(0.08) : Color(red: 0.97, green: 0.97, blue: 0.97))
+                    .fill(isSelected ? green.opacity(0.08) : Color(red: 0.97, green: 0.97, blue: 0.97))
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 12)
-                    .stroke(isSelected ? Color(red: 0.133, green: 0.545, blue: 0.133) : .clear, lineWidth: 2)
+                    .stroke(isSelected ? green : .clear, lineWidth: 2)
             )
         }
     }
