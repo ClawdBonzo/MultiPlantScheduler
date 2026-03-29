@@ -55,6 +55,33 @@ struct SettingsView: View {
                         }
                     }
                     .padding(.vertical, 4)
+
+
+                    // Cloud ID Credits
+                    HStack {
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Cloud AI Credits")
+                                .font(.system(.body, design: .rounded))
+                                .fontWeight(.semibold)
+                                .foregroundColor(AppColors.textPrimary)
+
+                            if revenueCatManager.isPremium {
+                                Text("Unlimited precise plant IDs")
+                                    .font(.system(.caption, design: .rounded))
+                                    .foregroundColor(AppColors.textSecondary)
+                            } else {
+                                Text("\(CloudIdentificationManager.shared.creditsRemaining) of \(CloudIdentificationManager.maxFreeCredits) free IDs remaining")
+                                    .font(.system(.caption, design: .rounded))
+                                    .foregroundColor(AppColors.textSecondary)
+                            }
+                        }
+
+                        Spacer()
+
+                        Image(systemName: "cloud.fill")
+                            .font(.system(size: 16, weight: .semibold))
+                            .foregroundColor(revenueCatManager.isPremium ? AppColors.limeGreen : .orange)
+                    }
                 }
                 .listRowBackground(Color(red: 0.118, green: 0.118, blue: 0.118))
 

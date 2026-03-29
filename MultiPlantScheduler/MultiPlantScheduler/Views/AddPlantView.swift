@@ -45,6 +45,11 @@ struct AddPlantView: View {
     @State private var showCamera = false
     @State private var showPhotoPicker = false
 
+    // Cloud ID state
+    @State private var isCloudIdentifying = false
+    @State private var cloudIDUsed = false
+    @State private var showUpgradeForCloud = false
+
     // Save state
     @State private var showSaveError = false
     @State private var saveErrorMessage = ""
@@ -332,7 +337,63 @@ struct AddPlantView: View {
                                 .transition(.scale.combined(with: .opacity))
                             }
 
-                            if photoData != nil && !isIdentifying {
+                            // "Get Precise ID" cloud button
+                            if photoData != nil && showAIResult && !isIdentifying && !isCloudIdentifying && !cloudIDUsed {
+                                Button {
+                                    getPreciseCloudID()
+                                } label: {
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "icloud.and.arrow.up")
+                                            .font(.system(size: 14, weight: .semibold))
+                                        Text("Get Precise ID")
+                                            .font(.system(.caption, design: .rounded))
+                                            .fontWeight(.bold)
+
+                                        Spacer()
+
+                                        let credits = CloudIdentificationManager.shared.creditsRemaining
+                                        let isPremium = revenueCatManager.isPremium
+                                        if isPremium {
+                                            Text("Unlimited")
+                                                .font(.system(size: 9, weight: .medium, design: .rounded))
+                                                .foregroundStyle(AppColors.limeGreen)
+                                        } else {
+                                            Text("\(credits)/\(CloudIdentificationManager.maxFreeCredits) free")
+                                                .font(.system(size: 9, weight: .medium, design: .rounded))
+                                                .foregroundStyle(credits > 0 ? AppColors.textSecondary : .yellow)
+                                        }
+                                    }
+                                    .foregroundStyle(.white)
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 10)
+                                    .background(
+                                        LinearGradient(
+                                            colors: [AppColors.forestGreen, AppColors.limeGreen.opacity(0.8)],
+                                            startPoint: .leading,
+                                            endPoint: .trailing
+                                        )
+                                    )
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                                }
+                                .transition(.scale.combined(with: .opacity))
+                            }
+
+                            // Cloud identifying spinner
+                            if isCloudIdentifying {
+                                HStack(spacing: 8) {
+                                    ProgressView()
+                                        .tint(AppColors.limeGreen)
+                                        .scaleEffect(0.8)
+                                    Text("Getting precise ID...")
+                                        .font(.system(.caption, design: .rounded))
+                                        .fontWeight(.medium)
+                                        .foregroundColor(AppColors.textSecondary)
+                                }
+                                .padding(.vertical, 4)
+                                .transition(.opacity)
+                            }
+
+                            if photoData != nil && !isIdentifying && !isCloudIdentifying {
                                 Button(role: .destructive) {
                                     withAnimation {
                                         photoData = nil
@@ -542,6 +603,11 @@ struct AddPlantView: View {
             } message: {
                 Text(saveErrorMessage)
             }
+            .alert("Cloud IDs Used", isPresented: $showUpgradeForCloud) {
+                Button("Maybe Later", role: .cancel) {}
+            } message: {
+                Text("You've used all 10 free cloud identifications. Upgrade to Premium for unlimited precise plant IDs.")
+            }
         }
     }
 
@@ -550,6 +616,7 @@ struct AddPlantView: View {
     private func startScanningAnimation(photoData: Data) {
         // Reset state
         showAIResult = false
+        cloudIDUsed = false
         scanProgress = 0
         scanPulse = false
         leafRotation = 0
@@ -656,6 +723,65 @@ struct AddPlantView: View {
             guard self.isIdentifying else { return }
             self.dotCount = (self.dotCount % 3) + 1
             self.startDotAnimation()
+        }
+    }
+
+    // MARK: - Cloud Precise ID
+
+    private func getPreciseCloudID() {
+        let isPremium = revenueCatManager.isPremium
+        let cloud = CloudIdentificationManager.shared
+
+        guard cloud.canUseCloud(isPremium: isPremium) else {
+            showUpgradeForCloud = true
+            return
+        }
+
+        guard let data = photoData, let uiImage = UIImage(data: data) else { return }
+
+        withAnimation { isCloudIdentifying = true }
+
+        let impact = UIImpactFeedbackGenerator(style: .light)
+        impact.impactOccurred()
+
+        Task {
+            if let cloudResult = await cloud.identifyPlant(from: uiImage, isPremium: isPremium) {
+                let result = cloud.toIdentificationResult(cloudResult)
+
+                await MainActor.run {
+                    withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
+                        isCloudIdentifying = false
+                        cloudIDUsed = true
+
+                        aiConfidence = result.confidence
+                        aiSpeciesName = result.species
+                        aiSuggestions = result.topSuggestions
+
+                        // Cloud results are high quality — auto-fill
+                        if let matchedSpecies = result.species {
+                            if let dbSpecies = PlantSpeciesDatabase.species(named: matchedSpecies) {
+                                species = dbSpecies
+                                wateringIntervalDays = dbSpecies.defaultWateringDays
+                                if name.isEmpty {
+                                    let shortName = matchedSpecies.components(separatedBy: " - ").last ?? matchedSpecies
+                                    name = shortName
+                                }
+                            } else {
+                                if name.isEmpty { name = matchedSpecies }
+                                wateringIntervalDays = result.defaultInterval
+                            }
+                        }
+                    }
+
+                    let success = UINotificationFeedbackGenerator()
+                    success.notificationOccurred(.success)
+                }
+            } else {
+                await MainActor.run {
+                    withAnimation { isCloudIdentifying = false }
+                    // API not configured or network error — silent fail, on-device result stays
+                }
+            }
         }
     }
 
