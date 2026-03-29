@@ -40,7 +40,9 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         }
 
         guard let plantID = UUID(uuidString: plantIDString) else {
+            #if DEBUG
             print("Invalid plant ID in notification: \(plantIDString)")
+            #endif
             return
         }
 
@@ -53,14 +55,20 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
                 predicate: #Predicate<Plant> { $0.id == plantID }
             )
             guard let plant = try context.fetch(descriptor).first else {
+                #if DEBUG
                 print("Plant not found for ID: \(plantID)")
+                #endif
                 return
             }
 
             WateringService.markAsWatered(plant: plant, context: context)
+            #if DEBUG
             print("Marked \(plant.name) as watered from notification action")
+            #endif
         } catch {
+            #if DEBUG
             print("Error handling notification action: \(error)")
+            #endif
         }
     }
 }

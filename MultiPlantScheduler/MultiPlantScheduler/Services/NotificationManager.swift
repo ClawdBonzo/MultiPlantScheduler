@@ -46,7 +46,9 @@ class NotificationManager {
             }
             return granted
         } catch {
+            #if DEBUG
             print("Error requesting notification permission: \(error)")
+            #endif
             return false
         }
     }
@@ -55,10 +57,9 @@ class NotificationManager {
 
     /// Clear the app badge count
     func clearBadgeCount() {
-        Task { @MainActor in
-            UIApplication.shared.applicationIconBadgeNumber = 0
-        }
-        UNUserNotificationCenter.current().removeAllDeliveredNotifications()
+        let center = UNUserNotificationCenter.current()
+        center.setBadgeCount(0)
+        center.removeAllDeliveredNotifications()
     }
 
     // MARK: - Scheduling
@@ -108,9 +109,13 @@ class NotificationManager {
 
         do {
             try await UNUserNotificationCenter.current().add(request)
+            #if DEBUG
             print("Scheduled watering reminder for \(plant.name) on \(plant.nextWateringDate) at \(time.hour):\(String(format: "%02d", time.minute))")
+            #endif
         } catch {
+            #if DEBUG
             print("Error scheduling notification for \(plant.name): \(error)")
+            #endif
         }
 
         // Also schedule a follow-up reminder for the next day in case they miss it
@@ -147,7 +152,9 @@ class NotificationManager {
         do {
             try await UNUserNotificationCenter.current().add(request)
         } catch {
+            #if DEBUG
             print("Error scheduling follow-up for \(plant.name): \(error)")
+            #endif
         }
     }
 
@@ -158,7 +165,9 @@ class NotificationManager {
         UNUserNotificationCenter.current().removePendingNotificationRequests(
             withIdentifiers: [plant.id.uuidString, "\(plant.id.uuidString)-followup"]
         )
+        #if DEBUG
         print("Cancelled notification for \(plant.name)")
+        #endif
     }
 
     /// Cancel all pending notifications and reschedule for all plants
@@ -168,7 +177,9 @@ class NotificationManager {
         for plant in plants {
             await scheduleReminder(for: plant)
         }
+        #if DEBUG
         print("Rescheduled reminders for all \(plants.count) plants")
+        #endif
     }
 
     // MARK: - Queries

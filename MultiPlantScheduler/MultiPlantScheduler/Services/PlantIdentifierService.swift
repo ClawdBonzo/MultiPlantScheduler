@@ -37,9 +37,13 @@ final class PlantIdentifierService {
             config.computeUnits = .cpuAndNeuralEngine
             let model = try HousePlantIdentifier(configuration: config)
             vnModel = try VNCoreMLModel(for: model.model)
+            #if DEBUG
             print("HousePlantIdentifier CoreML model loaded successfully")
+            #endif
         } catch {
+            #if DEBUG
             print("Failed to load HousePlantIdentifier model: \(error)")
+            #endif
             // Fallback: will use Vision classifier
         }
     }
@@ -108,7 +112,9 @@ final class PlantIdentifierService {
             do {
                 try handler.perform([request])
             } catch {
+                #if DEBUG
                 print("CoreML request failed: \(error)")
+                #endif
                 continuation.resume(returning: IdentificationResult(
                     species: nil, confidence: 0, defaultInterval: 7, isLowConfidence: true, topSuggestions: []
                 ))
@@ -137,7 +143,9 @@ final class PlantIdentifierService {
             do {
                 try handler.perform([request])
             } catch {
+                #if DEBUG
                 print("Vision request failed: \(error)")
+                #endif
                 continuation.resume(returning: IdentificationResult(
                     species: nil, confidence: 0, defaultInterval: 7, isLowConfidence: true, topSuggestions: []
                 ))

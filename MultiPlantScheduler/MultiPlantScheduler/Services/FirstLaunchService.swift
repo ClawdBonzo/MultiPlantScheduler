@@ -15,8 +15,10 @@ enum FirstLaunchService {
         UserDefaults.standard.set(true, forKey: firstLaunchKey)
     }
 
+    #if DEBUG
     /// Reset the first launch flag (useful for testing)
     static func resetFirstLaunchFlag() {
         UserDefaults.standard.set(false, forKey: firstLaunchKey)
     }
+    #endif
 }

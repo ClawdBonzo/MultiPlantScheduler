@@ -62,7 +62,7 @@ struct TodayChecklistView: View {
         let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
         impactFeedback.impactOccurred()
 
-        withAnimation(.easeInOut(duration: 0.4)) {
+        _ = withAnimation(.easeInOut(duration: 0.4)) {
             wateredPlantIDs.insert(plant.id)
         }
 

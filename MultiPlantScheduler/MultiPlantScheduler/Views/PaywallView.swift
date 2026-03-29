@@ -72,7 +72,7 @@ struct PaywallView: View {
                             Text("Go Premium")
                                 .font(.system(size: 26, weight: .bold, design: .rounded))
                                 .foregroundStyle(.white)
-                            Text("Unlimited plants, AI identification & more")
+                            Text("Unlimited plants, Cloud AI & more")
                                 .font(.system(size: 14, weight: .medium))
                                 .foregroundStyle(.white.opacity(0.8))
                         }
@@ -118,7 +118,10 @@ struct PaywallView: View {
                         // Feature benefits — clean icons
                         VStack(spacing: 14) {
                             PaywallBenefitRow(icon: "leaf.fill", title: "Unlimited Plants", subtitle: "Track your entire collection")
-                            PaywallBenefitRow(icon: "camera.viewfinder", title: "AI Plant Identifier", subtitle: "Snap a photo, know your plant")
+                            PaywallBenefitRow(icon: "cloud.fill", title: "Unlimited Cloud AI IDs", subtitle: "Precise identification powered by Plant.id")
+                            PaywallBenefitRow(icon: "camera.viewfinder", title: "On-Device AI + Cloud AI", subtitle: "Dual AI for 99% accuracy on 1000+ species")
+                            PaywallBenefitRow(icon: "photo.on.rectangle.angled", title: "Photo Timeline", subtitle: "Track growth over time with photos")
+                            PaywallBenefitRow(icon: "bell.badge", title: "Custom Reminder Times", subtitle: "Set per-plant notification schedules")
                             PaywallBenefitRow(icon: "calendar", title: "Seasonal Auto-Adjust", subtitle: "Smart watering by season")
                             PaywallBenefitRow(icon: "square.and.arrow.up", title: "Export Care History", subtitle: "Download your care logs")
                         }
@@ -169,7 +172,7 @@ struct PaywallView: View {
                         .opacity(isLoading ? 0.6 : 1)
 
                         Button(action: { dismiss() }) {
-                            Text("Continue with Free (5 plants)")
+                            Text("Continue with Free (5 plants, 10 cloud IDs)")
                                 .font(.system(size: 15, weight: .semibold))
                                 .foregroundStyle(.gray)
                         }
@@ -230,7 +233,9 @@ struct PaywallView: View {
             let fetchedOfferings = try await Purchases.shared.offerings()
             await MainActor.run { self.offerings = fetchedOfferings }
         } catch {
+            #if DEBUG
             print("Failed to load offerings: \(error)")
+            #endif
         }
     }
 

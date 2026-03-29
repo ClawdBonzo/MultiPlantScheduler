@@ -1,0 +1,7 @@
+// Config.example.xcconfig — Template for API keys
+// 1. Copy this file to Config.xcconfig
+// 2. Replace YOUR_KEY_HERE with your real Plant.id API key
+// 3. Get a key at https://admin.kindwise.com/signup
+
+PLANT_ID_API_KEY = YOUR_KEY_HERE
+INFOPLIST_KEY_PLANT_ID_API_KEY = $(PLANT_ID_API_KEY)

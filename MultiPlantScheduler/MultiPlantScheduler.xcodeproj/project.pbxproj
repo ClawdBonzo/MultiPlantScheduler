@@ -57,6 +57,7 @@
 		AA000002AAAA000000000001 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		AA000004AAAA000000000001 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		AA000021AAAA000000000001 /* MultiPlantWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = MultiPlantWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC000001BBBB000000000001 /* Config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -379,6 +380,7 @@
 /* Begin XCBuildConfiguration section */
 		446B4B522F7859F00049E80F /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = CC000001BBBB000000000001 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
@@ -441,6 +443,7 @@
 		};
 		446B4B532F7859F00049E80F /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = CC000001BBBB000000000001 /* Config.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
