@@ -9,7 +9,7 @@ final class CloudIdentificationManager {
 
     // MARK: - Plant.id API Configuration
     // Get your API key at https://admin.kindwise.com/signup
-    private let apiKey = "YOUR_PLANT_ID_API_KEY_HERE" // ← PASTE YOUR PLANT.ID API KEY HERE
+    private let apiKey = "REDACTED_KEY_ROTATED"
     private let apiURL = "https://plant.id/api/v3/identification"
 
     // MARK: - Credit Tracking (UserDefaults)
