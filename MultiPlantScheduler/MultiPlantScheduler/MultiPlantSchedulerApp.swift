@@ -9,7 +9,8 @@ struct MultiPlantSchedulerApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var revenueCatManager = RevenueCatManager.shared
     @State private var showOnboarding: Bool
-    @State private var showSoftPaywall = false
+    @State private var showAddPlantFromOnboarding = false
+    @State private var showCelebratory = false
     @State private var hasAppeared = false
     @Environment(\.scenePhase) private var scenePhase
 
@@ -18,7 +19,7 @@ struct MultiPlantSchedulerApp: App {
     init() {
         logger.notice("App init starting")
 
-        // Configure SwiftData container — use simplest possible approach
+        // Configure SwiftData container
         let schema = Schema([Plant.self, CareLog.self, HealthEntry.self, PhotoEntry.self])
         var container: ModelContainer
         do {
@@ -27,15 +28,13 @@ struct MultiPlantSchedulerApp: App {
             logger.notice("Persistent ModelContainer created")
         } catch {
             logger.error("Persistent store failed: \(error.localizedDescription). Using in-memory.")
-            // Fall back to in-memory — app will work but data won't persist across launches
             let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
             container = try! ModelContainer(for: schema, configurations: config)
         }
         self.modelContainer = container
 
-        // Seed sample data on first launch
+        // Mark first launch (no sample seeding)
         if FirstLaunchService.isFirstLaunch {
-            FirstLaunchService.seedSamplePlants(context: container.mainContext)
             FirstLaunchService.markLaunchComplete()
         }
 
@@ -50,23 +49,20 @@ struct MultiPlantSchedulerApp: App {
         WindowGroup {
             Group {
                 if showOnboarding {
-                    OnboardingView(isPresented: $showOnboarding)
-                        .onChange(of: showOnboarding) { _, newValue in
-                            if !newValue {
-                                UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
-                                // Show soft paywall after onboarding completes
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                                    showSoftPaywall = true
-                                }
-                            }
-                        }
+                    OnboardingView(
+                        isPresented: $showOnboarding,
+                        launchAddPlant: $showAddPlantFromOnboarding
+                    )
                 } else {
                     ContentView()
                 }
             }
-            .sheet(isPresented: $showSoftPaywall) {
-                SoftPaywallView()
-                    .environmentObject(revenueCatManager)
+            .sheet(isPresented: $showAddPlantFromOnboarding) {
+                AddPlantView(isFromOnboarding: true, showCelebratory: $showCelebratory)
+                    .presentationDetents([.large])
+            }
+            .fullScreenCover(isPresented: $showCelebratory) {
+                CelebratoryView()
             }
             .modelContainer(modelContainer)
             .environmentObject(revenueCatManager)
@@ -75,16 +71,13 @@ struct MultiPlantSchedulerApp: App {
                 guard !hasAppeared else { return }
                 hasAppeared = true
                 logger.notice("App body appeared — configuring RevenueCat")
-                // Configure RevenueCat after UI is loaded to avoid init crash
                 revenueCatManager.configure()
-                // Request notification permission
                 Task {
                     let _ = await NotificationManager.shared.requestPermission()
                 }
             }
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {
-                    // Clear badge count when app becomes active
                     NotificationManager.shared.clearBadgeCount()
                 }
             }

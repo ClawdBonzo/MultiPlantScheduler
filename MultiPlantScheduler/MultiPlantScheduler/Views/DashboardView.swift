@@ -178,13 +178,13 @@ struct DashboardView: View {
                 }
 
                 if plants.isEmpty {
-                    // Empty state
-                    VStack(spacing: 20) {
+                    // Empty state — invites user to AI-identify their first plant
+                    VStack(spacing: 24) {
                         Spacer()
 
                         VStack(spacing: 16) {
-                            Image(systemName: "leaf.circle")
-                                .font(.system(size: 64, weight: .light))
+                            Image(systemName: "camera.viewfinder")
+                                .font(.system(size: 56, weight: .ultraLight))
                                 .foregroundColor(AppColors.limeGreen)
 
                             Text("Your Garden Is Empty")
@@ -192,21 +192,24 @@ struct DashboardView: View {
                                 .fontWeight(.bold)
                                 .foregroundColor(AppColors.textPrimary)
 
-                            Text("Add your first plant to get started")
+                            Text("Snap a photo of a plant and let AI\nidentify it and set up care reminders")
                                 .font(.system(.subheadline, design: .rounded))
                                 .foregroundColor(AppColors.textSecondary)
                                 .multilineTextAlignment(.center)
                         }
 
                         Button(action: { showAddPlant = true }) {
-                            Text("Add Your First Plant")
+                            HStack(spacing: 8) {
+                                Image(systemName: "camera.fill")
+                                Text("Add Your First Plant")
+                            }
                                 .font(.system(.headline, design: .rounded))
                                 .fontWeight(.semibold)
                                 .foregroundColor(AppColors.background)
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 12)
+                                .padding(.vertical, 14)
                                 .background(AppColors.limeGreen)
-                                .cornerRadius(10)
+                                .cornerRadius(12)
                         }
                         .padding(.horizontal, 40)
 

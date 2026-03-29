@@ -8,6 +8,8 @@ struct AddPlantView: View {
     @EnvironmentObject var revenueCatManager: RevenueCatManager
 
     var plantToEdit: Plant?
+    var isFromOnboarding: Bool = false
+    @Binding var showCelebratory: Bool
 
     @State private var name = ""
     @State private var species: PlantSpecies?
@@ -26,7 +28,16 @@ struct AddPlantView: View {
     @State private var aiConfidence: Double?
     @State private var aiSpeciesName: String?
 
+    // Auto-launch photo picker for onboarding flow
+    @State private var showPhotoPicker = false
+
     let rooms = ["Living Room", "Bedroom", "Kitchen", "Bathroom", "Office", "Balcony", "Other"]
+
+    init(plantToEdit: Plant? = nil, isFromOnboarding: Bool = false, showCelebratory: Binding<Bool> = .constant(false)) {
+        self.plantToEdit = plantToEdit
+        self.isFromOnboarding = isFromOnboarding
+        self._showCelebratory = showCelebratory
+    }
 
     var filteredSpecies: [PlantSpecies] {
         if speciesSearchText.isEmpty {
@@ -109,8 +120,9 @@ struct AddPlantView: View {
                                                 )
 
                                             VStack(spacing: 4) {
-                                                Text("📸")
+                                                Image(systemName: "camera.fill")
                                                     .font(.system(size: 28))
+                                                    .foregroundColor(.white.opacity(0.8))
 
                                                 Text("Add Photo")
                                                     .font(.system(.caption, design: .rounded))
@@ -122,12 +134,12 @@ struct AddPlantView: View {
                                 }
                             }
 
-                            // AI identification progress
+                            // AI identification progress overlay
                             if isIdentifying {
                                 HStack(spacing: 8) {
                                     ProgressView()
                                         .tint(AppColors.limeGreen)
-                                    Text("Identifying with AI…")
+                                    Text("Identifying with AI...")
                                         .font(.system(.caption, design: .rounded))
                                         .fontWeight(.semibold)
                                         .foregroundColor(AppColors.limeGreen)
@@ -135,12 +147,12 @@ struct AddPlantView: View {
                                 .padding(.vertical, 4)
                             }
 
-                            // AI result badge
+                            // AI result banner
                             if let confidence = aiConfidence, let speciesName = aiSpeciesName {
                                 HStack(spacing: 6) {
-                                    Image(systemName: "brain")
-                                        .font(.system(size: 12, weight: .semibold))
-                                        .foregroundStyle(AppColors.limeGreen)
+                                    Image(systemName: confidence >= 0.70 ? "checkmark.circle.fill" : "questionmark.circle.fill")
+                                        .font(.system(size: 14, weight: .semibold))
+                                        .foregroundStyle(confidence >= 0.70 ? AppColors.limeGreen : .yellow)
 
                                     Text("\(Int(confidence * 100))% \(speciesName)")
                                         .font(.system(.caption, design: .rounded))
@@ -159,8 +171,10 @@ struct AddPlantView: View {
                                     }
                                 }
                                 .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(AppColors.limeGreen.opacity(0.12))
+                                .padding(.vertical, 8)
+                                .background(
+                                    (confidence >= 0.70 ? AppColors.limeGreen : Color.yellow).opacity(0.12)
+                                )
                                 .clipShape(Capsule())
                             }
 
@@ -327,13 +341,18 @@ struct AddPlantView: View {
                         aiConfidence = confidence
                         aiSpeciesName = plant.species
                     }
+                } else if isFromOnboarding {
+                    // Auto-launch photo picker when coming from onboarding
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        showPhotoPicker = true
+                    }
                 }
             }
+            .photosPicker(isPresented: $showPhotoPicker, selection: $selectedPhotoItem, matching: .images)
             .onChange(of: selectedPhotoItem) { _, newValue in
                 Task {
                     if let data = try? await newValue?.loadTransferable(type: Data.self) {
                         photoData = data
-                        // Auto-identify with AI after photo is loaded
                         await identifyPlantFromPhoto(data: data)
                     }
                 }
@@ -362,17 +381,22 @@ struct AddPlantView: View {
                     species = dbSpecies
                     wateringIntervalDays = dbSpecies.defaultWateringDays
 
-                    // Auto-fill name if empty (use short species name)
+                    // Auto-fill name if empty
                     if name.isEmpty {
                         let shortName = matchedSpecies.components(separatedBy: " - ").last ?? matchedSpecies
                         name = shortName
                     }
+                } else {
+                    // Species not in database — use the AI name directly
+                    if name.isEmpty {
+                        name = matchedSpecies
+                    }
+                    wateringIntervalDays = result.defaultInterval
                 }
 
                 let impact = UIImpactFeedbackGenerator(style: .light)
                 impact.impactOccurred()
             } else if result.confidence > 0 {
-                // Detected a plant but couldn't identify species
                 aiConfidence = result.confidence
                 aiSpeciesName = "Unknown plant"
             } else {
@@ -421,14 +445,22 @@ struct AddPlantView: View {
 
             modelContext.insert(newPlant)
 
-            // Schedule notification
             Task {
                 await NotificationManager.shared.scheduleReminder(for: newPlant)
             }
         }
 
         try? modelContext.save()
-        dismiss()
+
+        // If this was the first plant from onboarding, show celebratory view
+        if isFromOnboarding && plantToEdit == nil {
+            dismiss()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                showCelebratory = true
+            }
+        } else {
+            dismiss()
+        }
     }
 }
 
@@ -451,8 +483,10 @@ struct SearchableSpeciesPicker: View {
                             searchText = ""
                         }) {
                             HStack {
-                                Text(spec.emoji)
-                                    .font(.system(size: 18))
+                                Image(systemName: "leaf.fill")
+                                    .font(.system(size: 14))
+                                    .foregroundStyle(AppColors.limeGreen)
+                                    .frame(width: 24)
 
                                 VStack(alignment: .leading, spacing: 2) {
                                     Text(spec.name)
@@ -478,8 +512,9 @@ struct SearchableSpeciesPicker: View {
 
             if let selected = species {
                 HStack {
-                    Text(selected.emoji)
-                        .font(.system(size: 16))
+                    Image(systemName: "leaf.fill")
+                        .font(.system(size: 14))
+                        .foregroundStyle(AppColors.limeGreen)
 
                     Text(selected.name)
                         .font(.system(.callout, design: .rounded))

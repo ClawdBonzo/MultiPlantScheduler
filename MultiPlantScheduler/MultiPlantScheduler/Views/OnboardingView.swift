@@ -2,6 +2,7 @@ import SwiftUI
 
 struct OnboardingView: View {
     @Binding var isPresented: Bool
+    @Binding var launchAddPlant: Bool
     @State private var currentPage = 0
 
     var body: some View {
@@ -9,112 +10,143 @@ struct OnboardingView: View {
             AppColors.background.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // Skip button (only on pages 0-1)
-                HStack {
-                    if currentPage < 2 {
-                        Button(action: { currentPage = 2 }) {
-                            Text("Skip")
-                                .font(.system(.body, design: .rounded))
-                                .fontWeight(.semibold)
-                                .foregroundColor(AppColors.textSecondary)
-                        }
-                    }
-
-                    Spacer()
-                }
-                .padding(.horizontal, 20)
-                .padding(.vertical, 16)
-
-                // TabView for pages
                 TabView(selection: $currentPage) {
-                    // Page 1
-                    OnboardingPage(
-                        title: "Welcome to MultiPlant AI",
-                        subtitle: "Track 30+ plants in one place",
-                        icon: "leaf.fill",
-                        iconColor: AppColors.limeGreen,
-                        content: {
-                            HStack(spacing: 20) {
-                                ForEach(
-                                    [("leaf.fill", Color.green), ("camera.viewfinder", Color.blue),
-                                     ("drop.fill", Color.cyan), ("sun.max.fill", Color.yellow)],
-                                    id: \.0
-                                ) { icon, color in
-                                    Image(systemName: icon)
-                                        .font(.system(size: 32, weight: .semibold))
-                                        .foregroundStyle(color)
-                                        .frame(width: 56, height: 56)
-                                        .background(color.opacity(0.15))
-                                        .clipShape(RoundedRectangle(cornerRadius: 14))
-                                }
-                            }
-                            .padding(.vertical, 20)
+                    // MARK: - Page 1: Hook
+                    VStack(spacing: 32) {
+                        Spacer()
+
+                        Image(systemName: "leaf.circle.fill")
+                            .font(.system(size: 80, weight: .light))
+                            .foregroundStyle(AppColors.limeGreen)
+
+                        VStack(spacing: 12) {
+                            Text("Identify Any Houseplant Instantly")
+                                .font(.system(.title, design: .rounded))
+                                .fontWeight(.bold)
+                                .foregroundColor(AppColors.textPrimary)
+                                .multilineTextAlignment(.center)
+
+                            Text("Snap a photo. AI tells you what it is\nand when to water it.")
+                                .font(.system(.body, design: .rounded))
+                                .foregroundColor(AppColors.textSecondary)
+                                .multilineTextAlignment(.center)
                         }
-                    )
+
+                        // Benefit pills
+                        HStack(spacing: 12) {
+                            BenefitPill(icon: "camera.viewfinder", label: "AI Plant ID")
+                            BenefitPill(icon: "drop.fill", label: "Smart Reminders")
+                            BenefitPill(icon: "infinity", label: "Track Unlimited")
+                        }
+
+                        Spacer()
+
+                        Button {
+                            withAnimation { currentPage = 1 }
+                        } label: {
+                            Text("Next")
+                                .font(.system(.headline, design: .rounded))
+                                .fontWeight(.semibold)
+                                .foregroundColor(AppColors.background)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(AppColors.limeGreen)
+                                .clipShape(RoundedRectangle(cornerRadius: 14))
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.bottom, 8)
+                    }
                     .tag(0)
 
-                    // Page 2
-                    OnboardingPage(
-                        title: "Never Forget to Water",
-                        subtitle: "Smart reminders that adjust by season",
-                        icon: "bell.badge.fill",
-                        iconColor: AppColors.limeGreen,
-                        content: {
-                            VStack(spacing: 12) {
-                                Image(systemName: "bell.badge.fill")
-                                    .font(.system(size: 44, weight: .semibold))
-                                    .foregroundColor(AppColors.limeGreen)
+                    // MARK: - Page 2: How it works
+                    VStack(spacing: 32) {
+                        Spacer()
 
-                                Text("Get notified when your plants need attention")
-                                    .font(.system(.body, design: .rounded))
-                                    .foregroundColor(AppColors.textSecondary)
-                                    .multilineTextAlignment(.center)
-                            }
-                            .padding(.vertical, 20)
+                        Text("3 Steps. Zero Guesswork.")
+                            .font(.system(.title, design: .rounded))
+                            .fontWeight(.bold)
+                            .foregroundColor(AppColors.textPrimary)
+                            .multilineTextAlignment(.center)
+
+                        VStack(spacing: 24) {
+                            StepRow(number: 1, icon: "camera.fill", title: "Take a photo of your plant", color: .blue)
+                            StepRow(number: 2, icon: "sparkles", title: "AI identifies species + care needs", color: .yellow)
+                            StepRow(number: 3, icon: "bell.badge.fill", title: "Get reminders when it needs water", color: AppColors.limeGreen)
                         }
-                    )
+                        .padding(.horizontal, 32)
+
+                        Spacer()
+
+                        Button {
+                            withAnimation { currentPage = 2 }
+                        } label: {
+                            Text("Next")
+                                .font(.system(.headline, design: .rounded))
+                                .fontWeight(.semibold)
+                                .foregroundColor(AppColors.background)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 16)
+                                .background(AppColors.limeGreen)
+                                .clipShape(RoundedRectangle(cornerRadius: 14))
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.bottom, 8)
+                    }
                     .tag(1)
 
-                    // Page 3
-                    OnboardingPage(
-                        title: "Your Garden Awaits",
-                        subtitle: "Let's get started!",
-                        icon: "sparkles",
-                        iconColor: .yellow,
-                        content: {
-                            VStack(spacing: 16) {
-                                Button(action: { isPresented = false }) {
-                                    Text("Get Started")
-                                        .font(.system(.headline, design: .rounded))
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(AppColors.background)
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 14)
-                                        .background(AppColors.limeGreen)
-                                        .cornerRadius(10)
-                                }
-                                .padding(.top, 10)
+                    // MARK: - Page 3: Let's go
+                    VStack(spacing: 32) {
+                        Spacer()
 
-                                Button(action: { isPresented = false }) {
-                                    Text("Maybe Later")
-                                        .font(.system(.body, design: .rounded))
-                                        .fontWeight(.semibold)
-                                        .foregroundColor(AppColors.limeGreen)
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, 12)
-                                        .background(AppColors.forestGreen.opacity(0.2))
-                                        .cornerRadius(10)
-                                }
-                            }
-                            .padding(.vertical, 20)
+                        Image(systemName: "camera.viewfinder")
+                            .font(.system(size: 72, weight: .ultraLight))
+                            .foregroundStyle(AppColors.limeGreen)
+
+                        VStack(spacing: 12) {
+                            Text("Let's Identify Your First Plant")
+                                .font(.system(.title, design: .rounded))
+                                .fontWeight(.bold)
+                                .foregroundColor(AppColors.textPrimary)
+                                .multilineTextAlignment(.center)
+
+                            Text("Point your camera at any houseplant")
+                                .font(.system(.body, design: .rounded))
+                                .foregroundColor(AppColors.textSecondary)
+                                .multilineTextAlignment(.center)
                         }
-                    )
+
+                        Spacer()
+
+                        VStack(spacing: 16) {
+                            Button {
+                                completeOnboarding(openCamera: true)
+                            } label: {
+                                Text("Identify My First Plant")
+                                    .font(.system(.headline, design: .rounded))
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(AppColors.background)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 16)
+                                    .background(AppColors.limeGreen)
+                                    .clipShape(RoundedRectangle(cornerRadius: 14))
+                            }
+
+                            Button {
+                                completeOnboarding(openCamera: false)
+                            } label: {
+                                Text("I'll do this later")
+                                    .font(.system(.subheadline, design: .rounded))
+                                    .foregroundColor(AppColors.textSecondary)
+                            }
+                        }
+                        .padding(.horizontal, 24)
+                        .padding(.bottom, 8)
+                    }
                     .tag(2)
                 }
                 .tabViewStyle(.page(indexDisplayMode: .never))
-                .indexViewStyle(.page(backgroundDisplayMode: .never))
 
-                // Custom page indicator
+                // Page dots
                 HStack(spacing: 8) {
                     ForEach(0..<3, id: \.self) { index in
                         Capsule()
@@ -124,53 +156,80 @@ struct OnboardingView: View {
                     }
                 }
                 .padding(.bottom, 24)
+            }
+        }
+    }
 
-                Spacer()
+    private func completeOnboarding(openCamera: Bool) {
+        UserDefaults.standard.set(true, forKey: "hasSeenOnboarding")
+        isPresented = false
+        if openCamera {
+            // Small delay to let onboarding dismiss before presenting AddPlantView
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                launchAddPlant = true
             }
         }
     }
 }
 
-struct OnboardingPage<Content: View>: View {
-    let title: String
-    let subtitle: String
+// MARK: - Subviews
+
+private struct BenefitPill: View {
     let icon: String
-    let iconColor: Color
-    @ViewBuilder let content: () -> Content
+    let label: String
 
     var body: some View {
-        VStack(spacing: 20) {
-            Spacer()
+        VStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.system(size: 22, weight: .semibold))
+                .foregroundStyle(AppColors.limeGreen)
+                .frame(width: 48, height: 48)
+                .background(AppColors.limeGreen.opacity(0.15))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
 
-            VStack(spacing: 16) {
+            Text(label)
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .foregroundColor(AppColors.textPrimary)
+        }
+    }
+}
+
+private struct StepRow: View {
+    let number: Int
+    let icon: String
+    let title: String
+    let color: Color
+
+    var body: some View {
+        HStack(spacing: 16) {
+            ZStack {
+                Circle()
+                    .fill(color.opacity(0.15))
+                    .frame(width: 52, height: 52)
+
                 Image(systemName: icon)
-                    .font(.system(size: 64, weight: .light))
-                    .foregroundStyle(iconColor)
-
-                VStack(spacing: 8) {
-                    Text(title)
-                        .font(.system(.title, design: .rounded))
-                        .fontWeight(.bold)
-                        .foregroundColor(AppColors.textPrimary)
-                        .multilineTextAlignment(.center)
-
-                    Text(subtitle)
-                        .font(.system(.body, design: .rounded))
-                        .foregroundColor(AppColors.textSecondary)
-                        .multilineTextAlignment(.center)
-                }
+                    .font(.system(size: 22, weight: .semibold))
+                    .foregroundStyle(color)
             }
 
-            content()
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Step \(number)")
+                    .font(.system(size: 12, weight: .medium, design: .rounded))
+                    .foregroundColor(AppColors.textSecondary)
+                Text(title)
+                    .font(.system(.body, design: .rounded))
+                    .fontWeight(.semibold)
+                    .foregroundColor(AppColors.textPrimary)
+            }
 
             Spacer()
         }
-        .padding(.horizontal, 24)
     }
 }
 
 #Preview {
     @State var isPresented = true
+    @State var launchAddPlant = false
 
-    return OnboardingView(isPresented: $isPresented)
+    return OnboardingView(isPresented: $isPresented, launchAddPlant: $launchAddPlant)
 }
