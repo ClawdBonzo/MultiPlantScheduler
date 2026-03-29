@@ -718,6 +718,10 @@ struct PlantDetailView: View {
     private func getPreciseCloudID() {
         guard let data = plant.photoData, let uiImage = UIImage(data: data) else { return }
 
+        #if DEBUG
+        print("☁️ PlantDetail — 'Get Precise ID' tapped for plant: \(plant.name)")
+        #endif
+
         let cloud = CloudIdentificationManager.shared
         guard cloud.canUseCloud(isPremium: revenueCatManager.isPremium) else {
             showUpgradeForCloud = true
@@ -734,6 +738,12 @@ struct PlantDetailView: View {
                 await MainActor.run {
                     isCloudIdentifying = false
                     cloudIDUsed = true
+
+                    #if DEBUG
+                    print("☁️ PlantDetail — cloud result: \(result.species ?? "nil") @ \(Int(result.confidence * 100))%")
+                    print("☁️ PlantDetail — credits after call: \(CloudIdentificationManager.shared.creditsRemaining)")
+                    #endif
+
                     if let speciesName = result.species {
                         withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
                             plant.species = speciesName
@@ -753,10 +763,16 @@ struct PlantDetailView: View {
                 await MainActor.run {
                     isCloudIdentifying = false
                     if !cloud.isAPIKeyConfigured {
-                        reidentifyResult = "Cloud AI not configured"
+                        reidentifyResult = "Cloud AI not configured — check Config.xcconfig"
+                    } else if let errorMsg = cloud.lastErrorMessage {
+                        reidentifyResult = errorMsg
                     } else {
-                        reidentifyResult = "Cloud ID unavailable"
+                        reidentifyResult = "Cloud ID unavailable — try again"
                     }
+
+                    #if DEBUG
+                    print("☁️ PlantDetail — cloud call failed: \(cloud.lastErrorMessage ?? "unknown")")
+                    #endif
                 }
             }
         }

@@ -732,6 +732,10 @@ struct AddPlantView: View {
         let isPremium = revenueCatManager.isPremium
         let cloud = CloudIdentificationManager.shared
 
+        #if DEBUG
+        print("☁️ AddPlant — 'Get Precise ID' tapped")
+        #endif
+
         guard cloud.canUseCloud(isPremium: isPremium) else {
             showUpgradeForCloud = true
             return
@@ -757,6 +761,11 @@ struct AddPlantView: View {
                         aiSpeciesName = result.species
                         aiSuggestions = result.topSuggestions
 
+                        #if DEBUG
+                        print("☁️ AddPlant — cloud result: \(result.species ?? "nil") @ \(Int(result.confidence * 100))%")
+                        print("☁️ AddPlant — credits after call: \(CloudIdentificationManager.shared.creditsRemaining)")
+                        #endif
+
                         // Cloud results are high quality — auto-fill
                         if let matchedSpecies = result.species {
                             if let dbSpecies = PlantSpeciesDatabase.species(named: matchedSpecies) {
@@ -779,7 +788,10 @@ struct AddPlantView: View {
             } else {
                 await MainActor.run {
                     withAnimation { isCloudIdentifying = false }
-                    // API not configured or network error — silent fail, on-device result stays
+                    #if DEBUG
+                    print("☁️ AddPlant — cloud call failed: \(cloud.lastErrorMessage ?? "unknown")")
+                    #endif
+                    // Key not configured — on-device result stays, no disruptive error
                 }
             }
         }

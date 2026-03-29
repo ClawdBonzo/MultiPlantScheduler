@@ -12,6 +12,10 @@ struct SettingsView: View {
     @State private var showNotificationError = false
     @State private var notificationsEnabled = false
     @State private var showShareGarden = false
+    #if DEBUG
+    @State private var debugCloudResult = ""
+    @State private var isTestingCloudAPI = false
+    #endif
     @State private var notificationTime = {
         let hour = UserDefaults.standard.object(forKey: Constants.App.globalNotificationHourKey) as? Int ?? 9
         let minute = UserDefaults.standard.integer(forKey: Constants.App.globalNotificationMinuteKey)
@@ -352,6 +356,73 @@ struct SettingsView: View {
                     }
                 }
                 .listRowBackground(Color(red: 0.118, green: 0.118, blue: 0.118))
+
+                #if DEBUG
+                // Debug Cloud API section (DEBUG builds only)
+                Section("Debug Cloud API") {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Text("API Key")
+                                .font(.system(.body, design: .rounded))
+                                .fontWeight(.semibold)
+                                .foregroundColor(AppColors.textPrimary)
+                            Spacer()
+                            Text(CloudIdentificationManager.shared.isAPIKeyConfigured ? "✅ Loaded" : "❌ Missing")
+                                .font(.system(.caption, design: .rounded))
+                                .foregroundColor(CloudIdentificationManager.shared.isAPIKeyConfigured ? AppColors.limeGreen : .red)
+                        }
+
+                        HStack {
+                            Text("Credits")
+                                .font(.system(.body, design: .rounded))
+                                .fontWeight(.semibold)
+                                .foregroundColor(AppColors.textPrimary)
+                            Spacer()
+                            Text("\(CloudIdentificationManager.shared.creditsRemaining)/\(CloudIdentificationManager.maxFreeCredits)")
+                                .font(.system(.caption, design: .rounded))
+                                .foregroundColor(AppColors.textSecondary)
+                        }
+                    }
+
+                    Button {
+                        isTestingCloudAPI = true
+                        debugCloudResult = "Testing..."
+                        Task {
+                            let result = await CloudIdentificationManager.shared.debugTestAPICall()
+                            await MainActor.run {
+                                debugCloudResult = result
+                                isTestingCloudAPI = false
+                            }
+                        }
+                    } label: {
+                        HStack(spacing: 8) {
+                            if isTestingCloudAPI {
+                                ProgressView()
+                                    .tint(AppColors.limeGreen)
+                                    .scaleEffect(0.7)
+                            } else {
+                                Image(systemName: "ant.fill")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.orange)
+                            }
+
+                            Text("Test Cloud API Call")
+                                .font(.system(.body, design: .rounded))
+                                .fontWeight(.medium)
+                                .foregroundColor(AppColors.textPrimary)
+                        }
+                    }
+                    .disabled(isTestingCloudAPI)
+
+                    if !debugCloudResult.isEmpty {
+                        Text(debugCloudResult)
+                            .font(.system(.caption2, design: .monospaced))
+                            .foregroundColor(AppColors.textSecondary)
+                            .textSelection(.enabled)
+                    }
+                }
+                .listRowBackground(Color(red: 0.118, green: 0.118, blue: 0.118))
+                #endif
 
                 // Danger zone
                 Section("Danger Zone") {
