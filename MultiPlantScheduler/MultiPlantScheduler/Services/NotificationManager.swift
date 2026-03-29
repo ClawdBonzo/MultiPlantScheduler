@@ -1,3 +1,4 @@
+import UIKit
 import UserNotifications
 import Foundation
 
@@ -116,5 +117,12 @@ class NotificationManager {
     /// - Returns: Array of pending UNNotificationRequest objects
     func getPendingNotifications() async -> [UNNotificationRequest] {
         await UNUserNotificationCenter.current().pendingNotificationRequests()
+    }
+}
+
+// MARK: - Badge Management
+extension NotificationManager {
+    func clearBadgeCount() {
+        UNUserNotificationCenter.current().setBadgeCount(0)
     }
 }

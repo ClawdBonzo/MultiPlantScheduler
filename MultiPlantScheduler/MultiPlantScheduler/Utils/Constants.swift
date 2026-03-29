@@ -18,7 +18,7 @@ enum Constants {
 
     // MARK: - RevenueCat Configuration
     enum RevenueCat {
-        static let apiKey = "test_qDnILCnTOuZhYTQesXaFWzWNxQA"
+        static let apiKey = "appl_iwUIsFniEdnILPWkxeuJvgzLpuJ"
         static let premiumEntitlementID = "premium"
     }
 
