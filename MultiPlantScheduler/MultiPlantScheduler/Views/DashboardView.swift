@@ -9,6 +9,7 @@ struct DashboardView: View {
     @State private var showAddPlant = false
     @State private var showSettings = false
     @State private var showPaywall = false
+    @State private var showShareGarden = false
     @State private var refreshTrigger = UUID()
 
     let columns = [
@@ -59,6 +60,14 @@ struct DashboardView: View {
                         Spacer()
 
                         HStack(spacing: 12) {
+                            if !plants.isEmpty {
+                                Button(action: { showShareGarden = true }) {
+                                    Image(systemName: "square.and.arrow.up")
+                                        .font(.system(size: 16, weight: .semibold))
+                                        .foregroundColor(AppColors.limeGreen)
+                                }
+                            }
+
                             Button(action: { showSettings = true }) {
                                 Image(systemName: "gear")
                                     .font(.system(size: 18, weight: .semibold))
@@ -118,6 +127,13 @@ struct DashboardView: View {
                     .cornerRadius(8)
                     .padding(.horizontal, 20)
                     .padding(.bottom, 16)
+                }
+
+                // Today's watering checklist
+                if !plants.isEmpty {
+                    TodayChecklistView(plants: plants)
+                        .padding(.horizontal, 20)
+                        .padding(.bottom, 16)
                 }
 
                 // Free plan upgrade banner
@@ -224,6 +240,9 @@ struct DashboardView: View {
         .sheet(isPresented: $showPaywall) {
             PaywallView()
                 .presentationDetents([.medium, .large])
+        }
+        .sheet(isPresented: $showShareGarden) {
+            ShareGardenView(plants: plants)
         }
     }
 }

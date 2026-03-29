@@ -1,5 +1,5 @@
 import UserNotifications
-import Foundation
+import UIKit
 
 /// Manages local push notifications for watering reminders
 class NotificationManager {
@@ -7,40 +7,10 @@ class NotificationManager {
 
     private init() {}
 
-    /// Request user permission for notifications
-    /// - Returns: true if permission was granted, false otherwise
-    func requestPermission() async -> Bool {
-        do {
-            let granted = try await UNUserNotificationCenter.current()
-                .requestAuthorization(options: [.alert, .sound, .badge])
-            if granted {
-                await MainActor.run {
-                    UIApplication.shared.registerForRemoteNotifications()
-                }
-            }
-            return granted
-        } catch {
-            print("Error requesting notification permission: \(error)")
-            return false
-        }
-    }
+    // MARK: - Categories
 
-    /// Schedule a watering reminder notification for a plant
-    /// - Parameter plant: The plant to schedule a reminder for
-    func scheduleReminder(for plant: Plant) async {
-        let content = UNMutableNotificationContent()
-        content.title = Constants.Notifications.wateringReminderTitle
-        content.body = "\(plant.name) needs watering today"
-        content.sound = .default
-        content.categoryIdentifier = Constants.Notifications.wateringReminderCategory
-
-        // Safely read badge count on main thread
-        let currentBadge: Int = await MainActor.run {
-            UIApplication.shared.applicationIconBadgeNumber
-        }
-        content.badge = NSNumber(value: currentBadge + 1)
-
-        // Add action to the notification
+    /// Register notification categories and actions — call once from AppDelegate
+    func registerCategories() {
         let waterAction = UNNotificationAction(
             identifier: Constants.Notifications.markWateredAction,
             title: "Mark as Watered",
@@ -59,14 +29,74 @@ class NotificationManager {
             options: []
         )
         UNUserNotificationCenter.current().setNotificationCategories([category])
+    }
 
-        // Schedule for 9 AM on the next watering date
+    // MARK: - Permissions
+
+    /// Request user permission for notifications
+    func requestPermission() async -> Bool {
+        do {
+            let granted = try await UNUserNotificationCenter.current()
+                .requestAuthorization(options: [.alert, .sound, .badge])
+            if granted {
+                await MainActor.run {
+                    UIApplication.shared.registerForRemoteNotifications()
+                }
+            }
+            return granted
+        } catch {
+            print("Error requesting notification permission: \(error)")
+            return false
+        }
+    }
+
+    // MARK: - Badge Management
+
+    /// Clear the app badge count
+    func clearBadgeCount() {
+        Task { @MainActor in
+            UIApplication.shared.applicationIconBadgeNumber = 0
+        }
+        UNUserNotificationCenter.current().removeAllDeliveredNotifications()
+    }
+
+    // MARK: - Scheduling
+
+    /// Resolve the notification hour/minute for a plant
+    private func notificationTime(for plant: Plant) -> (hour: Int, minute: Int) {
+        // Per-plant override (premium)
+        if let hour = plant.preferredNotificationHour {
+            return (hour, plant.preferredNotificationMinute ?? 0)
+        }
+        // Global user preference
+        let defaults = UserDefaults.standard
+        let globalHour = defaults.object(forKey: Constants.App.globalNotificationHourKey) as? Int
+        if let globalHour = globalHour {
+            let globalMinute = defaults.integer(forKey: Constants.App.globalNotificationMinuteKey)
+            return (globalHour, globalMinute)
+        }
+        // Default: 9:00 AM
+        return (Constants.App.notificationHour, 0)
+    }
+
+    /// Schedule a watering reminder notification for a plant
+    func scheduleReminder(for plant: Plant) async {
+        let content = UNMutableNotificationContent()
+        content.title = Constants.Notifications.wateringReminderTitle
+        content.body = "\(plant.name) needs watering today"
+        content.sound = .default
+        content.categoryIdentifier = Constants.Notifications.wateringReminderCategory
+        content.badge = 1
+
+        let time = notificationTime(for: plant)
+
+        // Schedule for the configured time on the next watering date
         var dateComponents = Calendar.current.dateComponents(
             [.year, .month, .day],
             from: plant.nextWateringDate
         )
-        dateComponents.hour = Constants.App.notificationHour
-        dateComponents.minute = 0
+        dateComponents.hour = time.hour
+        dateComponents.minute = time.minute
 
         let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
         let request = UNNotificationRequest(
@@ -77,43 +107,78 @@ class NotificationManager {
 
         do {
             try await UNUserNotificationCenter.current().add(request)
-            print("Scheduled watering reminder for \(plant.name) on \(plant.nextWateringDate)")
+            print("Scheduled watering reminder for \(plant.name) on \(plant.nextWateringDate) at \(time.hour):\(String(format: "%02d", time.minute))")
         } catch {
             print("Error scheduling notification for \(plant.name): \(error)")
         }
+
+        // Also schedule a follow-up reminder for the next day in case they miss it
+        await scheduleFollowUpReminder(for: plant, time: time)
     }
 
-    /// Cancel a scheduled reminder for a plant
-    /// - Parameter plant: The plant to cancel the reminder for
+    /// Schedule a follow-up reminder for the day after the watering date
+    private func scheduleFollowUpReminder(for plant: Plant, time: (hour: Int, minute: Int)) async {
+        let followUpDate = Calendar.current.date(
+            byAdding: .day, value: 1, to: plant.nextWateringDate
+        ) ?? plant.nextWateringDate
+
+        let content = UNMutableNotificationContent()
+        content.title = "🚨 \(plant.name) still needs water!"
+        content.body = "Don't forget — \(plant.name) was due for watering yesterday"
+        content.sound = .default
+        content.categoryIdentifier = Constants.Notifications.wateringReminderCategory
+        content.badge = 1
+
+        var dateComponents = Calendar.current.dateComponents(
+            [.year, .month, .day],
+            from: followUpDate
+        )
+        dateComponents.hour = time.hour
+        dateComponents.minute = time.minute
+
+        let trigger = UNCalendarNotificationTrigger(dateMatching: dateComponents, repeats: false)
+        let request = UNNotificationRequest(
+            identifier: "\(plant.id.uuidString)-followup",
+            content: content,
+            trigger: trigger
+        )
+
+        do {
+            try await UNUserNotificationCenter.current().add(request)
+        } catch {
+            print("Error scheduling follow-up for \(plant.name): \(error)")
+        }
+    }
+
+    // MARK: - Cancellation
+
+    /// Cancel a scheduled reminder and its follow-up for a plant
     func cancelReminder(for plant: Plant) {
         UNUserNotificationCenter.current().removePendingNotificationRequests(
-            withIdentifiers: [plant.id.uuidString]
+            withIdentifiers: [plant.id.uuidString, "\(plant.id.uuidString)-followup"]
         )
         print("Cancelled notification for \(plant.name)")
     }
 
     /// Cancel all pending notifications and reschedule for all plants
-    /// - Parameter plants: Array of plants to reschedule reminders for
     func rescheduleAllReminders(plants: [Plant]) async {
-        // Cancel all pending notifications
         UNUserNotificationCenter.current().removeAllPendingNotificationRequests()
 
-        // Reschedule for each plant
         for plant in plants {
             await scheduleReminder(for: plant)
         }
         print("Rescheduled reminders for all \(plants.count) plants")
     }
 
+    // MARK: - Queries
+
     /// Get the count of pending notifications
-    /// - Returns: The number of pending notifications
     func getPendingNotificationsCount() async -> Int {
         let requests = await UNUserNotificationCenter.current().pendingNotificationRequests()
         return requests.count
     }
 
     /// Get all pending notification requests
-    /// - Returns: Array of pending UNNotificationRequest objects
     func getPendingNotifications() async -> [UNNotificationRequest] {
         await UNUserNotificationCenter.current().pendingNotificationRequests()
     }

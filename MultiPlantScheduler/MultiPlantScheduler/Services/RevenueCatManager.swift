@@ -6,7 +6,13 @@ import RevenueCat
 class RevenueCatManager: ObservableObject {
     static let shared = RevenueCatManager()
 
-    @Published var isPremium: Bool = false
+    @Published var isPremium: Bool = false {
+        didSet {
+            // Mirror premium status to shared UserDefaults for widget access
+            UserDefaults(suiteName: SharedContainer.appGroupID)?
+                .set(isPremium, forKey: "isPremium")
+        }
+    }
     @Published var offerings: Offerings?
     @Published var isLoading: Bool = false
     @Published var error: Error?

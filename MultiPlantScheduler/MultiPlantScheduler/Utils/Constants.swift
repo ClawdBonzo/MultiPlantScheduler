@@ -47,6 +47,10 @@ enum Constants {
         static let notificationHour = 9          // 9 AM daily reminders
         static let jpegCompressionQuality: CGFloat = 0.7
         static let freePlantLimit = Subscription.freeTierPlantLimit
+
+        // UserDefaults keys for custom notification time
+        static let globalNotificationHourKey = "globalNotificationHour"
+        static let globalNotificationMinuteKey = "globalNotificationMinute"
     }
 }
 

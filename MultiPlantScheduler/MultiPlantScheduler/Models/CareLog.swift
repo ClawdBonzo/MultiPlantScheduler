@@ -5,9 +5,9 @@ import Foundation
 /// A record of care activities performed on a plant
 @Model
 final class CareLog {
-    @Attribute(.unique) var id: UUID
-    var logDate: Date
-    var careType: String  // Use CareType.rawValue
+    var id: UUID = UUID()
+    var logDate: Date = Date.now
+    var careType: String = "water"  // Use CareType.rawValue
     var notes: String?
     var plant: Plant?
 

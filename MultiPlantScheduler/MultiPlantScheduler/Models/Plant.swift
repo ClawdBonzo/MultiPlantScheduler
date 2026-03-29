@@ -6,21 +6,35 @@ import Foundation
 /// A houseplant tracked in the app with watering schedule and care history
 @Model
 final class Plant {
-    @Attribute(.unique) var id: UUID
-    var name: String
+    var id: UUID = UUID()
+    var name: String = ""
     var species: String?
-    var wateringIntervalDays: Int
+    var wateringIntervalDays: Int = 7
     var lastWateredDate: Date?
     var lastFertilizedDate: Date?
     var photoData: Data?  // Compressed JPEG data
     var room: String?
     var notes: String?
     var fertilizerType: String?
-    var createdAt: Date
-    var wateringStreak: Int
+    var createdAt: Date = Date.now
+    var wateringStreak: Int = 0
+
+    // Health tracking
+    var healthStatus: String?
+    var lastHealthCheckDate: Date?
+
+    // Custom notification time
+    var preferredNotificationHour: Int?
+    var preferredNotificationMinute: Int?
 
     @Relationship(deleteRule: .cascade, inverse: \CareLog.plant)
     var careLogs: [CareLog] = []
+
+    @Relationship(deleteRule: .cascade, inverse: \HealthEntry.plant)
+    var healthEntries: [HealthEntry] = []
+
+    @Relationship(deleteRule: .cascade, inverse: \PhotoEntry.plant)
+    var photoEntries: [PhotoEntry] = []
 
     init(
         name: String,
@@ -94,6 +108,19 @@ final class Plant {
             return nil
         }
         return Image(uiImage: uiImage)
+    }
+
+    /// Parsed health status from stored string
+    var currentHealth: HealthStatus {
+        guard let healthStatus = healthStatus else { return .unknown }
+        return HealthStatus(rawValue: healthStatus) ?? .unknown
+    }
+
+    /// Whether a health check is due (no check or last check > 14 days ago)
+    var isHealthCheckDue: Bool {
+        guard let lastCheck = lastHealthCheckDate else { return true }
+        let daysSinceCheck = Calendar.current.dateComponents([.day], from: lastCheck, to: Date.now).day ?? 0
+        return daysSinceCheck >= 14
     }
 }
 

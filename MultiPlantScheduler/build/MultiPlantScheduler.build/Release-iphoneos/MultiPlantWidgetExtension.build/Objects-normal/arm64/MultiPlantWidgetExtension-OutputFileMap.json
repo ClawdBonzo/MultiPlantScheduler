@@ -1,0 +1,36 @@
+{
+  "" : {
+    "const-values" : "/Users/robgoldstein/Desktop/MultiPlantScheduler/MultiPlantScheduler/.claude/worktrees/elegant-ride/MultiPlantScheduler/build/MultiPlantScheduler.build/Release-iphoneos/MultiPlantWidgetExtension.build/Objects-normal/arm64/MultiPlantWidgetExtension-primary.swiftconstvalues",
+    "dependencies" : "/Users/robgoldstein/Desktop/MultiPlantScheduler/MultiPlantScheduler/.claude/worktrees/elegant-ride/MultiPlantScheduler/build/MultiPlantScheduler.build/Release-iphoneos/MultiPlantWidgetExtension.build/Objects-normal/arm64/MultiPlantWidgetExtension-primary.d",
+    "diagnostics" : "/Users/robgoldstein/Desktop/MultiPlantScheduler/MultiPlantScheduler/.claude/worktrees/elegant-ride/MultiPlantScheduler/build/MultiPlantScheduler.build/Release-iphoneos/MultiPlantWidgetExtension.build/Objects-normal/arm64/MultiPlantWidgetExtension-primary.dia",
+    "emit-module-dependencies" : "/Users/robgoldstein/Desktop/MultiPlantScheduler/MultiPlantScheduler/.claude/worktrees/elegant-ride/MultiPlantScheduler/build/MultiPlantScheduler.build/Release-iphoneos/MultiPlantWidgetExtension.build/Objects-normal/arm64/MultiPlantWidgetExtension-primary-emit-module.d",
+    "emit-module-diagnostics" : "/Users/robgoldstein/Desktop/MultiPlantScheduler/MultiPlantScheduler/.claude/worktrees/elegant-ride/MultiPlantScheduler/build/MultiPlantScheduler.build/Release-iphoneos/MultiPlantWidgetExtension.build/Objects-normal/arm64/MultiPlantWidgetExtension-primary-emit-module.dia",
+    "pch" : "/Users/robgoldstein/Desktop/MultiPlantScheduler/MultiPlantScheduler/.claude/worktrees/elegant-ride/MultiPlantScheduler/build/MultiPlantScheduler.build/Release-iphoneos/MultiPlantWidgetExtension.build/Objects-normal/arm64/MultiPlantWidgetExtension-primary-Bridging-header.pch",
+    "swift-dependencies" : "/Users/robgoldstein/Desktop/MultiPlantScheduler/MultiPlantScheduler/.claude/worktrees/elegant-ride/MultiPlantScheduler/build/MultiPlantScheduler.build/Release-iphoneos/MultiPlantWidgetExtension.build/Objects-normal/arm64/MultiPlantWidgetExtension-primary.swiftdeps"
+  },
+  "/Users/robgoldstein/Desktop/MultiPlantScheduler/MultiPlantScheduler/.claude/worktrees/elegant-ride/MultiPlantScheduler/MultiPlantWidget/MediumWidgetView.swift" : {
+    "index-unit-output-path" : "/MultiPlantScheduler.build/Release-iphoneos/MultiPlantWidgetExtension.build/Objects-normal/arm64/MediumWidgetView.o",
+    "llvm-bc" : "/Users/robgoldstein/Desktop/MultiPlantScheduler/MultiPlantScheduler/.claude/worktrees/elegant-ride/MultiPlantScheduler/build/MultiPlantScheduler.build/Release-iphoneos/MultiPlantWidgetExtension.build/Objects-normal/arm64/MediumWidgetView.bc",
+    "object" : "/Users/robgoldstein/Desktop/MultiPlantScheduler/MultiPlantScheduler/.claude/worktrees/elegant-ride/MultiPlantScheduler/build/MultiPlantScheduler.build/Release-iphoneos/MultiPlantWidgetExtension.build/Objects-normal/arm64/MediumWidgetView.o"
+  },
+  "/Users/robgoldstein/Desktop/MultiPlantScheduler/MultiPlantScheduler/.claude/worktrees/elegant-ride/MultiPlantScheduler/MultiPlantWidget/MultiPlantWidgetBundle.swift" : {
+    "index-unit-output-path" : "/MultiPlantScheduler.build/Release-iphoneos/MultiPlantWidgetExtension.build/Objects-normal/arm64/MultiPlantWidgetBundle.o",
+    "llvm-bc" : "/Users/robgoldstein/Desktop/MultiPlantScheduler/MultiPlantScheduler/.claude/worktrees/elegant-ride/MultiPlantScheduler/build/MultiPlantScheduler.build/Release-iphoneos/MultiPlantWidgetExtension.build/Objects-normal/arm64/MultiPlantWidgetBundle.bc",
+    "object" : "/Users/robgoldstein/Desktop/MultiPlantScheduler/MultiPlantScheduler/.claude/worktrees/elegant-ride/MultiPlantScheduler/build/MultiPlantScheduler.build/Release-iphoneos/MultiPlantWidgetExtension.build/Objects-normal/arm64/MultiPlantWidgetBundle.o"
+  },
+  "/Users/robgoldstein/Desktop/MultiPlantScheduler/MultiPlantScheduler/.claude/worktrees/elegant-ride/MultiPlantScheduler/MultiPlantWidget/PlantWidgetEntry.swift" : {
+    "index-unit-output-path" : "/MultiPlantScheduler.build/Release-iphoneos/MultiPlantWidgetExtension.build/Objects-normal/arm64/PlantWidgetEntry.o",
+    "llvm-bc" : "/Users/robgoldstein/Desktop/MultiPlantScheduler/MultiPlantScheduler/.claude/worktrees/elegant-ride/MultiPlantScheduler/build/MultiPlantScheduler.build/Release-iphoneos/MultiPlantWidgetExtension.build/Objects-normal/arm64/PlantWidgetEntry.bc",
+    "object" : "/Users/robgoldstein/Desktop/MultiPlantScheduler/MultiPlantScheduler/.claude/worktrees/elegant-ride/MultiPlantScheduler/build/MultiPlantScheduler.build/Release-iphoneos/MultiPlantWidgetExtension.build/Objects-normal/arm64/PlantWidgetEntry.o"
+  },
+  "/Users/robgoldstein/Desktop/MultiPlantScheduler/MultiPlantScheduler/.claude/worktrees/elegant-ride/MultiPlantScheduler/MultiPlantWidget/PlantWidgetProvider.swift" : {
+    "index-unit-output-path" : "/MultiPlantScheduler.build/Release-iphoneos/MultiPlantWidgetExtension.build/Objects-normal/arm64/PlantWidgetProvider.o",
+    "llvm-bc" : "/Users/robgoldstein/Desktop/MultiPlantScheduler/MultiPlantScheduler/.claude/worktrees/elegant-ride/MultiPlantScheduler/build/MultiPlantScheduler.build/Release-iphoneos/MultiPlantWidgetExtension.build/Objects-normal/arm64/PlantWidgetProvider.bc",
+    "object" : "/Users/robgoldstein/Desktop/MultiPlantScheduler/MultiPlantScheduler/.claude/worktrees/elegant-ride/MultiPlantScheduler/build/MultiPlantScheduler.build/Release-iphoneos/MultiPlantWidgetExtension.build/Objects-normal/arm64/PlantWidgetProvider.o"
+  },
+  "/Users/robgoldstein/Desktop/MultiPlantScheduler/MultiPlantScheduler/.claude/worktrees/elegant-ride/MultiPlantScheduler/MultiPlantWidget/SmallWidgetView.swift" : {
+    "index-unit-output-path" : "/MultiPlantScheduler.build/Release-iphoneos/MultiPlantWidgetExtension.build/Objects-normal/arm64/SmallWidgetView.o",
+    "llvm-bc" : "/Users/robgoldstein/Desktop/MultiPlantScheduler/MultiPlantScheduler/.claude/worktrees/elegant-ride/MultiPlantScheduler/build/MultiPlantScheduler.build/Release-iphoneos/MultiPlantWidgetExtension.build/Objects-normal/arm64/SmallWidgetView.bc",
+    "object" : "/Users/robgoldstein/Desktop/MultiPlantScheduler/MultiPlantScheduler/.claude/worktrees/elegant-ride/MultiPlantScheduler/build/MultiPlantScheduler.build/Release-iphoneos/MultiPlantWidgetExtension.build/Objects-normal/arm64/SmallWidgetView.o"
+  }
+}

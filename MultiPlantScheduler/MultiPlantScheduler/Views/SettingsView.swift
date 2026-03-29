@@ -11,6 +11,15 @@ struct SettingsView: View {
     @State private var showDeleteSecondConfirmation = false
     @State private var showNotificationError = false
     @State private var notificationsEnabled = false
+    @State private var showShareGarden = false
+    @State private var notificationTime = {
+        let hour = UserDefaults.standard.object(forKey: Constants.App.globalNotificationHourKey) as? Int ?? 9
+        let minute = UserDefaults.standard.integer(forKey: Constants.App.globalNotificationMinuteKey)
+        var components = DateComponents()
+        components.hour = hour
+        components.minute = minute
+        return Calendar.current.date(from: components) ?? Date.now
+    }()
 
     var appVersion: String {
         Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
@@ -126,6 +135,40 @@ struct SettingsView: View {
                                 .foregroundColor(AppColors.textPrimary)
                         }
                     }
+
+                    if revenueCatManager.isPremium {
+                        DatePicker(
+                            "Reminder Time",
+                            selection: $notificationTime,
+                            displayedComponents: .hourAndMinute
+                        )
+                        .font(.system(.body, design: .rounded))
+                        .fontWeight(.semibold)
+                        .foregroundColor(AppColors.textPrimary)
+                        .tint(AppColors.limeGreen)
+                        .onChange(of: notificationTime) { _, newTime in
+                            let components = Calendar.current.dateComponents([.hour, .minute], from: newTime)
+                            UserDefaults.standard.set(components.hour, forKey: Constants.App.globalNotificationHourKey)
+                            UserDefaults.standard.set(components.minute, forKey: Constants.App.globalNotificationMinuteKey)
+                            Task {
+                                await NotificationManager.shared.rescheduleAllReminders(plants: plants)
+                            }
+                        }
+                    } else {
+                        HStack {
+                            Text("Custom Reminder Time")
+                                .font(.system(.body, design: .rounded))
+                                .fontWeight(.semibold)
+                                .foregroundColor(AppColors.textSecondary)
+                            Spacer()
+                            Image(systemName: "lock.fill")
+                                .foregroundColor(.yellow)
+                                .font(.caption)
+                            Text("Premium")
+                                .font(.caption)
+                                .foregroundColor(.yellow)
+                        }
+                    }
                 }
                 .listRowBackground(Color(red: 0.118, green: 0.118, blue: 0.118))
 
@@ -162,6 +205,29 @@ struct SettingsView: View {
                             Image(systemName: "chevron.right")
                                 .font(.system(size: 14, weight: .semibold))
                                 .foregroundColor(AppColors.textSecondary)
+                        }
+                    }
+
+                    if !plants.isEmpty {
+                        Button {
+                            showShareGarden = true
+                        } label: {
+                            HStack(spacing: 8) {
+                                Image(systemName: "photo.artframe")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(AppColors.limeGreen)
+
+                                Text("Share My Garden")
+                                    .font(.system(.body, design: .rounded))
+                                    .fontWeight(.medium)
+                                    .foregroundColor(AppColors.textPrimary)
+
+                                Spacer()
+
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(AppColors.textSecondary)
+                            }
                         }
                     }
 
@@ -303,6 +369,9 @@ struct SettingsView: View {
             Button("OK") { }
         } message: {
             Text("Please enable notifications in Settings > Notifications to use this feature.")
+        }
+        .sheet(isPresented: $showShareGarden) {
+            ShareGardenView(plants: plants)
         }
     }
 

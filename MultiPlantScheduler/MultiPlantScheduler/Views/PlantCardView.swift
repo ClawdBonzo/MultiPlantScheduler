@@ -44,6 +44,17 @@ struct PlantCardView: View {
             }
             .frame(height: 120)
             .clipped()
+            .overlay(alignment: .topTrailing) {
+                if plant.currentHealth != .unknown {
+                    Circle()
+                        .fill(plant.currentHealth.color)
+                        .frame(width: 12, height: 12)
+                        .overlay(
+                            Circle().stroke(Color(red: 0.118, green: 0.118, blue: 0.118), lineWidth: 2)
+                        )
+                        .padding(8)
+                }
+            }
 
             // Info section
             VStack(alignment: .leading, spacing: 6) {
