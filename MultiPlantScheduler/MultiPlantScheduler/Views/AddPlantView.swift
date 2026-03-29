@@ -57,7 +57,7 @@ struct AddPlantView: View {
 
     var filteredSpecies: [PlantSpecies] {
         if speciesSearchText.isEmpty {
-            return PlantSpeciesDatabase.database.prefix(10).map { $0 }
+            return Array(PlantSpeciesDatabase.database.prefix(20))
         }
         return PlantSpeciesDatabase.search(query: speciesSearchText)
     }
@@ -640,17 +640,78 @@ struct SearchableSpeciesPicker: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            TextField("Search species...", text: $searchText)
-                .font(.system(.body, design: .rounded))
-                .textFieldStyle(.roundedBorder)
+            // Selected species chip
+            if let selected = species {
+                HStack {
+                    Image(systemName: "leaf.fill")
+                        .font(.system(size: 14))
+                        .foregroundStyle(AppColors.limeGreen)
 
-            if !filteredSpecies.isEmpty {
-                VStack(alignment: .leading, spacing: 4) {
-                    ForEach(filteredSpecies, id: \.name) { spec in
-                        Button(action: {
-                            species = spec
+                    Text(selected.name)
+                        .font(.system(.callout, design: .rounded))
+                        .fontWeight(.semibold)
+                        .foregroundColor(AppColors.textPrimary)
+
+                    Text("\(selected.defaultWateringDays)d watering")
+                        .font(.system(.caption2, design: .rounded))
+                        .foregroundColor(AppColors.textSecondary)
+
+                    Spacer()
+
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundColor(AppColors.textSecondary)
+                        .onTapGesture {
+                            species = nil
+                        }
+                }
+                .padding(8)
+                .background(AppColors.forestGreen.opacity(0.2))
+                .cornerRadius(8)
+            }
+
+            // Search field
+            HStack {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 14))
+                    .foregroundColor(AppColors.textSecondary)
+
+                TextField("Search 143 species...", text: $searchText)
+                    .font(.system(.body, design: .rounded))
+
+                if !searchText.isEmpty {
+                    Image(systemName: "xmark.circle.fill")
+                        .font(.system(size: 14))
+                        .foregroundColor(AppColors.textSecondary)
+                        .onTapGesture {
                             searchText = ""
-                        }) {
+                        }
+                }
+            }
+            .padding(8)
+            .background(Color(red: 0.15, green: 0.15, blue: 0.15))
+            .cornerRadius(8)
+
+            // Results list
+            if !filteredSpecies.isEmpty && species == nil {
+                ScrollView {
+                    VStack(alignment: .leading, spacing: 0) {
+                        if searchText.isEmpty {
+                            Text("Popular species")
+                                .font(.system(size: 11, weight: .medium, design: .rounded))
+                                .foregroundColor(AppColors.textSecondary)
+                                .padding(.horizontal, 8)
+                                .padding(.top, 4)
+                                .padding(.bottom, 2)
+                        } else {
+                            Text("\(filteredSpecies.count) result\(filteredSpecies.count != 1 ? "s" : "")")
+                                .font(.system(size: 11, weight: .medium, design: .rounded))
+                                .foregroundColor(AppColors.textSecondary)
+                                .padding(.horizontal, 8)
+                                .padding(.top, 4)
+                                .padding(.bottom, 2)
+                        }
+
+                        ForEach(filteredSpecies, id: \.name) { spec in
                             HStack {
                                 Image(systemName: "leaf.fill")
                                     .font(.system(size: 14))
@@ -663,44 +724,36 @@ struct SearchableSpeciesPicker: View {
                                         .fontWeight(.semibold)
                                         .foregroundColor(AppColors.textPrimary)
 
-                                    Text("\(spec.defaultWateringDays) day interval")
+                                    Text("Water every \(spec.defaultWateringDays) days")
                                         .font(.system(.caption, design: .rounded))
                                         .foregroundColor(AppColors.textSecondary)
                                 }
 
                                 Spacer()
+
+                                Image(systemName: "chevron.right")
+                                    .font(.system(size: 12, weight: .semibold))
+                                    .foregroundColor(AppColors.textSecondary.opacity(0.5))
                             }
-                            .padding(8)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 8)
                             .contentShape(Rectangle())
+                            .onTapGesture {
+                                species = spec
+                                searchText = ""
+                                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+                            }
+
+                            if spec.name != filteredSpecies.last?.name {
+                                Divider()
+                                    .background(Color.white.opacity(0.05))
+                                    .padding(.leading, 40)
+                            }
                         }
                     }
                 }
+                .frame(maxHeight: 200)
                 .background(Color(red: 0.08, green: 0.08, blue: 0.08))
-                .cornerRadius(8)
-            }
-
-            if let selected = species {
-                HStack {
-                    Image(systemName: "leaf.fill")
-                        .font(.system(size: 14))
-                        .foregroundStyle(AppColors.limeGreen)
-
-                    Text(selected.name)
-                        .font(.system(.callout, design: .rounded))
-                        .fontWeight(.semibold)
-                        .foregroundColor(AppColors.textPrimary)
-
-                    Spacer()
-
-                    Button(action: {
-                        species = nil
-                    }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .foregroundColor(AppColors.textSecondary)
-                    }
-                }
-                .padding(8)
-                .background(AppColors.forestGreen.opacity(0.2))
                 .cornerRadius(8)
             }
         }
