@@ -156,8 +156,8 @@ struct DashboardView: View {
                         .padding(.bottom, 16)
                 }
 
-                // Soft nudge when approaching plant limit (4-5 plants)
-                if !revenueCatManager.isPremium && plants.count >= 4 && plants.count < AppConfig.freePlantLimit {
+                // Soft nudge when approaching plant limit
+                if !revenueCatManager.isPremium && plants.count >= 2 && plants.count < AppConfig.freePlantLimit {
                     Button {
                         showPaywall = true
                     } label: {

@@ -2,7 +2,7 @@ import UIKit
 import Foundation
 
 /// Manages Plant.id cloud API calls and free credit tracking.
-/// Every new user gets 10 free cloud IDs. Premium users get unlimited.
+/// Every new user gets 5 free cloud IDs. Premium users get unlimited.
 /// The app remains 100% offline-first — cloud is optional for higher accuracy.
 final class CloudIdentificationManager {
     static let shared = CloudIdentificationManager()
@@ -16,7 +16,7 @@ final class CloudIdentificationManager {
     // MARK: - Credit Tracking (UserDefaults)
     private let creditsKey = "cloudIDCreditsRemaining"
     private let initializedKey = "cloudIDCreditsInitialized"
-    static let maxFreeCredits = 10
+    static let maxFreeCredits = 5
 
     /// Last error message from a cloud call (for UI display)
     private(set) var lastErrorMessage: String?

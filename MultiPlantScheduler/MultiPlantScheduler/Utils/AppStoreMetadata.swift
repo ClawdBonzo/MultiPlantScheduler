@@ -37,7 +37,7 @@ struct AppStoreMetadata {
     • Care timeline showing your plant care history
 
     PREMIUM BENEFITS:
-    • Unlimited plants (free plan: 5 plants)
+    • Unlimited plants (free plan: 3 plants)
     • Export care history as CSV
     • Priority features and early access
     • Full seasonal adjustments

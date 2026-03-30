@@ -629,7 +629,7 @@ struct AddPlantView: View {
             .alert("Cloud IDs Used", isPresented: $showUpgradeForCloud) {
                 Button("Maybe Later", role: .cancel) {}
             } message: {
-                Text("You've used all 10 free cloud identifications. Upgrade to Premium for unlimited precise plant IDs.")
+                Text("You've used all \(CloudIdentificationManager.maxFreeCredits) free cloud identifications. Upgrade to Premium for unlimited precise plant IDs.")
             }
         }
     }

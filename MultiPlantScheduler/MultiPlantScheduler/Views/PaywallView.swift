@@ -195,7 +195,7 @@ struct PaywallView: View {
                         }
 
                         Button(action: { dismiss() }) {
-                            Text("Continue with Free (5 plants, 10 cloud IDs)")
+                            Text("Continue with Free (3 plants, 5 cloud IDs)")
                                 .font(.system(size: 14, weight: .medium))
                                 .foregroundStyle(.gray)
                         }
