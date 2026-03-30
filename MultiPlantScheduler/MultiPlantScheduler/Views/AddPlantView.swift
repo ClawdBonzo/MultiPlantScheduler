@@ -254,7 +254,7 @@ struct AddPlantView: View {
                                                 .font(.system(size: 14, weight: .semibold))
                                                 .foregroundStyle(confidence >= 0.80 ? AppColors.limeGreen : .yellow)
 
-                                            Text("\(Int(confidence * 100))% \(speciesName)")
+                                            Text("\(min(Int(confidence * 100), 100))% \(speciesName)")
                                                 .font(.system(.caption, design: .rounded))
                                                 .fontWeight(.semibold)
                                                 .foregroundColor(AppColors.textPrimary)
@@ -296,7 +296,7 @@ struct AddPlantView: View {
                                                         .fontWeight(.medium)
                                                         .foregroundColor(AppColors.textPrimary)
 
-                                                    Text("\(Int(suggestion.confidence * 100))%")
+                                                    Text("\(min(Int(suggestion.confidence * 100), 100))%")
                                                         .font(.system(size: 10, weight: .medium, design: .rounded))
                                                         .foregroundColor(AppColors.textSecondary)
 

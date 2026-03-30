@@ -31,11 +31,20 @@ final class CloudIdentificationManager {
         #endif
     }
 
-    /// Initialize credits for first-time users
+    /// Initialize credits for first-time users, and cap existing users to current max
     private func initializeCreditsIfNeeded() {
         if !UserDefaults.standard.bool(forKey: initializedKey) {
             UserDefaults.standard.set(Self.maxFreeCredits, forKey: creditsKey)
             UserDefaults.standard.set(true, forKey: initializedKey)
+        } else {
+            // Cap existing credits to current max (handles downgrade from 10 → 5)
+            let current = UserDefaults.standard.integer(forKey: creditsKey)
+            if current > Self.maxFreeCredits {
+                UserDefaults.standard.set(Self.maxFreeCredits, forKey: creditsKey)
+                #if DEBUG
+                print("☁️ CloudID — capped credits from \(current) to \(Self.maxFreeCredits)")
+                #endif
+            }
         }
     }
 
@@ -202,7 +211,8 @@ final class CloudIdentificationManager {
 
             for (index, suggestion) in suggestions.prefix(5).enumerated() {
                 let scientificName = suggestion["name"] as? String ?? "Unknown"
-                let probability = suggestion["probability"] as? Double ?? 0
+                let rawProbability = suggestion["probability"] as? Double ?? 0
+                let probability = min(rawProbability, 1.0) // Clamp to 100% max
                 var commonName: String?
 
                 if let details = suggestion["details"] as? [String: Any],
@@ -361,11 +371,12 @@ final class CloudIdentificationManager {
             )
         }
 
+        let clampedConfidence = min(cloud.confidence, 1.0)
         return PlantIdentifierService.IdentificationResult(
             species: mappedName,
-            confidence: cloud.confidence,
+            confidence: clampedConfidence,
             defaultInterval: interval,
-            isLowConfidence: cloud.confidence < 0.70,
+            isLowConfidence: clampedConfidence < 0.70,
             topSuggestions: suggestions
         )
     }

@@ -78,7 +78,7 @@ final class PlantIdentifierService {
                     return
                 }
 
-                let confidence = Double(top.confidence)
+                let confidence = min(Double(top.confidence), 1.0) // Clamp to 100% max
                 let rawLabel = top.identifier
 
                 // Map CoreML label to our app's species database
@@ -92,7 +92,7 @@ final class PlantIdentifierService {
                     let sugInterval = PlantSpeciesDatabase.species(named: mappedName)?.defaultWateringDays ?? Self.defaultInterval(for: obs.identifier)
                     return Suggestion(
                         species: mappedName,
-                        confidence: Double(obs.confidence),
+                        confidence: min(Double(obs.confidence), 1.0),
                         defaultInterval: sugInterval
                     )
                 }

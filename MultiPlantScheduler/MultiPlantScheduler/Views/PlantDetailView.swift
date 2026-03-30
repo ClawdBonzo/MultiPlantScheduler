@@ -219,7 +219,7 @@ struct PlantDetailView: View {
                                         Image(systemName: "brain")
                                             .font(.system(size: 12, weight: .semibold))
                                             .foregroundStyle(AppColors.limeGreen)
-                                        Text("AI Identified: \(Int(confidence * 100))% confidence")
+                                        Text("AI Identified: \(min(Int(confidence * 100), 100))% confidence")
                                             .font(.system(.caption, design: .rounded))
                                             .fontWeight(.medium)
                                             .foregroundColor(AppColors.textSecondary)
@@ -720,7 +720,7 @@ struct PlantDetailView: View {
                         if let dbSpecies = PlantSpeciesDatabase.species(named: speciesName) {
                             plant.wateringIntervalDays = dbSpecies.defaultWateringDays
                         }
-                        reidentifyResult = "\(Int(result.confidence * 100))% \(speciesName)"
+                        reidentifyResult = "\(min(Int(result.confidence * 100), 100))% \(speciesName)"
                     }
                     try? modelContext.save()
 
@@ -773,7 +773,7 @@ struct PlantDetailView: View {
                             plant.aiConfidence = result.confidence
                             plant.lastIdentifiedDate = Date.now
                             plant.wateringIntervalDays = result.defaultInterval
-                            reidentifyResult = "Cloud AI: \(Int(result.confidence * 100))% \(speciesName)"
+                            reidentifyResult = "Cloud AI: \(min(Int(result.confidence * 100), 100))% \(speciesName)"
                         }
 
                         // Re-assign photo data to prevent SwiftData eviction on save
