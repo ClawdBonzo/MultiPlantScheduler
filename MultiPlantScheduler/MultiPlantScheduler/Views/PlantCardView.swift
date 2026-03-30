@@ -114,14 +114,9 @@ struct PlantCardView: View {
             RoundedRectangle(cornerRadius: 16)
                 .fill(Color(red: 0.118, green: 0.118, blue: 0.118)) // #1E1E1E
         )
+        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .contentShape(RoundedRectangle(cornerRadius: 16))
         .shadow(color: Color.black.opacity(0.3), radius: 8, x: 0, y: 4)
-        .scaleEffect(isPressed ? 0.97 : 1.0)
-        .onLongPressGesture(
-            minimumDuration: 0.1,
-            perform: {},
-            onPressingChanged: { isPressed = $0 }
-        )
-        .animation(.easeInOut(duration: 0.15), value: isPressed)
     }
 }
 

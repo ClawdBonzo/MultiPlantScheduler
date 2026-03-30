@@ -21,6 +21,7 @@ struct PlantDetailView: View {
     @State private var isCloudIdentifying = false
     @State private var cloudIDUsed = false
     @State private var showUpgradeForCloud = false
+    @State private var creditsRefresh = UUID()
 
     var adjustedWateringInterval: Int {
         SeasonalAdjuster.adjustedInterval(baseInterval: plant.wateringIntervalDays)
@@ -263,17 +264,18 @@ struct PlantDetailView: View {
 
                                                     Spacer()
 
+                                                    let _ = creditsRefresh // Force re-read
                                                     let credits = CloudIdentificationManager.shared.creditsRemaining
                                                     if revenueCatManager.isPremium {
                                                         Text("Unlimited")
                                                             .font(.system(.caption2, design: .rounded))
-                                                            .fontWeight(.semibold)
-                                                            .foregroundStyle(.white.opacity(0.7))
+                                                            .fontWeight(.bold)
+                                                            .foregroundStyle(.white)
                                                     } else {
                                                         Text("\(credits)/\(CloudIdentificationManager.maxFreeCredits) free")
                                                             .font(.system(.caption2, design: .rounded))
-                                                            .fontWeight(.semibold)
-                                                            .foregroundStyle(.white.opacity(0.7))
+                                                            .fontWeight(.bold)
+                                                            .foregroundStyle(.white)
                                                     }
                                                 }
                                                 .foregroundStyle(.white)
@@ -312,6 +314,8 @@ struct PlantDetailView: View {
 
                                 // Cloud credits badge (always visible)
                                 HStack(spacing: 6) {
+                                    let _ = creditsRefresh // Force re-read
+                                    let currentCredits = CloudIdentificationManager.shared.creditsRemaining
                                     Image(systemName: "cloud.fill")
                                         .font(.system(size: 11, weight: .semibold))
                                         .foregroundColor(revenueCatManager.isPremium ? AppColors.limeGreen : .orange)
@@ -321,10 +325,10 @@ struct PlantDetailView: View {
                                             .fontWeight(.medium)
                                             .foregroundColor(AppColors.textSecondary)
                                     } else {
-                                        Text("Cloud Credits: \(CloudIdentificationManager.shared.creditsRemaining)/\(CloudIdentificationManager.maxFreeCredits) free")
+                                        Text("Cloud Credits: \(currentCredits)/\(CloudIdentificationManager.maxFreeCredits) free")
                                             .font(.system(.caption2, design: .rounded))
                                             .fontWeight(.medium)
-                                            .foregroundColor(CloudIdentificationManager.shared.creditsRemaining <= 3 ? .orange : AppColors.textSecondary)
+                                            .foregroundColor(currentCredits <= 3 ? .orange : AppColors.textSecondary)
                                     }
                                 }
                                 .padding(.vertical, 2)
@@ -784,15 +788,19 @@ struct PlantDetailView: View {
                             try? modelContext.save()
                         }
 
+                        creditsRefresh = UUID() // Update credits display
+
                         let success = UINotificationFeedbackGenerator()
                         success.notificationOccurred(.success)
                     } else {
                         reidentifyResult = "Cloud AI could not identify"
                     }
+                    creditsRefresh = UUID()
                 }
             } else {
                 await MainActor.run {
                     isCloudIdentifying = false
+                    creditsRefresh = UUID()
                     if !cloud.isAPIKeyConfigured {
                         reidentifyResult = "Cloud AI not configured — check Config.xcconfig"
                     } else if let errorMsg = cloud.lastErrorMessage {

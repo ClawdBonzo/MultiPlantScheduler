@@ -51,6 +51,7 @@ struct AddPlantView: View {
     @State private var isCloudIdentifying = false
     @State private var cloudIDUsed = false
     @State private var showUpgradeForCloud = false
+    @State private var creditsRefresh = UUID() // Triggers UI update after credit change
 
     // Save state
     @State private var showSaveError = false
@@ -353,16 +354,17 @@ struct AddPlantView: View {
 
                                         Spacer()
 
+                                        let _ = creditsRefresh // Force re-read on refresh
                                         let credits = CloudIdentificationManager.shared.creditsRemaining
                                         let isPremium = revenueCatManager.isPremium
                                         if isPremium {
                                             Text("Unlimited")
-                                                .font(.system(size: 9, weight: .medium, design: .rounded))
-                                                .foregroundStyle(AppColors.limeGreen)
+                                                .font(.system(size: 10, weight: .bold, design: .rounded))
+                                                .foregroundStyle(.white)
                                         } else {
                                             Text("\(credits)/\(CloudIdentificationManager.maxFreeCredits) free")
-                                                .font(.system(size: 9, weight: .medium, design: .rounded))
-                                                .foregroundStyle(credits > 0 ? AppColors.textSecondary : .yellow)
+                                                .font(.system(size: 10, weight: .bold, design: .rounded))
+                                                .foregroundStyle(.white)
                                         }
                                     }
                                     .foregroundStyle(.white)
@@ -805,12 +807,15 @@ struct AddPlantView: View {
                         }
                     }
 
+                    creditsRefresh = UUID() // Update credits display
+
                     let success = UINotificationFeedbackGenerator()
                     success.notificationOccurred(.success)
                 }
             } else {
                 await MainActor.run {
                     withAnimation { isCloudIdentifying = false }
+                    creditsRefresh = UUID() // Update credits display
                     #if DEBUG
                     print("☁️ AddPlant — cloud call failed: \(cloud.lastErrorMessage ?? "unknown")")
                     #endif
