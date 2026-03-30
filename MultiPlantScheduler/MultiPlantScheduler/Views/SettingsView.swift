@@ -69,23 +69,41 @@ struct SettingsView: View {
                         Button {
                             showPaywall = true
                         } label: {
-                            HStack(spacing: 8) {
+                            HStack(spacing: 10) {
                                 Image(systemName: "star.fill")
-                                    .font(.system(size: 14, weight: .semibold))
+                                    .font(.system(size: 16, weight: .semibold))
                                     .foregroundColor(.yellow)
 
-                                Text("Upgrade to Premium")
-                                    .font(.system(.body, design: .rounded))
-                                    .fontWeight(.semibold)
-                                    .foregroundColor(AppColors.limeGreen)
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("Go Premium")
+                                        .font(.system(.body, design: .rounded))
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.white)
+
+                                    Text("Unlimited plants, Cloud AI & more")
+                                        .font(.system(.caption2, design: .rounded))
+                                        .foregroundColor(.white.opacity(0.8))
+                                }
 
                                 Spacer()
 
                                 Image(systemName: "chevron.right")
-                                    .font(.system(size: 12, weight: .semibold))
-                                    .foregroundColor(AppColors.textSecondary)
+                                    .font(.system(size: 12, weight: .bold))
+                                    .foregroundColor(.white.opacity(0.8))
                             }
+                            .padding(.vertical, 4)
+                            .padding(.horizontal, 2)
                         }
+                        .listRowBackground(
+                            LinearGradient(
+                                colors: [
+                                    Color(red: 0.08, green: 0.35, blue: 0.10),
+                                    Color(red: 0.15, green: 0.55, blue: 0.18)
+                                ],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
                     }
 
                     Button {

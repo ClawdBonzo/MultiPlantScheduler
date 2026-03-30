@@ -156,6 +156,36 @@ struct DashboardView: View {
                         .padding(.bottom, 16)
                 }
 
+                // Soft nudge when approaching plant limit (4-5 plants)
+                if !revenueCatManager.isPremium && plants.count >= 4 && plants.count < AppConfig.freePlantLimit {
+                    Button {
+                        showPaywall = true
+                    } label: {
+                        HStack(spacing: 8) {
+                            Image(systemName: "sparkles")
+                                .foregroundColor(AppColors.limeGreen)
+
+                            Text("You have \(plants.count)/\(AppConfig.freePlantLimit) free plants — Upgrade for unlimited + Cloud AI")
+                                .font(.system(.caption, design: .rounded))
+                                .fontWeight(.medium)
+                                .foregroundColor(AppColors.textSecondary)
+                                .lineLimit(2)
+
+                            Spacer()
+
+                            Image(systemName: "chevron.right")
+                                .font(.system(size: 10, weight: .semibold))
+                                .foregroundColor(AppColors.textSecondary)
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 10)
+                        .background(AppColors.limeGreen.opacity(0.08))
+                        .cornerRadius(8)
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 12)
+                }
+
                 // Free plan upgrade banner
                 if !revenueCatManager.isPremium && plants.count >= AppConfig.freePlantLimit {
                     HStack(spacing: 8) {

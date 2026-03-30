@@ -91,26 +91,33 @@ struct PaywallView: View {
                     .padding(.leading, 16)
                     .padding(.top, 12)
 
-                    // Sale badge
-                    VStack(spacing: 1) {
-                        Text("50%")
-                            .font(.system(size: 18, weight: .black))
-                        Text("OFF")
-                            .font(.system(size: 10, weight: .bold))
-                        HStack(spacing: 2) {
-                            Image(systemName: "hourglass")
-                                .font(.system(size: 7))
-                            Text(String(format: "%d:%02d", countdownMinutes, countdownSeconds))
-                                .font(.system(size: 9, weight: .bold, design: .monospaced))
-                        }
-                    }
-                    .foregroundStyle(.white)
-                    .frame(width: 60, height: 60)
-                    .background(Circle().fill(Color.red))
-                    .frame(maxWidth: .infinity, alignment: .trailing)
-                    .padding(.trailing, 16)
-                    .padding(.top, 160)
                 }
+
+                // Sale ribbon banner
+                HStack(spacing: 10) {
+                    Image(systemName: "tag.fill")
+                        .font(.system(size: 14, weight: .bold))
+                    Text("50% OFF")
+                        .font(.system(size: 16, weight: .black, design: .rounded))
+                    Text("·")
+                        .font(.system(size: 14, weight: .bold))
+                    HStack(spacing: 3) {
+                        Image(systemName: "hourglass")
+                            .font(.system(size: 11, weight: .semibold))
+                        Text(String(format: "Ends in %d:%02d", countdownMinutes, countdownSeconds))
+                            .font(.system(size: 13, weight: .bold, design: .monospaced))
+                    }
+                }
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+                .background(
+                    LinearGradient(
+                        colors: [Color.red, Color.orange],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
 
                 // MARK: - Content Card
                 ScrollView(showsIndicators: false) {
@@ -316,10 +323,10 @@ private struct PaywallBenefitRow: View {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(.black)
+                    .foregroundStyle(Color(red: 0.15, green: 0.15, blue: 0.15))
                 Text(subtitle)
                     .font(.system(size: 12))
-                    .foregroundStyle(.gray)
+                    .foregroundStyle(Color(red: 0.4, green: 0.4, blue: 0.4))
             }
             Spacer()
         }

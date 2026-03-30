@@ -578,7 +578,8 @@ struct PlantDetailView: View {
         }
         .sheet(isPresented: $showPaywall) {
             PaywallView()
-                .presentationDetents([.medium, .large])
+                .presentationDetents([.large])
+                .interactiveDismissDisabled(false)
         }
         .sheet(isPresented: $showHealthCheck) {
             HealthCheckView(plant: plant)
