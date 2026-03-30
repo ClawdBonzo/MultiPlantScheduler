@@ -56,6 +56,7 @@ struct AddPlantView: View {
     // Save state
     @State private var showSaveError = false
     @State private var saveErrorMessage = ""
+    @State private var showNameRequired = false
 
     let rooms = ["Living Room", "Bedroom", "Kitchen", "Bathroom", "Office", "Balcony", "Other"]
 
@@ -421,10 +422,29 @@ struct AddPlantView: View {
 
                     // Details section
                     Section("Details") {
-                        TextField("Plant name", text: $name)
-                            .font(.system(.body, design: .rounded))
-                            .opacity(formFieldsOpacity)
-                            .focused($isNameFieldFocused)
+                        VStack(alignment: .leading, spacing: 4) {
+                            TextField("Plant name", text: $name)
+                                .font(.system(.body, design: .rounded))
+                                .opacity(formFieldsOpacity)
+                                .focused($isNameFieldFocused)
+                                .onChange(of: name) { _, _ in
+                                    if showNameRequired && !name.trimmingCharacters(in: .whitespaces).isEmpty {
+                                        withAnimation { showNameRequired = false }
+                                    }
+                                }
+
+                            if showNameRequired {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "exclamationmark.circle.fill")
+                                        .font(.system(size: 12))
+                                    Text("Plant name is required")
+                                        .font(.system(.caption, design: .rounded))
+                                        .fontWeight(.medium)
+                                }
+                                .foregroundColor(.red)
+                                .transition(.opacity.combined(with: .move(edge: .top)))
+                            }
+                        }
 
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Species (Optional)")
@@ -864,6 +884,17 @@ struct AddPlantView: View {
     // MARK: - Save
 
     private func savePlant() {
+        // Validate name
+        guard isFormValid else {
+            withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+                showNameRequired = true
+            }
+            isNameFieldFocused = true
+            let warning = UINotificationFeedbackGenerator()
+            warning.notificationOccurred(.warning)
+            return
+        }
+
         let impact = UIImpactFeedbackGenerator(style: .medium)
         impact.impactOccurred()
 
