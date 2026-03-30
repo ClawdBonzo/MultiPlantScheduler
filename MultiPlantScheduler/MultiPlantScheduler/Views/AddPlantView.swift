@@ -6,6 +6,8 @@ struct AddPlantView: View {
     @Environment(\.modelContext) var modelContext
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var revenueCatManager: RevenueCatManager
+    @FocusState private var isNameFieldFocused: Bool
+    @Query(sort: \Plant.createdAt) private var existingPlants: [Plant]
 
     var plantToEdit: Plant?
     var isFromOnboarding: Bool = false
@@ -420,6 +422,7 @@ struct AddPlantView: View {
                         TextField("Plant name", text: $name)
                             .font(.system(.body, design: .rounded))
                             .opacity(formFieldsOpacity)
+                            .focused($isNameFieldFocused)
 
                         VStack(alignment: .leading, spacing: 8) {
                             Text("Species (Optional)")
@@ -522,6 +525,10 @@ struct AddPlantView: View {
                     .listRowBackground(Color(red: 0.118, green: 0.118, blue: 0.118))
                 }
                 .scrollContentBackground(.hidden)
+                .scrollDismissesKeyboard(.interactively)
+            }
+            .onTapGesture {
+                isNameFieldFocused = false
             }
             .navigationTitle(plantToEdit == nil ? "Add Plant" : "Edit Plant")
             .navigationBarTitleDisplayMode(.inline)
@@ -536,13 +543,26 @@ struct AddPlantView: View {
 
                 ToolbarItem(placement: .topBarTrailing) {
                     Button("Save") {
-                        savePlant()
+                        isNameFieldFocused = false
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                            savePlant()
+                        }
                     }
                     .font(.system(.body, design: .rounded))
                     .fontWeight(.semibold)
                     .foregroundColor(AppColors.limeGreen)
                     .disabled(!isFormValid || isIdentifying)
                     .opacity(isFormValid && !isIdentifying ? 1 : 0.5)
+                }
+
+                ToolbarItemGroup(placement: .keyboard) {
+                    Spacer()
+                    Button("Done") {
+                        isNameFieldFocused = false
+                    }
+                    .font(.system(.body, design: .rounded))
+                    .fontWeight(.semibold)
+                    .foregroundColor(AppColors.limeGreen)
                 }
             }
             .confirmationDialog("Add Plant Photo", isPresented: $showPhotoActionSheet, titleVisibility: .visible) {
@@ -881,7 +901,9 @@ struct AddPlantView: View {
 
             try modelContext.save()
 
-            if isFromOnboarding && plantToEdit == nil {
+            // Show celebratory for first-ever plant (onboarding or otherwise)
+            let isFirstPlant = existingPlants.isEmpty || (existingPlants.count == 1 && plantToEdit != nil)
+            if plantToEdit == nil && (isFromOnboarding || isFirstPlant) {
                 dismiss()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                     showCelebratory = true
