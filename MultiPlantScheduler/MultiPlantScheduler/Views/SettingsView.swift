@@ -574,9 +574,8 @@ struct SettingsView: View {
         .sheet(isPresented: $showShareGarden) {
             ShareGardenView(plants: plants)
         }
-        .sheet(isPresented: $showPaywall) {
+        .fullScreenCover(isPresented: $showPaywall) {
             PaywallView()
-                .presentationDetents([.medium, .large])
         }
         .alert("Restore Purchases", isPresented: $showRestoreResult) {
             Button("OK") { }

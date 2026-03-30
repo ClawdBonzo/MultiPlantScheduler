@@ -291,9 +291,8 @@ struct DashboardView: View {
             }
             .presentationDetents([.large])
         }
-        .sheet(isPresented: $showPaywall) {
+        .fullScreenCover(isPresented: $showPaywall) {
             PaywallView()
-                .presentationDetents([.medium, .large])
         }
         .sheet(isPresented: $showShareGarden) {
             ShareGardenView(plants: plants)

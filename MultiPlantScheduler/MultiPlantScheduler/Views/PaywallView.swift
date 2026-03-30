@@ -18,7 +18,15 @@ struct PaywallView: View {
 
     private var monthlyPackage: Package? { offerings?.current?.monthly }
     private var annualPackage: Package? { offerings?.current?.annual }
-    private var lifetimePackage: Package? { offerings?.current?.lifetime }
+    private var lifetimePackage: Package? {
+        // Try the standard $rc_lifetime first
+        if let pkg = offerings?.current?.lifetime { return pkg }
+        // Fallback: search all packages for a lifetime type or matching product ID
+        return offerings?.current?.availablePackages.first { pkg in
+            pkg.packageType == .lifetime ||
+            pkg.storeProduct.productIdentifier.lowercased().contains("lifetime")
+        }
+    }
 
     private var monthlyPrice: String { monthlyPackage?.storeProduct.localizedPriceString ?? "$3.99" }
     private var yearlyPrice: String { annualPackage?.storeProduct.localizedPriceString ?? "$29.99" }
@@ -146,15 +154,17 @@ struct PaywallView: View {
                                 isSelected: selectedPlan == .yearly
                             ) { selectedPlan = .yearly }
 
-                            PaywallPlanRow(
-                                title: "Lifetime",
-                                price: lifetimePrice,
-                                period: "once",
-                                detail: "Pay once, own forever",
-                                badge: "BEST LONG-TERM VALUE",
-                                badgeColor: Color(red: 0.55, green: 0.42, blue: 0.15),
-                                isSelected: selectedPlan == .lifetime
-                            ) { selectedPlan = .lifetime }
+                            if lifetimePackage != nil {
+                                PaywallPlanRow(
+                                    title: "Lifetime",
+                                    price: lifetimePrice,
+                                    period: "once",
+                                    detail: "Pay once, own forever",
+                                    badge: "BEST LONG-TERM VALUE",
+                                    badgeColor: Color(red: 0.55, green: 0.42, blue: 0.15),
+                                    isSelected: selectedPlan == .lifetime
+                                ) { selectedPlan = .lifetime }
+                            }
 
                             PaywallPlanRow(
                                 title: "Monthly",
@@ -264,9 +274,22 @@ struct PaywallView: View {
         do {
             let fetchedOfferings = try await Purchases.shared.offerings()
             await MainActor.run { self.offerings = fetchedOfferings }
+            #if DEBUG
+            if let offering = fetchedOfferings.current {
+                print("💰 RevenueCat — offering '\(offering.identifier)' loaded with \(offering.availablePackages.count) packages:")
+                for pkg in offering.availablePackages {
+                    print("  💰 Package: \(pkg.identifier) | type: \(pkg.packageType) | product: \(pkg.storeProduct.productIdentifier) | price: \(pkg.storeProduct.localizedPriceString)")
+                }
+                print("  💰 .monthly: \(offering.monthly?.storeProduct.productIdentifier ?? "nil")")
+                print("  💰 .annual: \(offering.annual?.storeProduct.productIdentifier ?? "nil")")
+                print("  💰 .lifetime: \(offering.lifetime?.storeProduct.productIdentifier ?? "nil")")
+            } else {
+                print("💰 RevenueCat — no current offering found")
+            }
+            #endif
         } catch {
             #if DEBUG
-            print("Failed to load offerings: \(error)")
+            print("💰 RevenueCat — failed to load offerings: \(error)")
             #endif
         }
     }

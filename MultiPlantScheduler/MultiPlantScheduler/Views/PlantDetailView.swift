@@ -580,10 +580,8 @@ struct PlantDetailView: View {
         } message: {
             Text("Are you sure you want to delete \(plant.name)? This cannot be undone.")
         }
-        .sheet(isPresented: $showPaywall) {
+        .fullScreenCover(isPresented: $showPaywall) {
             PaywallView()
-                .presentationDetents([.large])
-                .interactiveDismissDisabled(false)
         }
         .sheet(isPresented: $showHealthCheck) {
             HealthCheckView(plant: plant)
