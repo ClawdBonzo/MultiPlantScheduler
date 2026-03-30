@@ -738,6 +738,9 @@ struct PlantDetailView: View {
     private func getPreciseCloudID() {
         guard let data = plant.photoData, let uiImage = UIImage(data: data) else { return }
 
+        // Cache photo data — SwiftData can evict large blobs on save
+        let cachedPhotoData = data
+
         #if DEBUG
         print("☁️ PlantDetail — 'Get Precise ID' tapped for plant: \(plant.name)")
         #endif
@@ -772,7 +775,15 @@ struct PlantDetailView: View {
                             plant.wateringIntervalDays = result.defaultInterval
                             reidentifyResult = "Cloud AI: \(Int(result.confidence * 100))% \(speciesName)"
                         }
-                        try? modelContext.save()
+
+                        // Re-assign photo data to prevent SwiftData eviction on save
+                        plant.photoData = cachedPhotoData
+
+                        // Delay save so SwiftUI finishes rendering with cached data
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            try? modelContext.save()
+                        }
+
                         let success = UINotificationFeedbackGenerator()
                         success.notificationOccurred(.success)
                     } else {
