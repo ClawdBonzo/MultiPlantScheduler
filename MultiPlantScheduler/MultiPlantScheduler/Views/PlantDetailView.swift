@@ -35,11 +35,13 @@ struct PlantDetailView: View {
         let days = plant.daysUntilWatering
         let dateStr = plant.nextWateringDate.formatted(.dateTime.month(.abbreviated).day())
         if days < 0 {
-            return "Overdue by \(abs(days)) day\(abs(days) == 1 ? "" : "s")"
+            let absDays = abs(days)
+            return String(format: absDays == 1 ? NSLocalizedString("Overdue by %d day", comment: "Overdue singular") : NSLocalizedString("Overdue by %d days", comment: "Overdue plural"), absDays)
         } else if days == 0 {
-            return "Due today"
+            return NSLocalizedString("Due today", comment: "Due today")
         } else {
-            return "In \(days) day\(days == 1 ? "" : "s") (\(dateStr))"
+            let dayStr = String(format: days == 1 ? NSLocalizedString("In %d day", comment: "Days until singular") : NSLocalizedString("In %d days", comment: "Days until plural"), days)
+            return "\(dayStr) (\(dateStr))"
         }
     }
 
@@ -220,7 +222,7 @@ struct PlantDetailView: View {
                                         Image(systemName: "brain")
                                             .font(.system(size: 12, weight: .semibold))
                                             .foregroundStyle(AppColors.limeGreen)
-                                        Text("AI Identified: \(min(Int(confidence * 100), 100))% confidence")
+                                        Text(String(format: NSLocalizedString("AI Identified: %d%% confidence", comment: "AI confidence"), min(Int(confidence * 100), 100)))
                                             .font(.system(.caption, design: .rounded))
                                             .fontWeight(.medium)
                                             .foregroundColor(AppColors.textSecondary)
@@ -273,7 +275,7 @@ struct PlantDetailView: View {
                                                             .fontWeight(.bold)
                                                             .foregroundStyle(.white)
                                                     } else {
-                                                        Text("\(credits)/\(CloudIdentificationManager.maxFreeCredits) free")
+                                                        Text(String(format: NSLocalizedString("%d/%d free", comment: "Cloud credits"), credits, CloudIdentificationManager.maxFreeCredits))
                                                             .font(.system(.caption2, design: .rounded))
                                                             .fontWeight(.bold)
                                                             .foregroundStyle(.white)
@@ -322,12 +324,12 @@ struct PlantDetailView: View {
                                         .font(.system(size: 11, weight: .semibold))
                                         .foregroundColor(revenueCatManager.isPremium ? AppColors.limeGreen : .orange)
                                     if revenueCatManager.isPremium {
-                                        Text("Cloud Credits: Unlimited")
+                                        Text(NSLocalizedString("Cloud Credits: Unlimited", comment: "Unlimited cloud credits"))
                                             .font(.system(.caption2, design: .rounded))
                                             .fontWeight(.medium)
                                             .foregroundColor(AppColors.textSecondary)
                                     } else {
-                                        Text("Cloud Credits: \(currentCredits)/\(CloudIdentificationManager.maxFreeCredits) free")
+                                        Text(String(format: NSLocalizedString("Cloud Credits: %d/%d free", comment: "Cloud credits count"), currentCredits, CloudIdentificationManager.maxFreeCredits))
                                             .font(.system(.caption2, design: .rounded))
                                             .fontWeight(.medium)
                                             .foregroundColor(currentCredits <= 3 ? .orange : AppColors.textSecondary)
@@ -500,7 +502,7 @@ struct PlantDetailView: View {
                                                 showAllCareLogs.toggle()
                                             }
                                         } label: {
-                                            Text(showAllCareLogs ? "Show Less" : "View All (\(sortedCareLogs.count))")
+                                            Text(showAllCareLogs ? NSLocalizedString("Show Less", comment: "Show less") : String(format: NSLocalizedString("View All (%d)", comment: "View all count"), sortedCareLogs.count))
                                                 .font(.system(.caption, design: .rounded))
                                                 .fontWeight(.semibold)
                                                 .foregroundColor(AppColors.limeGreen)
@@ -595,14 +597,14 @@ struct PlantDetailView: View {
             AddPlantView(plantToEdit: plant)
                 .presentationDetents([.large])
         }
-        .alert("Delete Plant", isPresented: $showDeleteConfirmation) {
-            Button("Cancel", role: .cancel) { }
+        .alert(NSLocalizedString("Delete Plant", comment: "Delete plant title"), isPresented: $showDeleteConfirmation) {
+            Button(NSLocalizedString("Cancel", comment: "Cancel"), role: .cancel) { }
 
-            Button("Delete", role: .destructive) {
+            Button(NSLocalizedString("Delete", comment: "Delete"), role: .destructive) {
                 deletePlant()
             }
         } message: {
-            Text("Are you sure you want to delete \(plant.name)? This cannot be undone.")
+            Text(String(format: NSLocalizedString("Are you sure you want to delete %@? This cannot be undone.", comment: "Delete plant confirmation"), plant.name))
         }
         .fullScreenCover(isPresented: $showPaywall) {
             PaywallView()
@@ -628,11 +630,11 @@ struct PlantDetailView: View {
             WateringSettingsSheet(plant: plant)
                 .presentationDetents([.medium])
         }
-        .alert("Cloud IDs Used", isPresented: $showUpgradeForCloud) {
-            Button("Upgrade to Premium") { showPaywall = true }
-            Button("OK", role: .cancel) { }
+        .alert(NSLocalizedString("Cloud IDs Used", comment: "Cloud IDs used alert"), isPresented: $showUpgradeForCloud) {
+            Button(NSLocalizedString("Upgrade to Premium", comment: "Upgrade button")) { showPaywall = true }
+            Button(NSLocalizedString("OK", comment: "OK"), role: .cancel) { }
         } message: {
-            Text("You've used all \(CloudIdentificationManager.maxFreeCredits) free cloud identifications. Upgrade to Premium for unlimited precise plant IDs!")
+            Text(String(format: NSLocalizedString("You've used all %d free cloud identifications. Upgrade to Premium for unlimited precise plant IDs.", comment: "Cloud IDs exhausted"), CloudIdentificationManager.maxFreeCredits))
         }
         .onAppear {
             withAnimation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.1)) {
@@ -672,8 +674,8 @@ struct PlantDetailView: View {
                     .foregroundStyle(locked ? AppColors.textSecondary : AppColors.textPrimary)
 
                 Text(locked
-                    ? "Track growth over time"
-                    : "\(plant.photoEntries.count) photo\(plant.photoEntries.count == 1 ? "" : "s")")
+                    ? NSLocalizedString("Track growth over time", comment: "Photo timeline locked subtitle")
+                    : String(format: plant.photoEntries.count == 1 ? NSLocalizedString("%d photo", comment: "Photo count singular") : NSLocalizedString("%d photos", comment: "Photo count plural"), plant.photoEntries.count))
                     .font(.system(.caption, design: .rounded))
                     .foregroundStyle(AppColors.textSecondary)
             }
@@ -959,7 +961,7 @@ struct WateringSettingsSheet: View {
                                     .foregroundStyle(AppColors.limeGreen)
                             }
 
-                            Text("\(interval) days")
+                            Text(String(format: NSLocalizedString("%d days", comment: "Interval days"), interval))
                                 .font(.system(size: 28, weight: .bold, design: .rounded))
                                 .foregroundColor(AppColors.limeGreen)
                                 .frame(minWidth: 100)

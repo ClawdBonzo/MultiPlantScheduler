@@ -17,7 +17,7 @@ struct AddPlantView: View {
     @State private var name = ""
     @State private var species: PlantSpecies?
     @State private var wateringIntervalDays = 7
-    @State private var room = "Living Room"
+    @State private var room = NSLocalizedString("Living Room", comment: "Default room")
     @State private var notes = ""
     @State private var fertilizerType = ""
     @State private var enableSeasonalAdjust = true
@@ -58,7 +58,15 @@ struct AddPlantView: View {
     @State private var saveErrorMessage = ""
     @State private var showNameRequired = false
 
-    let rooms = ["Living Room", "Bedroom", "Kitchen", "Bathroom", "Office", "Balcony", "Other"]
+    let rooms = [
+        NSLocalizedString("Living Room", comment: "Room name"),
+        NSLocalizedString("Bedroom", comment: "Room name"),
+        NSLocalizedString("Kitchen", comment: "Room name"),
+        NSLocalizedString("Bathroom", comment: "Room name"),
+        NSLocalizedString("Office", comment: "Room name"),
+        NSLocalizedString("Balcony", comment: "Room name"),
+        NSLocalizedString("Other", comment: "Room name")
+    ]
 
     init(plantToEdit: Plant? = nil, isFromOnboarding: Bool = false, openCameraOnAppear: Bool = false, showCelebratory: Binding<Bool> = .constant(false)) {
         self.plantToEdit = plantToEdit
@@ -364,7 +372,7 @@ struct AddPlantView: View {
                                                 .font(.system(size: 10, weight: .bold, design: .rounded))
                                                 .foregroundStyle(.white)
                                         } else {
-                                            Text("\(credits)/\(CloudIdentificationManager.maxFreeCredits) free")
+                                            Text(String(format: NSLocalizedString("%d/%d free", comment: "Cloud credits remaining"), credits, CloudIdentificationManager.maxFreeCredits))
                                                 .font(.system(size: 10, weight: .bold, design: .rounded))
                                                 .foregroundStyle(.white)
                                         }
@@ -453,7 +461,7 @@ struct AddPlantView: View {
 
                                 Spacer()
 
-                                Text("\(wateringIntervalDays) days")
+                                Text(String(format: NSLocalizedString("%d days", comment: "Watering interval days"), wateringIntervalDays))
                                     .font(.system(.headline, design: .rounded))
                                     .fontWeight(.semibold)
                                     .foregroundColor(AppColors.limeGreen)
@@ -631,7 +639,7 @@ struct AddPlantView: View {
                     name = plant.name
                     species = PlantSpeciesDatabase.database.first { $0.name == plant.species }
                     wateringIntervalDays = plant.wateringIntervalDays
-                    room = plant.room ?? "Living Room"
+                    room = plant.room ?? NSLocalizedString("Living Room", comment: "Default room")
                     notes = plant.notes ?? ""
                     fertilizerType = plant.fertilizerType ?? ""
                     if let photoData = plant.photoData {
@@ -657,10 +665,10 @@ struct AddPlantView: View {
             } message: {
                 Text(saveErrorMessage)
             }
-            .alert("Cloud IDs Used", isPresented: $showUpgradeForCloud) {
-                Button("Maybe Later", role: .cancel) {}
+            .alert(NSLocalizedString("Cloud IDs Used", comment: "Alert title"), isPresented: $showUpgradeForCloud) {
+                Button(NSLocalizedString("Maybe Later", comment: "Alert button"), role: .cancel) {}
             } message: {
-                Text("You've used all \(CloudIdentificationManager.maxFreeCredits) free cloud identifications. Upgrade to Premium for unlimited precise plant IDs.")
+                Text(String(format: NSLocalizedString("You've used all %d free cloud identifications. Upgrade to Premium for unlimited precise plant IDs.", comment: "Cloud IDs exhausted"), CloudIdentificationManager.maxFreeCredits))
             }
         }
     }
@@ -1052,7 +1060,7 @@ struct SearchableSpeciesPicker: View {
                         .fontWeight(.semibold)
                         .foregroundColor(AppColors.textPrimary)
 
-                    Text("\(selected.defaultWateringDays)d watering")
+                    Text(String(format: NSLocalizedString("%dd watering", comment: "Species watering interval short"), selected.defaultWateringDays))
                         .font(.system(.caption2, design: .rounded))
                         .foregroundColor(AppColors.textSecondary)
 
@@ -1075,7 +1083,7 @@ struct SearchableSpeciesPicker: View {
                     .font(.system(size: 14))
                     .foregroundColor(AppColors.textSecondary)
 
-                TextField("Search \(PlantSpeciesDatabase.database.count) species...", text: $searchText)
+                TextField(String(format: NSLocalizedString("Search %d species...", comment: "Species search placeholder"), PlantSpeciesDatabase.database.count), text: $searchText)
                     .font(.system(.body, design: .rounded))
 
                 if !searchText.isEmpty {
@@ -1103,7 +1111,7 @@ struct SearchableSpeciesPicker: View {
                                 .padding(.top, 4)
                                 .padding(.bottom, 2)
                         } else {
-                            Text("\(filteredSpecies.count) result\(filteredSpecies.count != 1 ? "s" : "")")
+                            Text(String(format: filteredSpecies.count != 1 ? NSLocalizedString("%d results", comment: "Search results plural") : NSLocalizedString("%d result", comment: "Search result singular"), filteredSpecies.count))
                                 .font(.system(size: 11, weight: .medium, design: .rounded))
                                 .foregroundColor(AppColors.textSecondary)
                                 .padding(.horizontal, 8)
@@ -1124,7 +1132,7 @@ struct SearchableSpeciesPicker: View {
                                         .fontWeight(.semibold)
                                         .foregroundColor(AppColors.textPrimary)
 
-                                    Text("Water every \(spec.defaultWateringDays) days")
+                                    Text(String(format: NSLocalizedString("Water every %d days", comment: "Species watering interval"), spec.defaultWateringDays))
                                         .font(.system(.caption, design: .rounded))
                                         .foregroundColor(AppColors.textSecondary)
                                 }

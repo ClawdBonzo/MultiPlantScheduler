@@ -50,13 +50,13 @@ enum CareType: String, CaseIterable, Codable {
     var label: String {
         switch self {
         case .water:
-            return "Watered"
+            return NSLocalizedString("Watered", comment: "Care type: watered")
         case .fertilize:
-            return "Fertilized"
+            return NSLocalizedString("Fertilized", comment: "Care type: fertilized")
         case .mist:
-            return "Misted"
+            return NSLocalizedString("Misted", comment: "Care type: misted")
         case .repot:
-            return "Repotted"
+            return NSLocalizedString("Repotted", comment: "Care type: repotted")
         }
     }
 

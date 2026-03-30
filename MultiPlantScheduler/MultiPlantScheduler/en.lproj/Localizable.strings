@@ -1,0 +1,324 @@
+/*
+   Localizable.strings (English)
+   MultiPlantScheduler
+
+   English base localization
+*/
+
+// MARK: - DashboardView
+
+"My Garden" = "My Garden";
+"%d plants" = "%d plants";
+"%d need water" = "%d need water";
+"%d cloud IDs" = "%d cloud IDs";
+"%d day streak!" = "%d day streak!";
+"You have %d/%d free plants — Upgrade for unlimited + Cloud AI" = "You have %d/%d free plants — Upgrade for unlimited + Cloud AI";
+"Upgrade to Premium" = "Upgrade to Premium";
+"From $3.99/mo or $49.99 lifetime" = "From $3.99/mo or $49.99 lifetime";
+"Your Garden Is Empty" = "Your Garden Is Empty";
+"Snap a photo of a plant and let AI\nidentify it and set up care reminders" = "Snap a photo of a plant and let AI\nidentify it and set up care reminders";
+"Add Your First Plant" = "Add Your First Plant";
+
+// MARK: - AddPlantView
+
+"Photo" = "Photo";
+"Analyzing\nwith AI" = "Analyzing\nwith AI";
+"Tap to Add Photo" = "Tap to Add Photo";
+"Best guess" = "Best guess";
+"Not right? Tap to select:" = "Not right? Tap to select:";
+"None of these — I'll pick manually" = "None of these — I'll pick manually";
+"Get Precise ID" = "Get Precise ID";
+"Unlimited" = "Unlimited";
+"%d/%d free" = "%d/%d free";
+"Remove Photo" = "Remove Photo";
+"Details" = "Details";
+"Plant name" = "Plant name";
+"Plant name is required" = "Plant name is required";
+"Species (Optional)" = "Species (Optional)";
+"Watering Interval" = "Watering Interval";
+"%d days" = "%d days";
+"Adjust interval" = "Adjust interval";
+"Room" = "Room";
+"Living Room" = "Living Room";
+"Bedroom" = "Bedroom";
+"Kitchen" = "Kitchen";
+"Bathroom" = "Bathroom";
+"Office" = "Office";
+"Balcony" = "Balcony";
+"Other" = "Other";
+"Notes" = "Notes";
+"Care tips, preferences..." = "Care tips, preferences...";
+"Fertilizer" = "Fertilizer";
+"Fertilizer type (optional)" = "Fertilizer type (optional)";
+"Smart Watering" = "Smart Watering";
+"Seasonal Auto-Adjust" = "Seasonal Auto-Adjust";
+"Adjust watering by season" = "Adjust watering by season";
+"Adjusted Interval" = "Adjusted Interval";
+"Add Plant" = "Add Plant";
+"Edit Plant" = "Edit Plant";
+"Cancel" = "Cancel";
+"Save" = "Save";
+"Done" = "Done";
+"Add Plant Photo" = "Add Plant Photo";
+"Take Photo" = "Take Photo";
+"Choose from Library" = "Choose from Library";
+"Error" = "Error";
+"OK" = "OK";
+"Calling cloud AI..." = "Calling cloud AI...";
+"Getting precise identification" = "Getting precise identification";
+"Cloud IDs Used" = "Cloud IDs Used";
+"Maybe Later" = "Maybe Later";
+"You've used all %d free cloud identifications. Upgrade to Premium for unlimited precise plant IDs." = "You've used all %d free cloud identifications. Upgrade to Premium for unlimited precise plant IDs.";
+"No photo available. Please add a photo first." = "No photo available. Please add a photo first.";
+"Popular species" = "Popular species";
+"%d results" = "%d results";
+"%d result" = "%d result";
+"Search %d species..." = "Search %d species...";
+"%dd watering" = "%dd watering";
+"Water every %d days" = "Water every %d days";
+
+// MARK: - PlantDetailView
+
+"Next Watering" = "Next Watering";
+"Overdue by %d day" = "Overdue by %d day";
+"Overdue by %d days" = "Overdue by %d days";
+"Due today" = "Due today";
+"In %d day" = "In %d day";
+"In %d days" = "In %d days";
+"Species" = "Species";
+"Location" = "Location";
+"Watering" = "Watering";
+"Last Watered" = "Last Watered";
+"Added" = "Added";
+"Health" = "Health";
+"AI Identified: %d%% confidence" = "AI Identified: %d%% confidence";
+"Getting precise ID..." = "Getting precise ID...";
+"Cloud Credits: Unlimited" = "Cloud Credits: Unlimited";
+"Cloud Credits: %d/%d free" = "Cloud Credits: %d/%d free";
+"Time for a health check!" = "Time for a health check!";
+"Quick Care" = "Quick Care";
+"Streak" = "Streak";
+"Care Logs" = "Care Logs";
+"Photo Timeline" = "Photo Timeline";
+"Track growth over time" = "Track growth over time";
+"%d photos" = "%d photos";
+"%d photo" = "%d photo";
+"Premium" = "Premium";
+"Health History" = "Health History";
+"Care History" = "Care History";
+"Show Less" = "Show Less";
+"View All (%d)" = "View All (%d)";
+"Export Care History" = "Export Care History";
+"Edit" = "Edit";
+"Delete" = "Delete";
+"Delete Plant" = "Delete Plant";
+"Are you sure you want to delete %@? This cannot be undone." = "Are you sure you want to delete %@? This cannot be undone.";
+"Could not identify" = "Could not identify";
+"Cloud AI could not identify" = "Cloud AI could not identify";
+"Cloud AI not configured — check Config.xcconfig" = "Cloud AI not configured — check Config.xcconfig";
+"No photo — add a photo first" = "No photo — add a photo first";
+
+// MARK: - WateringSettingsSheet
+
+"Watering Schedule" = "Watering Schedule";
+"Water Now" = "Water Now";
+
+// MARK: - SettingsView
+
+"✓ Premium Active" = "✓ Premium Active";
+"Free Plan" = "Free Plan";
+"Lifetime" = "Lifetime";
+"Upgrade to unlock unlimited plants and more" = "Upgrade to unlock unlimited plants and more";
+"Go Premium" = "Go Premium";
+"Unlimited plants, Cloud AI & more" = "Unlimited plants, Cloud AI & more";
+"Restore Purchases" = "Restore Purchases";
+"Cloud AI Credits" = "Cloud AI Credits";
+"Unlimited precise plant IDs" = "Unlimited precise plant IDs";
+"%d of %d free IDs remaining" = "%d of %d free IDs remaining";
+"Data" = "Data";
+"Plant Count" = "Plant Count";
+"%d plant" = "%d plant";
+"Plant Collection" = "Plant Collection";
+"My plants from Multi Plant app" = "My plants from Multi Plant app";
+"Plant List" = "Plant List";
+"Export All Plants as CSV" = "Export All Plants as CSV";
+"Notifications" = "Notifications";
+"Enable Reminders" = "Enable Reminders";
+"Reschedule All Reminders" = "Reschedule All Reminders";
+"Reminder Time" = "Reminder Time";
+"Custom Reminder Time" = "Custom Reminder Time";
+"App" = "App";
+"Version" = "Version";
+"Rate on App Store" = "Rate on App Store";
+"Share My Garden" = "Share My Garden";
+"Multi Plant Watering Schedule" = "Multi Plant Watering Schedule";
+"Check out this awesome plant care tracker!" = "Check out this awesome plant care tracker!";
+"Share with Friends" = "Share with Friends";
+"Legal" = "Legal";
+"Plant Care Disclaimer" = "Plant Care Disclaimer";
+"Privacy Policy" = "Privacy Policy";
+"Support" = "Support";
+"Send Feedback" = "Send Feedback";
+"Danger Zone" = "Danger Zone";
+"Delete All Data" = "Delete All Data";
+"Settings" = "Settings";
+"Delete All Data?" = "Delete All Data?";
+"This will delete all %d plants and their care history. This action cannot be undone." = "This will delete all %d plants and their care history. This action cannot be undone.";
+"Review Items" = "Review Items";
+"Delete Permanently?" = "Delete Permanently?";
+"Are you absolutely sure? This is permanent and cannot be recovered." = "Are you absolutely sure? This is permanent and cannot be recovered.";
+"Notification Permission Required" = "Notification Permission Required";
+"Please enable notifications in Settings > Notifications to use this feature." = "Please enable notifications in Settings > Notifications to use this feature.";
+"Premium restored!" = "Premium restored!";
+"No previous purchases found." = "No previous purchases found.";
+"Restore failed: %@" = "Restore failed: %@";
+
+// MARK: - OnboardingView
+
+"Identify Any Plant\nInstantly" = "Identify Any Plant\nInstantly";
+"Snap a photo. AI tells you what it is\nand when to water it." = "Snap a photo. AI tells you what it is\nand when to water it.";
+"AI Plant ID" = "AI Plant ID";
+"Smart Reminders" = "Smart Reminders";
+"Track Growth" = "Track Growth";
+"Next" = "Next";
+"3 Steps. Zero Guesswork." = "3 Steps. Zero Guesswork.";
+"Take a photo of your plant" = "Take a photo of your plant";
+"AI identifies species + care needs" = "AI identifies species + care needs";
+"Get reminders when it needs water" = "Get reminders when it needs water";
+"Step %d" = "Step %d";
+"Let's Identify Your\nFirst Plant" = "Let's Identify Your\nFirst Plant";
+"Point your camera at any houseplant" = "Point your camera at any houseplant";
+"Identify My First Plant" = "Identify My First Plant";
+"I'll do this later" = "I'll do this later";
+
+// MARK: - PaywallView
+
+"50% OFF" = "50% OFF";
+"Ends in %d:%02d" = "Ends in %d:%02d";
+"Unlimited Plants" = "Unlimited Plants";
+"Track your entire collection" = "Track your entire collection";
+"Unlimited Cloud AI IDs" = "Unlimited Cloud AI IDs";
+"Precise identification powered by Plant.id" = "Precise identification powered by Plant.id";
+"Track growth over time with photos" = "Track growth over time with photos";
+"Download your care logs" = "Download your care logs";
+"Yearly" = "Yearly";
+"Monthly" = "Monthly";
+"/year" = "/year";
+"once" = "once";
+"/month" = "/month";
+"Pay once, own forever" = "Pay once, own forever";
+"MOST POPULAR" = "MOST POPULAR";
+"BEST LONG-TERM VALUE" = "BEST LONG-TERM VALUE";
+"Buy Lifetime Access" = "Buy Lifetime Access";
+"Subscribe Now" = "Subscribe Now";
+"Continue with Free (3 plants, 5 cloud IDs)" = "Continue with Free (3 plants, 5 cloud IDs)";
+"One-time purchase. No subscription." = "One-time purchase. No subscription.";
+"Auto-renewable. Cancel anytime in Settings." = "Auto-renewable. Cancel anytime in Settings.";
+"Terms of Service" = "Terms of Service";
+"Processing..." = "Processing...";
+"No subscription available. Please try again later." = "No subscription available. Please try again later.";
+
+// MARK: - SoftPaywallView
+
+"Flash Sale" = "Flash Sale";
+"50 % OFF" = "50 % OFF";
+"Free Trial Enabled" = "Free Trial Enabled";
+"Due %@" = "Due %@";
+"3 days free" = "3 days free";
+"Free Trial Disabled" = "Free Trial Disabled";
+"Try for Free" = "Try for Free";
+"Continue" = "Continue";
+"Restore" = "Restore";
+"MultiPlant AI" = "MultiPlant AI";
+"Identify & Care for Your Plants" = "Identify & Care for Your Plants";
+"MINUTES" = "MINUTES";
+"SECONDS" = "SECONDS";
+"MS" = "MS";
+
+// MARK: - CelebratoryView
+
+"Your First Plant is Saved!" = "Your First Plant is Saved!";
+"Your garden has begun" = "Your garden has begun";
+
+// MARK: - HealthCheckView
+
+"How is this plant doing?" = "How is this plant doing?";
+"Notes (optional)" = "Notes (optional)";
+"Any observations..." = "Any observations...";
+"Save Health Check" = "Save Health Check";
+"Health Check" = "Health Check";
+
+// MARK: - HealthTimelineView
+
+"Care actions\nlast 30 days" = "Care actions\nlast 30 days";
+"Current\nstatus" = "Current\nstatus";
+"No health checks yet" = "No health checks yet";
+
+// MARK: - PhotoTimelineView
+
+"Add Photo" = "Add Photo";
+"Compare Photos" = "Compare Photos";
+"No photos yet" = "No photos yet";
+"Add photos over time to track your plant's growth" = "Add photos over time to track your plant's growth";
+
+// MARK: - PhotoCompareView
+
+"Before" = "Before";
+"After" = "After";
+"No photo" = "No photo";
+"Compare" = "Compare";
+
+// MARK: - PlantCardView
+
+"Overdue %dd" = "Overdue %dd";
+"Water in %dd" = "Water in %dd";
+
+// MARK: - GardenCardView
+
+"+%d more" = "+%d more";
+"Plants" = "Plants";
+"Day Streak" = "Day Streak";
+"Made with" = "Made with";
+"Multi Plant" = "Multi Plant";
+
+// MARK: - ShareGardenView
+
+"Share Your Garden" = "Share Your Garden";
+"Share" = "Share";
+
+// MARK: - TodayChecklistView
+
+"Today's Watering" = "Today's Watering";
+"All caught up! No plants need water today." = "All caught up! No plants need water today.";
+"Overdue by %dd" = "Overdue by %dd";
+
+// MARK: - HealthStatus
+
+"Healthy" = "Healthy";
+"Okay" = "Okay";
+"Struggling" = "Struggling";
+"Unknown" = "Unknown";
+
+// MARK: - CareType
+
+"Watered" = "Watered";
+"Fertilized" = "Fertilized";
+"Misted" = "Misted";
+"Repotted" = "Repotted";
+
+// MARK: - Constants
+
+"💧 Time to water!" = "💧 Time to water!";
+"Track up to %d plants + 5 free cloud IDs" = "Track up to %d plants + 5 free cloud IDs";
+
+// MARK: - NotificationManager
+
+"%@ needs watering today" = "%@ needs watering today";
+"🚨 %@ still needs water!" = "🚨 %@ still needs water!";
+"Don't forget — %@ was due for watering yesterday" = "Don't forget — %@ was due for watering yesterday";
+"Mark as Watered" = "Mark as Watered";
+"Dismiss" = "Dismiss";
+
+// MARK: - Disclaimer Body
+
+"Plant Care Disclaimer Body" = "Multi Plant Watering Schedule is a reminder and tracking tool designed to help you care for your plants. It is not a substitute for professional horticultural advice.\n\nPlant care needs vary based on:\n- Plant species\n- Local climate and weather\n- Light conditions\n- Soil type\n- Pot size and drainage\n- Season and humidity\n\nThe watering reminders are suggestions only. Always check your plant's soil moisture before watering. Different plants have different needs. Consult care guides or a local nursery for specific plant care information.\n\nThis app cannot be held responsible for plant health outcomes.";

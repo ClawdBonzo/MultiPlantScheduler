@@ -97,13 +97,13 @@ struct DashboardView: View {
                     // Summary badges
                     HStack(spacing: 12) {
                         Badge(
-                            label: "\(plants.count) plants",
+                            label: String(format: NSLocalizedString("%d plants", comment: "Plant count badge"), plants.count),
                             icon: "leaf.fill"
                         )
 
                         if plantsNeedingWaterToday > 0 {
                             Badge(
-                                label: "\(plantsNeedingWaterToday) need water",
+                                label: String(format: NSLocalizedString("%d need water", comment: "Plants needing water"), plantsNeedingWaterToday),
                                 icon: "droplet.fill",
                                 color: AppColors.urgencyRed
                             )
@@ -114,7 +114,7 @@ struct DashboardView: View {
                             let credits = CloudIdentificationManager.shared.creditsRemaining
                             if credits <= 3 {
                                 Badge(
-                                    label: "\(credits) cloud IDs",
+                                    label: String(format: NSLocalizedString("%d cloud IDs", comment: "Cloud credits badge"), credits),
                                     icon: "cloud.fill",
                                     color: credits == 0 ? AppColors.urgencyRed : .orange
                                 )
@@ -133,7 +133,7 @@ struct DashboardView: View {
                         HStack(spacing: 4) {
                             Image(systemName: "flame.fill")
                                 .foregroundColor(.orange)
-                            Text("\(maxWateringStreak) day streak!")
+                            Text(String(format: NSLocalizedString("%d day streak!", comment: "Watering streak"), maxWateringStreak))
                         }
                             .font(.system(.callout, design: .rounded))
                             .fontWeight(.semibold)
@@ -165,7 +165,7 @@ struct DashboardView: View {
                             Image(systemName: "sparkles")
                                 .foregroundColor(AppColors.limeGreen)
 
-                            Text("You have \(plants.count)/\(AppConfig.freePlantLimit) free plants — Upgrade for unlimited + Cloud AI")
+                            Text(String(format: NSLocalizedString("You have %d/%d free plants — Upgrade for unlimited + Cloud AI", comment: "Soft upgrade nudge"), plants.count, AppConfig.freePlantLimit))
                                 .font(.system(.caption, design: .rounded))
                                 .fontWeight(.medium)
                                 .foregroundColor(AppColors.textSecondary)

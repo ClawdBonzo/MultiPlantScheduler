@@ -9,10 +9,10 @@ enum HealthStatus: String, CaseIterable, Codable {
 
     var displayName: String {
         switch self {
-        case .healthy: return "Healthy"
-        case .okay: return "Okay"
-        case .struggling: return "Struggling"
-        case .unknown: return "Unknown"
+        case .healthy: return NSLocalizedString("Healthy", comment: "Health status: healthy")
+        case .okay: return NSLocalizedString("Okay", comment: "Health status: okay")
+        case .struggling: return NSLocalizedString("Struggling", comment: "Health status: struggling")
+        case .unknown: return NSLocalizedString("Unknown", comment: "Health status: unknown")
         }
     }
 

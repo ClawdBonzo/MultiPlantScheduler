@@ -104,8 +104,8 @@ struct TodayPlantRow: View {
                     .foregroundStyle(AppColors.textPrimary)
 
                 Text(plant.isOverdue
-                    ? "Overdue by \(abs(plant.daysUntilWatering))d"
-                    : "Due today")
+                    ? String(format: NSLocalizedString("Overdue by %dd", comment: "Overdue days"), abs(plant.daysUntilWatering))
+                    : NSLocalizedString("Due today", comment: "Due today"))
                     .font(.caption)
                     .foregroundStyle(plant.isOverdue ? Color.red : Color.yellow)
             }

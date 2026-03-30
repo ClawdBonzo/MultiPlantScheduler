@@ -14,12 +14,12 @@ class NotificationManager {
     func registerCategories() {
         let waterAction = UNNotificationAction(
             identifier: Constants.Notifications.markWateredAction,
-            title: "Mark as Watered",
+            title: NSLocalizedString("Mark as Watered", comment: "Notification action: mark plant as watered"),
             options: .foreground
         )
         let dismissAction = UNNotificationAction(
             identifier: Constants.Notifications.dismissAction,
-            title: "Dismiss",
+            title: NSLocalizedString("Dismiss", comment: "Notification action: dismiss"),
             options: []
         )
 
@@ -85,7 +85,7 @@ class NotificationManager {
     func scheduleReminder(for plant: Plant) async {
         let content = UNMutableNotificationContent()
         content.title = Constants.Notifications.wateringReminderTitle
-        content.body = "\(plant.name) needs watering today"
+        content.body = String(format: NSLocalizedString("%@ needs watering today", comment: "Notification body"), plant.name)
         content.sound = .default
         content.categoryIdentifier = Constants.Notifications.wateringReminderCategory
         content.badge = 1
@@ -129,8 +129,8 @@ class NotificationManager {
         ) ?? plant.nextWateringDate
 
         let content = UNMutableNotificationContent()
-        content.title = "🚨 \(plant.name) still needs water!"
-        content.body = "Don't forget — \(plant.name) was due for watering yesterday"
+        content.title = String(format: NSLocalizedString("🚨 %@ still needs water!", comment: "Follow-up notification title"), plant.name)
+        content.body = String(format: NSLocalizedString("Don't forget — %@ was due for watering yesterday", comment: "Follow-up notification body"), plant.name)
         content.sound = .default
         content.categoryIdentifier = Constants.Notifications.wateringReminderCategory
         content.badge = 1

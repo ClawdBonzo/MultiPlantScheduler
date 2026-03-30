@@ -8,11 +8,11 @@ struct PlantCardView: View {
     var urgencyText: String {
         if plant.isOverdue {
             let days = abs(plant.daysUntilWatering)
-            return "Overdue \(days)d"
+            return String(format: NSLocalizedString("Overdue %dd", comment: "Overdue days short"), days)
         } else if plant.isDueToday {
-            return "Due today"
+            return NSLocalizedString("Due today", comment: "Due today")
         } else {
-            return "Water in \(plant.daysUntilWatering)d"
+            return String(format: NSLocalizedString("Water in %dd", comment: "Water in days short"), plant.daysUntilWatering)
         }
     }
 

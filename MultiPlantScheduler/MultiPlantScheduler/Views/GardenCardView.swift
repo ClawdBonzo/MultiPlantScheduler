@@ -55,7 +55,7 @@ struct GardenCardView: View {
             }
 
             if overflowCount > 0 {
-                Text("+\(overflowCount) more")
+                Text(String(format: NSLocalizedString("+%d more", comment: "Overflow plant count"), overflowCount))
                     .font(.subheadline)
                     .foregroundStyle(AppColors.textSecondary)
             }

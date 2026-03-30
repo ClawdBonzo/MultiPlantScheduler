@@ -1,0 +1,324 @@
+/*
+   Localizable.strings (Portuguese — Brazil)
+   MultiPlantScheduler
+
+   Localização em português brasileiro
+*/
+
+// MARK: - DashboardView
+
+"My Garden" = "Meu Jardim";
+"%d plants" = "%d plantas";
+"%d need water" = "%d precisam de água";
+"%d cloud IDs" = "%d IDs na nuvem";
+"%d day streak!" = "Sequência de %d dias!";
+"You have %d/%d free plants — Upgrade for unlimited + Cloud AI" = "Você tem %d/%d plantas grátis — Atualize para ilimitadas + IA na nuvem";
+"Upgrade to Premium" = "Assine o Premium";
+"From $3.99/mo or $49.99 lifetime" = "A partir de $3.99/mês ou $49.99 vitalício";
+"Your Garden Is Empty" = "Seu Jardim Está Vazio";
+"Snap a photo of a plant and let AI\nidentify it and set up care reminders" = "Tire uma foto da sua planta e deixe a IA\nidentificar e criar lembretes de cuidado";
+"Add Your First Plant" = "Adicione Sua Primeira Planta";
+
+// MARK: - AddPlantView
+
+"Photo" = "Foto";
+"Analyzing\nwith AI" = "Analisando\ncom IA";
+"Tap to Add Photo" = "Toque para Adicionar Foto";
+"Best guess" = "Melhor palpite";
+"Not right? Tap to select:" = "Não é essa? Toque para escolher:";
+"None of these — I'll pick manually" = "Nenhuma dessas — vou escolher manualmente";
+"Get Precise ID" = "Obter ID Preciso";
+"Unlimited" = "Ilimitado";
+"%d/%d free" = "%d/%d grátis";
+"Remove Photo" = "Remover Foto";
+"Details" = "Detalhes";
+"Plant name" = "Nome da planta";
+"Plant name is required" = "O nome da planta é obrigatório";
+"Species (Optional)" = "Espécie (Opcional)";
+"Watering Interval" = "Intervalo de Rega";
+"%d days" = "%d dias";
+"Adjust interval" = "Ajustar intervalo";
+"Room" = "Cômodo";
+"Living Room" = "Sala";
+"Bedroom" = "Quarto";
+"Kitchen" = "Cozinha";
+"Bathroom" = "Banheiro";
+"Office" = "Escritório";
+"Balcony" = "Varanda";
+"Other" = "Outro";
+"Notes" = "Notas";
+"Care tips, preferences..." = "Dicas de cuidado, preferências...";
+"Fertilizer" = "Fertilizante";
+"Fertilizer type (optional)" = "Tipo de fertilizante (opcional)";
+"Smart Watering" = "Rega Inteligente";
+"Seasonal Auto-Adjust" = "Ajuste Automático por Estação";
+"Adjust watering by season" = "Ajusta a rega conforme a estação";
+"Adjusted Interval" = "Intervalo Ajustado";
+"Add Plant" = "Adicionar Planta";
+"Edit Plant" = "Editar Planta";
+"Cancel" = "Cancelar";
+"Save" = "Salvar";
+"Done" = "Pronto";
+"Add Plant Photo" = "Adicionar Foto da Planta";
+"Take Photo" = "Tirar Foto";
+"Choose from Library" = "Escolher da Galeria";
+"Error" = "Erro";
+"OK" = "OK";
+"Calling cloud AI..." = "Conectando com IA na nuvem...";
+"Getting precise identification" = "Obtendo identificação precisa";
+"Cloud IDs Used" = "IDs na Nuvem Esgotados";
+"Maybe Later" = "Talvez Depois";
+"You've used all %d free cloud identifications. Upgrade to Premium for unlimited precise plant IDs." = "Você usou todas as %d identificações gratuitas na nuvem. Assine o Premium para IDs ilimitados.";
+"No photo available. Please add a photo first." = "Nenhuma foto disponível. Adicione uma foto primeiro.";
+"Popular species" = "Espécies populares";
+"%d results" = "%d resultados";
+"%d result" = "%d resultado";
+"Search %d species..." = "Buscar entre %d espécies...";
+"%dd watering" = "Rega a cada %dd";
+"Water every %d days" = "Regar a cada %d dias";
+
+// MARK: - PlantDetailView
+
+"Next Watering" = "Próxima Rega";
+"Overdue by %d day" = "Atrasada %d dia";
+"Overdue by %d days" = "Atrasada %d dias";
+"Due today" = "Para hoje";
+"In %d day" = "Em %d dia";
+"In %d days" = "Em %d dias";
+"Species" = "Espécie";
+"Location" = "Local";
+"Watering" = "Rega";
+"Last Watered" = "Última Rega";
+"Added" = "Adicionada";
+"Health" = "Saúde";
+"AI Identified: %d%% confidence" = "IA identificou: %d%% de confiança";
+"Getting precise ID..." = "Obtendo ID preciso...";
+"Cloud Credits: Unlimited" = "Créditos na Nuvem: Ilimitados";
+"Cloud Credits: %d/%d free" = "Créditos na Nuvem: %d/%d grátis";
+"Time for a health check!" = "Hora de verificar a saúde!";
+"Quick Care" = "Cuidado Rápido";
+"Streak" = "Sequência";
+"Care Logs" = "Histórico de Cuidados";
+"Photo Timeline" = "Linha do Tempo de Fotos";
+"Track growth over time" = "Acompanhe o crescimento ao longo do tempo";
+"%d photos" = "%d fotos";
+"%d photo" = "%d foto";
+"Premium" = "Premium";
+"Health History" = "Histórico de Saúde";
+"Care History" = "Histórico de Cuidados";
+"Show Less" = "Ver Menos";
+"View All (%d)" = "Ver Tudo (%d)";
+"Export Care History" = "Exportar Histórico de Cuidados";
+"Edit" = "Editar";
+"Delete" = "Excluir";
+"Delete Plant" = "Excluir Planta";
+"Are you sure you want to delete %@? This cannot be undone." = "Tem certeza que deseja excluir %@? Essa ação não pode ser desfeita.";
+"Could not identify" = "Não foi possível identificar";
+"Cloud AI could not identify" = "A IA na nuvem não conseguiu identificar";
+"Cloud AI not configured — check Config.xcconfig" = "IA na nuvem não configurada — verifique Config.xcconfig";
+"No photo — add a photo first" = "Sem foto — adicione uma foto primeiro";
+
+// MARK: - WateringSettingsSheet
+
+"Watering Schedule" = "Programação de Rega";
+"Water Now" = "Regar Agora";
+
+// MARK: - SettingsView
+
+"✓ Premium Active" = "✓ Premium Ativo";
+"Free Plan" = "Plano Gratuito";
+"Lifetime" = "Vitalício";
+"Upgrade to unlock unlimited plants and more" = "Atualize para desbloquear plantas ilimitadas e mais";
+"Go Premium" = "Assine o Premium";
+"Unlimited plants, Cloud AI & more" = "Plantas ilimitadas, IA na nuvem e mais";
+"Restore Purchases" = "Restaurar Compras";
+"Cloud AI Credits" = "Créditos de IA na Nuvem";
+"Unlimited precise plant IDs" = "IDs precisos ilimitados";
+"%d of %d free IDs remaining" = "%d de %d IDs grátis restantes";
+"Data" = "Dados";
+"Plant Count" = "Total de Plantas";
+"%d plant" = "%d planta";
+"Plant Collection" = "Coleção de Plantas";
+"My plants from Multi Plant app" = "Minhas plantas do app Multi Plant";
+"Plant List" = "Lista de Plantas";
+"Export All Plants as CSV" = "Exportar Todas as Plantas como CSV";
+"Notifications" = "Notificações";
+"Enable Reminders" = "Ativar Lembretes";
+"Reschedule All Reminders" = "Reagendar Todos os Lembretes";
+"Reminder Time" = "Horário do Lembrete";
+"Custom Reminder Time" = "Horário Personalizado do Lembrete";
+"App" = "App";
+"Version" = "Versão";
+"Rate on App Store" = "Avaliar na App Store";
+"Share My Garden" = "Compartilhar Meu Jardim";
+"Multi Plant Watering Schedule" = "Multi Plant Agenda de Rega";
+"Check out this awesome plant care tracker!" = "Confira esse app incrível de cuidado de plantas!";
+"Share with Friends" = "Compartilhar com Amigos";
+"Legal" = "Jurídico";
+"Plant Care Disclaimer" = "Aviso sobre Cuidado de Plantas";
+"Privacy Policy" = "Política de Privacidade";
+"Support" = "Suporte";
+"Send Feedback" = "Enviar Feedback";
+"Danger Zone" = "Zona de Perigo";
+"Delete All Data" = "Excluir Todos os Dados";
+"Settings" = "Ajustes";
+"Delete All Data?" = "Excluir Todos os Dados?";
+"This will delete all %d plants and their care history. This action cannot be undone." = "Isso vai excluir suas %d plantas e todo o histórico de cuidados. Essa ação não pode ser desfeita.";
+"Review Items" = "Revisar Itens";
+"Delete Permanently?" = "Excluir Permanentemente?";
+"Are you absolutely sure? This is permanent and cannot be recovered." = "Tem certeza absoluta? Isso é permanente e não pode ser recuperado.";
+"Notification Permission Required" = "Permissão de Notificação Necessária";
+"Please enable notifications in Settings > Notifications to use this feature." = "Ative as notificações em Ajustes > Notificações para usar esse recurso.";
+"Premium restored!" = "Premium restaurado!";
+"No previous purchases found." = "Nenhuma compra anterior encontrada.";
+"Restore failed: %@" = "Falha ao restaurar: %@";
+
+// MARK: - OnboardingView
+
+"Identify Any Plant\nInstantly" = "Identifique Qualquer Planta\nna Hora";
+"Snap a photo. AI tells you what it is\nand when to water it." = "Tire uma foto. A IA diz qual é a planta\ne quando regar.";
+"AI Plant ID" = "ID de Planta com IA";
+"Smart Reminders" = "Lembretes Inteligentes";
+"Track Growth" = "Acompanhe o Crescimento";
+"Next" = "Próximo";
+"3 Steps. Zero Guesswork." = "3 Passos. Zero Adivinhação.";
+"Take a photo of your plant" = "Tire uma foto da sua planta";
+"AI identifies species + care needs" = "A IA identifica a espécie e os cuidados";
+"Get reminders when it needs water" = "Receba lembretes quando precisar regar";
+"Step %d" = "Passo %d";
+"Let's Identify Your\nFirst Plant" = "Vamos Identificar Sua\nPrimeira Planta";
+"Point your camera at any houseplant" = "Aponte a câmera para qualquer planta";
+"Identify My First Plant" = "Identificar Minha Primeira Planta";
+"I'll do this later" = "Vou fazer isso depois";
+
+// MARK: - PaywallView
+
+"50% OFF" = "50% DE DESCONTO";
+"Ends in %d:%02d" = "Termina em %d:%02d";
+"Unlimited Plants" = "Plantas Ilimitadas";
+"Track your entire collection" = "Acompanhe toda a sua coleção";
+"Unlimited Cloud AI IDs" = "IDs Ilimitados com IA na Nuvem";
+"Precise identification powered by Plant.id" = "Identificação precisa com Plant.id";
+"Track growth over time with photos" = "Registre o crescimento com fotos";
+"Download your care logs" = "Baixe seu histórico de cuidados";
+"Yearly" = "Anual";
+"Monthly" = "Mensal";
+"/year" = "/ano";
+"once" = "única vez";
+"/month" = "/mês";
+"Pay once, own forever" = "Pague uma vez, seu para sempre";
+"MOST POPULAR" = "MAIS POPULAR";
+"BEST LONG-TERM VALUE" = "MELHOR CUSTO-BENEFÍCIO";
+"Buy Lifetime Access" = "Comprar Acesso Vitalício";
+"Subscribe Now" = "Assinar Agora";
+"Continue with Free (3 plants, 5 cloud IDs)" = "Continuar Grátis (3 plantas, 5 IDs na nuvem)";
+"One-time purchase. No subscription." = "Compra única. Sem assinatura.";
+"Auto-renewable. Cancel anytime in Settings." = "Renovação automática. Cancele a qualquer momento nos Ajustes.";
+"Terms of Service" = "Termos de Uso";
+"Processing..." = "Processando...";
+"No subscription available. Please try again later." = "Assinatura indisponível. Tente novamente mais tarde.";
+
+// MARK: - SoftPaywallView
+
+"Flash Sale" = "Oferta Relâmpago";
+"50 % OFF" = "50 % DE DESCONTO";
+"Free Trial Enabled" = "Teste Grátis Ativado";
+"Due %@" = "Para %@";
+"3 days free" = "3 dias grátis";
+"Free Trial Disabled" = "Teste Grátis Indisponível";
+"Try for Free" = "Experimente Grátis";
+"Continue" = "Continuar";
+"Restore" = "Restaurar";
+"MultiPlant AI" = "MultiPlant IA";
+"Identify & Care for Your Plants" = "Identifique e Cuide das Suas Plantas";
+"MINUTES" = "MINUTOS";
+"SECONDS" = "SEGUNDOS";
+"MS" = "MS";
+
+// MARK: - CelebratoryView
+
+"Your First Plant is Saved!" = "Sua Primeira Planta Foi Salva!";
+"Your garden has begun" = "Seu jardim começou";
+
+// MARK: - HealthCheckView
+
+"How is this plant doing?" = "Como está essa planta?";
+"Notes (optional)" = "Notas (opcional)";
+"Any observations..." = "Alguma observação...";
+"Save Health Check" = "Salvar Verificação de Saúde";
+"Health Check" = "Verificação de Saúde";
+
+// MARK: - HealthTimelineView
+
+"Care actions\nlast 30 days" = "Cuidados nos\núltimos 30 dias";
+"Current\nstatus" = "Status\natual";
+"No health checks yet" = "Nenhuma verificação de saúde ainda";
+
+// MARK: - PhotoTimelineView
+
+"Add Photo" = "Adicionar Foto";
+"Compare Photos" = "Comparar Fotos";
+"No photos yet" = "Nenhuma foto ainda";
+"Add photos over time to track your plant's growth" = "Adicione fotos ao longo do tempo para acompanhar o crescimento da sua planta";
+
+// MARK: - PhotoCompareView
+
+"Before" = "Antes";
+"After" = "Depois";
+"No photo" = "Sem foto";
+"Compare" = "Comparar";
+
+// MARK: - PlantCardView
+
+"Overdue %dd" = "Atrasada %dd";
+"Water in %dd" = "Regar em %dd";
+
+// MARK: - GardenCardView
+
+"+%d more" = "+%d mais";
+"Plants" = "Plantas";
+"Day Streak" = "Dias Seguidos";
+"Made with" = "Feito com";
+"Multi Plant" = "Multi Plant";
+
+// MARK: - ShareGardenView
+
+"Share Your Garden" = "Compartilhe Seu Jardim";
+"Share" = "Compartilhar";
+
+// MARK: - TodayChecklistView
+
+"Today's Watering" = "Rega de Hoje";
+"All caught up! No plants need water today." = "Tudo em dia! Nenhuma planta precisa de água hoje.";
+"Overdue by %dd" = "Atrasada %dd";
+
+// MARK: - HealthStatus
+
+"Healthy" = "Saudável";
+"Okay" = "Bem";
+"Struggling" = "Com problemas";
+"Unknown" = "Desconhecido";
+
+// MARK: - CareType
+
+"Watered" = "Regada";
+"Fertilized" = "Fertilizada";
+"Misted" = "Borrifada";
+"Repotted" = "Replantada";
+
+// MARK: - Constants
+
+"💧 Time to water!" = "💧 Hora de regar!";
+"Track up to %d plants + 5 free cloud IDs" = "Acompanhe até %d plantas + 5 IDs grátis na nuvem";
+
+// MARK: - NotificationManager
+
+"%@ needs watering today" = "%@ precisa de água hoje";
+"🚨 %@ still needs water!" = "🚨 %@ ainda precisa de água!";
+"Don't forget — %@ was due for watering yesterday" = "Não esqueça — %@ devia ter sido regada ontem";
+"Mark as Watered" = "Marcar como Regada";
+"Dismiss" = "Dispensar";
+
+// MARK: - Disclaimer Body
+
+"Plant Care Disclaimer Body" = "Multi Plant Agenda de Rega é uma ferramenta de lembretes e acompanhamento criada para ajudar no cuidado das suas plantas. Não substitui orientação profissional de jardinagem.\n\nAs necessidades de cuidado variam conforme:\n- Espécie da planta\n- Clima e condições locais\n- Condições de luminosidade\n- Tipo de solo\n- Tamanho do vaso e drenagem\n- Estação do ano e umidade\n\nOs lembretes de rega são apenas sugestões. Sempre verifique a umidade do solo antes de regar. Cada planta tem necessidades diferentes. Consulte guias de cuidado ou um viveiro local para informações específicas.\n\nEste app não se responsabiliza pelos resultados na saúde das suas plantas.";

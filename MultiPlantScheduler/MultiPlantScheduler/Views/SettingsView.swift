@@ -111,9 +111,9 @@ struct SettingsView: View {
                         Task {
                             do {
                                 let restored = try await revenueCatManager.restorePurchases()
-                                restoreResultMessage = restored ? "Premium restored!" : "No previous purchases found."
+                                restoreResultMessage = restored ? NSLocalizedString("Premium restored!", comment: "Restore success") : NSLocalizedString("No previous purchases found.", comment: "Restore no purchases")
                             } catch {
-                                restoreResultMessage = "Restore failed: \(error.localizedDescription)"
+                                restoreResultMessage = String(format: NSLocalizedString("Restore failed: %@", comment: "Restore error"), error.localizedDescription)
                             }
                             isRestoringPurchases = false
                             showRestoreResult = true
@@ -151,7 +151,7 @@ struct SettingsView: View {
                                     .font(.system(.caption, design: .rounded))
                                     .foregroundColor(AppColors.textSecondary)
                             } else {
-                                Text("\(CloudIdentificationManager.shared.creditsRemaining) of \(CloudIdentificationManager.maxFreeCredits) free IDs remaining")
+                                Text(String(format: NSLocalizedString("%d of %d free IDs remaining", comment: "Cloud credits remaining"), CloudIdentificationManager.shared.creditsRemaining, CloudIdentificationManager.maxFreeCredits))
                                     .font(.system(.caption, design: .rounded))
                                     .foregroundColor(AppColors.textSecondary)
                             }
@@ -175,7 +175,7 @@ struct SettingsView: View {
                                 .fontWeight(.semibold)
                                 .foregroundColor(AppColors.textPrimary)
 
-                            Text("\(plants.count) plant\(plants.count != 1 ? "s" : "")")
+                            Text(String(format: plants.count != 1 ? NSLocalizedString("%d plants", comment: "Plant count plural") : NSLocalizedString("%d plant", comment: "Plant count singular"), plants.count))
                                 .font(.system(.caption, design: .rounded))
                                 .foregroundColor(AppColors.textSecondary)
                         }
@@ -548,14 +548,14 @@ struct SettingsView: View {
                 }
             }
         }
-        .alert("Delete All Data?", isPresented: $showDeleteConfirmation) {
-            Button("Cancel", role: .cancel) { }
+        .alert(NSLocalizedString("Delete All Data?", comment: "Delete confirmation title"), isPresented: $showDeleteConfirmation) {
+            Button(NSLocalizedString("Cancel", comment: "Cancel button"), role: .cancel) { }
 
-            Button("Review Items", role: .none) {
+            Button(NSLocalizedString("Review Items", comment: "Review items button"), role: .none) {
                 showDeleteSecondConfirmation = true
             }
         } message: {
-            Text("This will delete all \(plants.count) plants and their care history. This action cannot be undone.")
+            Text(String(format: NSLocalizedString("This will delete all %d plants and their care history. This action cannot be undone.", comment: "Delete confirmation message"), plants.count))
         }
         .alert("Delete Permanently?", isPresented: $showDeleteSecondConfirmation) {
             Button("Cancel", role: .cancel) { }
@@ -624,26 +624,12 @@ struct SettingsView: View {
 
     private func showDisclaimerAlert() {
         let alert = UIAlertController(
-            title: "Plant Care Disclaimer",
-            message: """
-            Multi Plant Watering Schedule is a reminder and tracking tool designed to help you care for your plants. It is not a substitute for professional horticultural advice.
-
-            Plant care needs vary based on:
-            - Plant species
-            - Local climate and weather
-            - Light conditions
-            - Soil type
-            - Pot size and drainage
-            - Season and humidity
-
-            The watering reminders are suggestions only. Always check your plant's soil moisture before watering. Different plants have different needs. Consult care guides or a local nursery for specific plant care information.
-
-            This app cannot be held responsible for plant health outcomes.
-            """,
+            title: NSLocalizedString("Plant Care Disclaimer", comment: "Disclaimer title"),
+            message: NSLocalizedString("Plant Care Disclaimer Body", comment: "Disclaimer body"),
             preferredStyle: .alert
         )
 
-        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        alert.addAction(UIAlertAction(title: NSLocalizedString("OK", comment: "OK button"), style: .default))
 
         if let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene {
             scene.windows.first?.rootViewController?.present(alert, animated: true)

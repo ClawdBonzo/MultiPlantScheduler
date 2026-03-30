@@ -112,7 +112,7 @@ struct PaywallView: View {
                     HStack(spacing: 3) {
                         Image(systemName: "hourglass")
                             .font(.system(size: 11, weight: .semibold))
-                        Text(String(format: "Ends in %d:%02d", countdownMinutes, countdownSeconds))
+                        Text(String(format: NSLocalizedString("Ends in %d:%02d", comment: "Sale countdown"), countdownMinutes, countdownSeconds))
                             .font(.system(size: 13, weight: .bold, design: .monospaced))
                     }
                 }
@@ -179,7 +179,7 @@ struct PaywallView: View {
 
                         // CTA
                         Button(action: { purchase() }) {
-                            Text(selectedPlan == .lifetime ? "Buy Lifetime Access" : "Subscribe Now")
+                            Text(selectedPlan == .lifetime ? NSLocalizedString("Buy Lifetime Access", comment: "Buy lifetime") : NSLocalizedString("Subscribe Now", comment: "Subscribe now"))
                                 .font(.system(size: 18, weight: .bold, design: .rounded))
                                 .foregroundStyle(.white)
                                 .frame(maxWidth: .infinity)
@@ -224,8 +224,8 @@ struct PaywallView: View {
                         // Legal
                         VStack(spacing: 4) {
                             Text(selectedPlan == .lifetime
-                                 ? "One-time purchase. No subscription."
-                                 : "Auto-renewable. Cancel anytime in Settings.")
+                                 ? NSLocalizedString("One-time purchase. No subscription.", comment: "Lifetime legal")
+                                 : NSLocalizedString("Auto-renewable. Cancel anytime in Settings.", comment: "Subscription legal"))
                                 .font(.system(size: 11))
                                 .foregroundStyle(.gray)
 

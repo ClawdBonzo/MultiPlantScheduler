@@ -1,4 +1,5 @@
 import SwiftUI
+import Foundation
 
 /// App-wide constants for the Multi Plant Watering Schedule app
 enum Constants {
@@ -28,7 +29,7 @@ enum Constants {
         static let monthlyPrice = 3.99
         static let yearlyPrice = 29.99
         static let lifetimePrice = 49.99
-        static let freeTierDescription = "Track up to \(freeTierPlantLimit) plants + 5 free cloud IDs"
+        static let freeTierDescription = String(format: NSLocalizedString("Track up to %d plants + 5 free cloud IDs", comment: "Free tier description"), freeTierPlantLimit)
         static let premiumDescription = "Unlimited plants, advanced features"
     }
 
@@ -37,7 +38,7 @@ enum Constants {
         static let wateringReminderCategory = "WATERING_REMINDER"
         static let markWateredAction = "MARK_WATERED_ACTION"
         static let dismissAction = "DISMISS_ACTION"
-        static let wateringReminderTitle = "💧 Time to water!"
+        static let wateringReminderTitle = NSLocalizedString("💧 Time to water!", comment: "Notification title for watering reminder")
     }
 
     // MARK: - App Configuration
