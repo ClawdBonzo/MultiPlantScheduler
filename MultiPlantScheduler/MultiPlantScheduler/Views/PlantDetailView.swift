@@ -253,6 +253,7 @@ struct PlantDetailView: View {
                                             .clipShape(RoundedRectangle(cornerRadius: 10))
                                         } else {
                                             Button {
+                                                print("🔥🔥🔥 GET PRECISE ID BUTTON TAPPED — TAP REGISTERED (PlantDetail)")
                                                 getPreciseCloudID()
                                             } label: {
                                                 HStack(spacing: 8) {
@@ -290,6 +291,7 @@ struct PlantDetailView: View {
                                                 )
                                                 .clipShape(RoundedRectangle(cornerRadius: 10))
                                             }
+                                            .buttonStyle(.plain)
                                         }
                                     }
                                     .padding(.vertical, 4)
@@ -547,6 +549,28 @@ struct PlantDetailView: View {
                     .padding(.vertical, 24)
                 }
             }
+
+            // Full-screen cloud ID spinner overlay
+            if isCloudIdentifying {
+                Color.black.opacity(0.6).ignoresSafeArea()
+                VStack(spacing: 16) {
+                    ProgressView()
+                        .tint(AppColors.limeGreen)
+                        .scaleEffect(1.5)
+                    Text("Calling cloud AI...")
+                        .font(.system(size: 16, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                    Text("Getting precise identification")
+                        .font(.system(size: 13, weight: .medium, design: .rounded))
+                        .foregroundStyle(.white.opacity(0.7))
+                }
+                .padding(32)
+                .background(
+                    RoundedRectangle(cornerRadius: 20)
+                        .fill(Color(red: 0.12, green: 0.12, blue: 0.12))
+                )
+                .transition(.opacity)
+            }
         }
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
@@ -738,21 +762,27 @@ struct PlantDetailView: View {
     // MARK: - Cloud Precise ID
 
     private func getPreciseCloudID() {
-        #if DEBUG
-        print("☁️ PlantDetail — 'Get Precise ID' tapped for plant: \(plant.name)")
-        print("☁️ PlantDetail — photoData is \(plant.photoData == nil ? "nil" : "\(plant.photoData!.count) bytes")")
-        #endif
-
         let cloud = CloudIdentificationManager.shared
-        guard cloud.canUseCloud(isPremium: revenueCatManager.isPremium) else {
+        let isPremium = revenueCatManager.isPremium
+
+        // ---- HEAVY DIAGNOSTIC LOGGING ----
+        print("🔥 Get Precise ID TAPPED (PlantDetail) for plant: \(plant.name)")
+        print("🔥 isPremium: \(isPremium)")
+        print("🔥 photoData: \(plant.photoData == nil ? "nil" : "\(plant.photoData!.count) bytes")")
+        let keyPreview = cloud.apiKey.isEmpty ? "(empty)" : String(cloud.apiKey.prefix(8)) + "..."
+        print("🔥 API key loaded: \(keyPreview)")
+        print("🔥 API key configured: \(cloud.isAPIKeyConfigured ? "YES" : "NO")")
+        print("🔥 canUseCloud: \(cloud.canUseCloud(isPremium: isPremium))")
+        print("🔥 Credits before: \(cloud.creditsRemaining)/\(CloudIdentificationManager.maxFreeCredits)")
+
+        guard cloud.canUseCloud(isPremium: isPremium) else {
+            print("🔥 BLOCKED — no credits and not premium")
             showUpgradeForCloud = true
             return
         }
 
         guard let data = plant.photoData, let uiImage = UIImage(data: data) else {
-            #if DEBUG
-            print("☁️ PlantDetail — BLOCKED: photoData is nil or corrupt")
-            #endif
+            print("🔥 BLOCKED — photoData is nil or corrupt")
             reidentifyResult = "No photo — add a photo first"
             let warning = UINotificationFeedbackGenerator()
             warning.notificationOccurred(.warning)
@@ -761,22 +791,29 @@ struct PlantDetailView: View {
 
         // Cache photo data — SwiftData can evict large blobs on save
         let cachedPhotoData = data
+        print("🔥 Photo cached: \(cachedPhotoData.count) bytes — starting cloud call...")
 
         isCloudIdentifying = true
         let impact = UIImpactFeedbackGenerator(style: .light)
         impact.impactOccurred()
 
         Task {
-            if let cloudResult = await cloud.identifyPlant(from: uiImage, isPremium: revenueCatManager.isPremium) {
-                let result = cloud.toIdentificationResult(cloudResult)
-                await MainActor.run {
+            print("🔥 Request sent to Plant.id API...")
+            let cloudResult = await cloud.identifyPlant(from: uiImage, isPremium: isPremium)
+
+            await MainActor.run {
+                // ALWAYS restore photo data first
+                plant.photoData = cachedPhotoData
+
+                if let cloudResult = cloudResult {
+                    let result = cloud.toIdentificationResult(cloudResult)
+
+                    print("🔥 Response status: SUCCESS")
+                    print("🔥 Result: \(result.species ?? "nil") @ \(Int(result.confidence * 100))%")
+                    print("🔥 Credits decremented to \(cloud.creditsRemaining)/\(CloudIdentificationManager.maxFreeCredits)")
+
                     isCloudIdentifying = false
                     cloudIDUsed = true
-
-                    #if DEBUG
-                    print("☁️ PlantDetail — cloud result: \(result.species ?? "nil") @ \(Int(result.confidence * 100))%")
-                    print("☁️ PlantDetail — credits after call: \(CloudIdentificationManager.shared.creditsRemaining)")
-                    #endif
 
                     if let speciesName = result.species {
                         withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
@@ -787,15 +824,16 @@ struct PlantDetailView: View {
                             reidentifyResult = "Cloud AI: \(min(Int(result.confidence * 100), 100))% \(speciesName)"
                         }
 
-                        // Re-assign photo data to prevent SwiftData eviction on save
+                        // Re-assign photo data AGAIN after animation to prevent eviction
                         plant.photoData = cachedPhotoData
 
-                        // Delay save so SwiftUI finishes rendering with cached data
                         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                            // Final photo restore before save
+                            plant.photoData = cachedPhotoData
                             try? modelContext.save()
                         }
 
-                        creditsRefresh = UUID() // Update credits display
+                        creditsRefresh = UUID()
 
                         let success = UINotificationFeedbackGenerator()
                         success.notificationOccurred(.success)
@@ -803,29 +841,23 @@ struct PlantDetailView: View {
                         reidentifyResult = "Cloud AI could not identify"
                     }
                     creditsRefresh = UUID()
-                }
-            } else {
-                await MainActor.run {
+                } else {
+                    print("🔥 Response status: FAILED")
+                    let errorMsg = cloud.lastErrorMessage ?? "Cloud identification failed"
+                    print("🔥 Error: \(errorMsg)")
+                    print("🔥 Credits after failed call: \(cloud.creditsRemaining)/\(CloudIdentificationManager.maxFreeCredits)")
+
                     isCloudIdentifying = false
-
-                    // Restore photo data in case SwiftData evicted it during the async call
-                    plant.photoData = cachedPhotoData
-
                     creditsRefresh = UUID()
+
                     if !cloud.isAPIKeyConfigured {
                         reidentifyResult = "Cloud AI not configured — check Config.xcconfig"
-                    } else if let errorMsg = cloud.lastErrorMessage {
-                        reidentifyResult = "Error: \(errorMsg)"
                     } else {
-                        reidentifyResult = "Cloud ID unavailable — try again"
+                        reidentifyResult = "Error: \(errorMsg)"
                     }
 
                     let warning = UINotificationFeedbackGenerator()
                     warning.notificationOccurred(.warning)
-
-                    #if DEBUG
-                    print("☁️ PlantDetail — cloud call failed: \(cloud.lastErrorMessage ?? "unknown")")
-                    #endif
                 }
             }
         }

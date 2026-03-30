@@ -10,7 +10,7 @@ final class CloudIdentificationManager {
     // MARK: - Plant.id API Configuration
     // API key loaded from APIKeys.generated.swift — never commit real keys
     // See Config.example.xcconfig for setup instructions
-    private let apiKey: String = APIKeys.plantIDAPIKey
+    let apiKey: String = APIKeys.plantIDAPIKey
     private let apiURL = "https://plant.id/api/v3/identification"
 
     // MARK: - Credit Tracking (UserDefaults)
