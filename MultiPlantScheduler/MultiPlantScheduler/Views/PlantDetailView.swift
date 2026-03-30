@@ -740,13 +740,9 @@ struct PlantDetailView: View {
     // MARK: - Cloud Precise ID
 
     private func getPreciseCloudID() {
-        guard let data = plant.photoData, let uiImage = UIImage(data: data) else { return }
-
-        // Cache photo data — SwiftData can evict large blobs on save
-        let cachedPhotoData = data
-
         #if DEBUG
         print("☁️ PlantDetail — 'Get Precise ID' tapped for plant: \(plant.name)")
+        print("☁️ PlantDetail — photoData is \(plant.photoData == nil ? "nil" : "\(plant.photoData!.count) bytes")")
         #endif
 
         let cloud = CloudIdentificationManager.shared
@@ -754,6 +750,19 @@ struct PlantDetailView: View {
             showUpgradeForCloud = true
             return
         }
+
+        guard let data = plant.photoData, let uiImage = UIImage(data: data) else {
+            #if DEBUG
+            print("☁️ PlantDetail — BLOCKED: photoData is nil or corrupt")
+            #endif
+            reidentifyResult = "No photo — add a photo first"
+            let warning = UINotificationFeedbackGenerator()
+            warning.notificationOccurred(.warning)
+            return
+        }
+
+        // Cache photo data — SwiftData can evict large blobs on save
+        let cachedPhotoData = data
 
         isCloudIdentifying = true
         let impact = UIImpactFeedbackGenerator(style: .light)
@@ -800,14 +809,21 @@ struct PlantDetailView: View {
             } else {
                 await MainActor.run {
                     isCloudIdentifying = false
+
+                    // Restore photo data in case SwiftData evicted it during the async call
+                    plant.photoData = cachedPhotoData
+
                     creditsRefresh = UUID()
                     if !cloud.isAPIKeyConfigured {
                         reidentifyResult = "Cloud AI not configured — check Config.xcconfig"
                     } else if let errorMsg = cloud.lastErrorMessage {
-                        reidentifyResult = errorMsg
+                        reidentifyResult = "Error: \(errorMsg)"
                     } else {
                         reidentifyResult = "Cloud ID unavailable — try again"
                     }
+
+                    let warning = UINotificationFeedbackGenerator()
+                    warning.notificationOccurred(.warning)
 
                     #if DEBUG
                     print("☁️ PlantDetail — cloud call failed: \(cloud.lastErrorMessage ?? "unknown")")

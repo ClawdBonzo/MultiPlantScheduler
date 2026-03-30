@@ -643,7 +643,7 @@ struct AddPlantView: View {
                     }
                 }
             }
-            .alert("Save Failed", isPresented: $showSaveError) {
+            .alert("Error", isPresented: $showSaveError) {
                 Button("OK") {}
             } message: {
                 Text(saveErrorMessage)
@@ -779,6 +779,8 @@ struct AddPlantView: View {
 
         #if DEBUG
         print("☁️ AddPlant — 'Get Precise ID' tapped")
+        print("☁️ AddPlant — photoData is \(photoData == nil ? "nil" : "\(photoData!.count) bytes")")
+        print("☁️ AddPlant — canUseCloud: \(cloud.canUseCloud(isPremium: isPremium)), credits: \(cloud.creditsRemaining)")
         #endif
 
         guard cloud.canUseCloud(isPremium: isPremium) else {
@@ -786,7 +788,17 @@ struct AddPlantView: View {
             return
         }
 
-        guard let data = photoData, let uiImage = UIImage(data: data) else { return }
+        guard let data = photoData, let uiImage = UIImage(data: data) else {
+            #if DEBUG
+            print("☁️ AddPlant — BLOCKED: photoData is nil or could not create UIImage")
+            #endif
+            saveErrorMessage = "No photo available. Please add a photo first."
+            showSaveError = true
+            return
+        }
+
+        // Cache photo data before async work — SwiftData can evict large blobs
+        let cachedPhotoData = data
 
         withAnimation { isCloudIdentifying = true }
 
@@ -798,6 +810,9 @@ struct AddPlantView: View {
                 let result = cloud.toIdentificationResult(cloudResult)
 
                 await MainActor.run {
+                    // Restore photo data first in case SwiftData evicted it
+                    photoData = cachedPhotoData
+
                     withAnimation(.spring(response: 0.4, dampingFraction: 0.7)) {
                         isCloudIdentifying = false
                         cloudIDUsed = true
@@ -835,11 +850,23 @@ struct AddPlantView: View {
             } else {
                 await MainActor.run {
                     withAnimation { isCloudIdentifying = false }
-                    creditsRefresh = UUID() // Update credits display
+
+                    // Restore photo data
+                    photoData = cachedPhotoData
+
+                    creditsRefresh = UUID()
+
+                    // Show the actual error to the user
+                    let errorMsg = cloud.lastErrorMessage ?? "Cloud identification failed"
+                    saveErrorMessage = errorMsg
+                    showSaveError = true
+
                     #if DEBUG
-                    print("☁️ AddPlant — cloud call failed: \(cloud.lastErrorMessage ?? "unknown")")
+                    print("☁️ AddPlant — cloud call failed: \(errorMsg)")
                     #endif
-                    // Key not configured — on-device result stays, no disruptive error
+
+                    let warning = UINotificationFeedbackGenerator()
+                    warning.notificationOccurred(.warning)
                 }
             }
         }

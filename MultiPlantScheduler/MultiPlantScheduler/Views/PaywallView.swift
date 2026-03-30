@@ -126,9 +126,7 @@ struct PaywallView: View {
                         VStack(spacing: 14) {
                             PaywallBenefitRow(icon: "leaf.fill", title: "Unlimited Plants", subtitle: "Track your entire collection")
                             PaywallBenefitRow(icon: "cloud.fill", title: "Unlimited Cloud AI IDs", subtitle: "Precise identification powered by Plant.id")
-                            PaywallBenefitRow(icon: "camera.viewfinder", title: "On-Device AI + Cloud AI", subtitle: "Dual AI for 99% accuracy on 1000+ species")
                             PaywallBenefitRow(icon: "photo.on.rectangle.angled", title: "Photo Timeline", subtitle: "Track growth over time with photos")
-                            PaywallBenefitRow(icon: "bell.badge", title: "Custom Reminder Times", subtitle: "Set per-plant notification schedules")
                             PaywallBenefitRow(icon: "calendar", title: "Seasonal Auto-Adjust", subtitle: "Smart watering by season")
                             PaywallBenefitRow(icon: "square.and.arrow.up", title: "Export Care History", subtitle: "Download your care logs")
                         }
@@ -172,11 +170,24 @@ struct PaywallView: View {
                         // CTA
                         Button(action: { purchase() }) {
                             Text(selectedPlan == .lifetime ? "Buy Lifetime Access" : "Subscribe Now")
-                                .font(.system(size: 18, weight: .bold))
+                                .font(.system(size: 18, weight: .bold, design: .rounded))
                                 .foregroundStyle(.white)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 16)
-                                .background(RoundedRectangle(cornerRadius: 14).fill(.black))
+                                .background(
+                                    RoundedRectangle(cornerRadius: 14)
+                                        .fill(
+                                            LinearGradient(
+                                                colors: [
+                                                    Color(red: 0.10, green: 0.45, blue: 0.10),
+                                                    Color(red: 0.20, green: 0.80, blue: 0.20)
+                                                ],
+                                                startPoint: .leading,
+                                                endPoint: .trailing
+                                            )
+                                        )
+                                )
+                                .shadow(color: Color(red: 0.133, green: 0.545, blue: 0.133).opacity(0.4), radius: 8, y: 4)
                         }
                         .disabled(isLoading)
                         .opacity(isLoading ? 0.6 : 1)
