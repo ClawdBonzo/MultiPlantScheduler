@@ -1,0 +1,26 @@
+plugins = []
+headers = []
+redirects = []
+
+[functions]
+
+[functions."*"]
+
+[build]
+publish = "/Users/robgoldstein/Desktop/MultiPlantScheduler/multiplant-site"
+publishOrigin = "default"
+base = "/Users/robgoldstein/Desktop/MultiPlantScheduler/multiplant-site"
+
+[build.environment]
+
+[build.processing]
+
+[build.processing.css]
+
+[build.processing.html]
+
+[build.processing.images]
+
+[build.processing.js]
+
+[build.services]

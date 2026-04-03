@@ -8,9 +8,6 @@ private let logger = Logger(subsystem: "com.clawdbonzo.MultiPlantScheduler", cat
 struct MultiPlantSchedulerApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var revenueCatManager = RevenueCatManager.shared
-    @State private var showOnboarding: Bool
-    @State private var showAddPlantFromOnboarding = false
-    @State private var showCelebratory = false
     @State private var hasAppeared = false
     @Environment(\.scenePhase) private var scenePhase
 
@@ -38,32 +35,12 @@ struct MultiPlantSchedulerApp: App {
             FirstLaunchService.markLaunchComplete()
         }
 
-        // Show onboarding if this is the first launch
-        let hasSeenOnboarding = UserDefaults.standard.bool(forKey: "hasSeenOnboarding")
-        _showOnboarding = State(initialValue: !hasSeenOnboarding)
-
         logger.notice("App init complete")
     }
 
     var body: some Scene {
         WindowGroup {
-            Group {
-                if showOnboarding {
-                    OnboardingView(
-                        isPresented: $showOnboarding,
-                        launchAddPlant: $showAddPlantFromOnboarding
-                    )
-                } else {
-                    ContentView()
-                }
-            }
-            .sheet(isPresented: $showAddPlantFromOnboarding) {
-                AddPlantView(isFromOnboarding: true, openCameraOnAppear: true, showCelebratory: $showCelebratory)
-                    .presentationDetents([.large])
-            }
-            .fullScreenCover(isPresented: $showCelebratory) {
-                CelebratoryView()
-            }
+            ContentView()
             .modelContainer(modelContainer)
             .environmentObject(revenueCatManager)
             .preferredColorScheme(.dark)
