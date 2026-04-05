@@ -1,7 +1,7 @@
 import SwiftUI
 import RevenueCat
 
-/// Dashboard paywall — Home AI style with hero, 3-tier pricing, and urgency elements
+/// Premium paywall — dark luxury design with 3-tier pricing and urgency elements
 struct PaywallView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var revenueCatManager: RevenueCatManager
@@ -13,15 +13,14 @@ struct PaywallView: View {
     @State private var offerings: Offerings?
     @State private var countdown: TimeInterval = 15 * 60
     @State private var timer: Timer?
+    @State private var animateHero = false
 
     enum PlanType { case monthly, yearly, lifetime }
 
     private var monthlyPackage: Package? { offerings?.current?.monthly }
     private var annualPackage: Package? { offerings?.current?.annual }
     private var lifetimePackage: Package? {
-        // Try the standard $rc_lifetime first
         if let pkg = offerings?.current?.lifetime { return pkg }
-        // Fallback: search all packages for a lifetime type or matching product ID
         return offerings?.current?.availablePackages.first { pkg in
             pkg.packageType == .lifetime ||
             pkg.storeProduct.productIdentifier.lowercased().contains("lifetime")
@@ -57,56 +56,71 @@ struct PaywallView: View {
 
     var body: some View {
         ZStack {
-            Color.white.ignoresSafeArea()
+            // Deep dark background
+            AppColors.background.ignoresSafeArea()
 
             VStack(spacing: 0) {
                 // MARK: - Hero Section
                 ZStack(alignment: .topLeading) {
-                    // Hero gradient — replace with Image("paywall_hero") for real photography
-                    LinearGradient(
-                        colors: [
-                            Color(red: 0.05, green: 0.25, blue: 0.08),
-                            Color(red: 0.12, green: 0.50, blue: 0.15),
-                            Color(red: 0.20, green: 0.65, blue: 0.25)
-                        ],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                    .overlay {
-                        VStack(spacing: 10) {
-                            Image(systemName: "leaf.circle.fill")
-                                .font(.system(size: 56, weight: .light))
-                                .foregroundStyle(.white.opacity(0.9))
+                    // Gradient hero with ambient glow
+                    ZStack {
+                        PremiumGradient.paywallHero
+
+                        // Floating ambient particles
+                        ParticleGlowView(count: 6, color: AppColors.limeGreen)
+                            .opacity(animateHero ? 0.8 : 0)
+
+                        VStack(spacing: 12) {
+                            ZStack {
+                                // Glow ring
+                                Circle()
+                                    .fill(AppColors.limeGreen.opacity(0.12))
+                                    .frame(width: 90, height: 90)
+                                    .scaleEffect(animateHero ? 1.1 : 0.9)
+                                    .animation(.easeInOut(duration: 2).repeatForever(autoreverses: true), value: animateHero)
+
+                                Image(systemName: "crown.fill")
+                                    .font(.system(size: 40, weight: .light))
+                                    .foregroundStyle(
+                                        LinearGradient(
+                                            colors: [.yellow, .orange],
+                                            startPoint: .top,
+                                            endPoint: .bottom
+                                        )
+                                    )
+                                    .shadow(color: .yellow.opacity(0.3), radius: 8)
+                            }
+
                             Text("Go Premium")
-                                .font(.system(size: 26, weight: .bold, design: .rounded))
+                                .font(.system(size: 28, weight: .bold, design: .rounded))
                                 .foregroundStyle(.white)
+
                             Text("Unlimited plants, Cloud AI & more")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundStyle(.white.opacity(0.8))
+                                .font(.system(size: 14, weight: .medium, design: .rounded))
+                                .foregroundStyle(.white.opacity(0.75))
                         }
                     }
-                    .frame(height: 220)
+                    .frame(height: 240)
 
                     // Close button
                     Button { dismiss() } label: {
                         Image(systemName: "xmark")
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(.white)
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundStyle(.white.opacity(0.8))
                             .frame(width: 32, height: 32)
-                            .background(.black.opacity(0.4))
+                            .background(.ultraThinMaterial.opacity(0.5))
                             .clipShape(Circle())
                     }
                     .padding(.leading, 16)
                     .padding(.top, 12)
-
                 }
 
-                // Sale ribbon banner
+                // Sale ribbon
                 HStack(spacing: 10) {
                     Image(systemName: "tag.fill")
-                        .font(.system(size: 14, weight: .bold))
+                        .font(.system(size: 13, weight: .bold))
                     Text("50% OFF")
-                        .font(.system(size: 16, weight: .black, design: .rounded))
+                        .font(.system(size: 15, weight: .black, design: .rounded))
                     Text("·")
                         .font(.system(size: 14, weight: .bold))
                     HStack(spacing: 3) {
@@ -121,28 +135,37 @@ struct PaywallView: View {
                 .padding(.vertical, 10)
                 .background(
                     LinearGradient(
-                        colors: [Color.red, Color.orange],
+                        colors: [Color(red: 0.85, green: 0.15, blue: 0.15), Color(red: 0.95, green: 0.45, blue: 0.15)],
                         startPoint: .leading,
                         endPoint: .trailing
                     )
                 )
 
-                // MARK: - Content Card
+                // MARK: - Content
                 ScrollView(showsIndicators: false) {
-                    VStack(spacing: 20) {
-                        // Feature benefits — clean icons
+                    VStack(spacing: 22) {
+                        // Feature benefits
                         VStack(spacing: 14) {
-                            PaywallBenefitRow(icon: "leaf.fill", title: "Unlimited Plants", subtitle: "Track your entire collection")
-                            PaywallBenefitRow(icon: "cloud.fill", title: "Unlimited Cloud AI IDs", subtitle: "Precise identification powered by Plant.id")
-                            PaywallBenefitRow(icon: "photo.on.rectangle.angled", title: "Photo Timeline", subtitle: "Track growth over time with photos")
-                            PaywallBenefitRow(icon: "calendar", title: "Seasonal Auto-Adjust", subtitle: "Smart watering by season")
-                            PaywallBenefitRow(icon: "square.and.arrow.up", title: "Export Care History", subtitle: "Download your care logs")
+                            PaywallBenefitRow(icon: "leaf.fill", title: "Unlimited Plants", subtitle: "Track your entire collection", iconColor: AppColors.emerald)
+                            PaywallBenefitRow(icon: "cloud.fill", title: "Unlimited Cloud AI IDs", subtitle: "Precise identification powered by Plant.id", iconColor: AppColors.teal)
+                            PaywallBenefitRow(icon: "photo.on.rectangle.angled", title: "Photo Timeline", subtitle: "Track growth over time with photos", iconColor: AppColors.jade)
+                            PaywallBenefitRow(icon: "calendar", title: "Seasonal Auto-Adjust", subtitle: "Smart watering by season", iconColor: AppColors.forestGreen)
+                            PaywallBenefitRow(icon: "microbe.fill", title: "Disease & Pest Detection", subtitle: "Unlimited AI health scans", iconColor: .purple)
+                            PaywallBenefitRow(icon: "chart.bar.fill", title: "Advanced Analytics", subtitle: "Charts, streaks, and insights", iconColor: .blue)
+                            PaywallBenefitRow(icon: "person.2.fill", title: "Community Tips & Tricks", subtitle: "Learn from thousands of plant parents", iconColor: .orange)
+                            PaywallBenefitRow(icon: "square.and.arrow.up", title: "Full Data Export", subtitle: "CSV export of all plants and care logs", iconColor: AppColors.mint)
                         }
                         .padding(16)
-                        .background(Color(red: 0.97, green: 0.97, blue: 0.97))
-                        .clipShape(RoundedRectangle(cornerRadius: 14))
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(Color.white.opacity(0.04))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 16)
+                                        .stroke(Color.white.opacity(0.06), lineWidth: 0.5)
+                                )
+                        )
 
-                        // 3-tier pricing — Annual first (default selected)
+                        // 3-tier pricing
                         VStack(spacing: 8) {
                             PaywallPlanRow(
                                 title: "Yearly",
@@ -150,7 +173,7 @@ struct PaywallView: View {
                                 period: "/year",
                                 detail: "\(yearlyMonthlyEquivalent)/mo · Save \(savingsPercent)%",
                                 badge: "MOST POPULAR",
-                                badgeColor: Color(red: 0.133, green: 0.545, blue: 0.133),
+                                badgeColor: AppColors.emerald,
                                 isSelected: selectedPlan == .yearly
                             ) { selectedPlan = .yearly }
 
@@ -160,8 +183,8 @@ struct PaywallView: View {
                                     price: lifetimePrice,
                                     period: "once",
                                     detail: "Pay once, own forever",
-                                    badge: "BEST LONG-TERM VALUE",
-                                    badgeColor: Color(red: 0.55, green: 0.42, blue: 0.15),
+                                    badge: "BEST VALUE",
+                                    badgeColor: Color(red: 0.75, green: 0.55, blue: 0.15),
                                     isSelected: selectedPlan == .lifetime
                                 ) { selectedPlan = .lifetime }
                             }
@@ -179,46 +202,45 @@ struct PaywallView: View {
 
                         // CTA
                         Button(action: { purchase() }) {
-                            Text(selectedPlan == .lifetime ? NSLocalizedString("Buy Lifetime Access", comment: "Buy lifetime") : NSLocalizedString("Subscribe Now", comment: "Subscribe now"))
-                                .font(.system(size: 18, weight: .bold, design: .rounded))
-                                .foregroundStyle(.white)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 16)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 14)
-                                        .fill(
-                                            LinearGradient(
-                                                colors: [
-                                                    Color(red: 0.10, green: 0.45, blue: 0.10),
-                                                    Color(red: 0.20, green: 0.80, blue: 0.20)
-                                                ],
-                                                startPoint: .leading,
-                                                endPoint: .trailing
-                                            )
-                                        )
-                                )
-                                .shadow(color: Color(red: 0.133, green: 0.545, blue: 0.133).opacity(0.4), radius: 8, y: 4)
+                            HStack(spacing: 8) {
+                                if isLoading {
+                                    ProgressView()
+                                        .tint(.black)
+                                        .scaleEffect(0.8)
+                                } else {
+                                    Image(systemName: "crown.fill")
+                                        .font(.system(size: 15, weight: .semibold))
+                                }
+                                Text(selectedPlan == .lifetime
+                                     ? NSLocalizedString("Buy Lifetime Access", comment: "Buy lifetime")
+                                     : NSLocalizedString("Subscribe Now", comment: "Subscribe now"))
+                                    .font(.system(size: 18, weight: .bold, design: .rounded))
+                            }
+                            .foregroundStyle(.black)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 16)
+                            .premiumButton()
                         }
                         .disabled(isLoading)
-                        .opacity(isLoading ? 0.6 : 1)
+                        .opacity(isLoading ? 0.7 : 1)
 
-                        // Restore Purchases button — App Store requirement
+                        // Restore
                         Button(action: { restorePurchases() }) {
                             Text("Restore Purchases")
-                                .font(.system(size: 15, weight: .semibold))
-                                .foregroundStyle(Color(red: 0.133, green: 0.545, blue: 0.133))
+                                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                                .foregroundStyle(AppColors.emerald)
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 12)
                                 .background(
                                     RoundedRectangle(cornerRadius: 12)
-                                        .stroke(Color(red: 0.133, green: 0.545, blue: 0.133), lineWidth: 1.5)
+                                        .stroke(AppColors.emerald.opacity(0.4), lineWidth: 1.5)
                                 )
                         }
 
                         Button(action: { dismiss() }) {
                             Text("Continue with Free (3 plants, 5 cloud IDs)")
-                                .font(.system(size: 14, weight: .medium))
-                                .foregroundStyle(.gray)
+                                .font(.system(size: 14, weight: .medium, design: .rounded))
+                                .foregroundStyle(AppColors.textSecondary)
                         }
 
                         // Legal
@@ -227,15 +249,15 @@ struct PaywallView: View {
                                  ? NSLocalizedString("One-time purchase. No subscription.", comment: "Lifetime legal")
                                  : NSLocalizedString("Auto-renewable. Cancel anytime in Settings.", comment: "Subscription legal"))
                                 .font(.system(size: 11))
-                                .foregroundStyle(.gray)
+                                .foregroundStyle(AppColors.textSecondary.opacity(0.6))
 
                             HStack(spacing: 4) {
                                 Link("Privacy Policy", destination: URL(string: "https://www.apple.com/legal/privacy/")!)
-                                Text("•").foregroundStyle(.gray)
+                                Text("•").foregroundStyle(AppColors.textSecondary.opacity(0.4))
                                 Link("Terms of Service", destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
                             }
                             .font(.system(size: 11))
-                            .foregroundStyle(.gray)
+                            .foregroundStyle(AppColors.textSecondary.opacity(0.5))
                         }
                     }
                     .padding(20)
@@ -249,13 +271,16 @@ struct PaywallView: View {
                         .tint(.white)
                         .scaleEffect(1.3)
                     Text("Processing...")
-                        .font(.system(size: 15, weight: .medium))
+                        .font(.system(size: 15, weight: .medium, design: .rounded))
                         .foregroundStyle(.white)
                 }
             }
         }
         .task { await loadOfferings() }
-        .onAppear { startTimer() }
+        .onAppear {
+            startTimer()
+            withAnimation(.easeOut(duration: 1.0)) { animateHero = true }
+        }
         .onDisappear { timer?.invalidate() }
         .alert("Error", isPresented: $showError) {
             Button("OK") { }
@@ -344,25 +369,36 @@ private struct PaywallBenefitRow: View {
     let icon: String
     let title: String
     let subtitle: String
+    var iconColor: Color = AppColors.emerald
 
     var body: some View {
         HStack(spacing: 12) {
             Image(systemName: icon)
-                .font(.system(size: 18, weight: .semibold))
-                .foregroundStyle(Color(red: 0.133, green: 0.545, blue: 0.133))
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [iconColor, iconColor.opacity(0.7)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
                 .frame(width: 32, height: 32)
-                .background(Color(red: 0.133, green: 0.545, blue: 0.133).opacity(0.12))
+                .background(iconColor.opacity(0.12))
                 .clipShape(RoundedRectangle(cornerRadius: 8))
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(Color(red: 0.15, green: 0.15, blue: 0.15))
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .foregroundStyle(AppColors.textPrimary)
                 Text(subtitle)
-                    .font(.system(size: 12))
-                    .foregroundStyle(Color(red: 0.4, green: 0.4, blue: 0.4))
+                    .font(.system(size: 12, design: .rounded))
+                    .foregroundStyle(AppColors.textSecondary)
             }
             Spacer()
+
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 16))
+                .foregroundStyle(iconColor.opacity(0.6))
         }
     }
 }
@@ -377,50 +413,48 @@ private struct PaywallPlanRow: View {
     let isSelected: Bool
     let onTap: () -> Void
 
-    private let green = Color(red: 0.133, green: 0.545, blue: 0.133)
-
     var body: some View {
         Button(action: onTap) {
             HStack {
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: 3) {
                     HStack(spacing: 6) {
                         Text(title)
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundStyle(.black)
+                            .font(.system(size: 15, weight: .semibold, design: .rounded))
+                            .foregroundStyle(AppColors.textPrimary)
                         if let badge {
                             Text(badge)
-                                .font(.system(size: 9, weight: .bold))
+                                .font(.system(size: 9, weight: .bold, design: .rounded))
                                 .foregroundStyle(.white)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
-                                .background(badgeColor ?? green)
+                                .background(badgeColor ?? AppColors.emerald)
                                 .clipShape(RoundedRectangle(cornerRadius: 4))
                         }
                     }
                     if let detail {
                         Text(detail)
-                            .font(.system(size: 12))
-                            .foregroundStyle(.gray)
+                            .font(.system(size: 12, design: .rounded))
+                            .foregroundStyle(AppColors.textSecondary)
                     }
                 }
                 Spacer()
                 HStack(alignment: .firstTextBaseline, spacing: 2) {
                     Text(price)
-                        .font(.system(size: 17, weight: .bold))
-                        .foregroundStyle(.black)
+                        .font(.system(size: 17, weight: .bold, design: .rounded))
+                        .foregroundStyle(AppColors.textPrimary)
                     Text(period)
-                        .font(.system(size: 12))
-                        .foregroundStyle(.gray)
+                        .font(.system(size: 12, design: .rounded))
+                        .foregroundStyle(AppColors.textSecondary)
                 }
             }
             .padding(14)
             .background(
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(isSelected ? green.opacity(0.08) : Color(red: 0.97, green: 0.97, blue: 0.97))
+                RoundedRectangle(cornerRadius: 14)
+                    .fill(isSelected ? AppColors.emerald.opacity(0.08) : Color.white.opacity(0.03))
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(isSelected ? green : .clear, lineWidth: 2)
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(isSelected ? AppColors.emerald.opacity(0.5) : Color.white.opacity(0.06), lineWidth: isSelected ? 1.5 : 0.5)
             )
         }
     }

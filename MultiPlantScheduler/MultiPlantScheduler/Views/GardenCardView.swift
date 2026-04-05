@@ -17,7 +17,7 @@ struct GardenCardView: View {
         VStack(spacing: 20) {
             // Header
             Text("My Garden")
-                .font(.title)
+                .font(.system(.title, design: .rounded))
                 .fontWeight(.bold)
                 .foregroundStyle(AppColors.textPrimary)
 
@@ -35,18 +35,21 @@ struct GardenCardView: View {
                                 .scaledToFill()
                                 .frame(width: 80, height: 80)
                                 .clipShape(Circle())
+                                .overlay(
+                                    Circle().stroke(AppColors.emerald.opacity(0.3), lineWidth: 1.5)
+                                )
                         } else {
                             Circle()
-                                .fill(AppColors.forestGreen.opacity(0.3))
+                                .fill(AppColors.emerald.opacity(0.15))
                                 .frame(width: 80, height: 80)
                                 .overlay {
                                     Image(systemName: "leaf.fill")
                                         .font(.system(size: 24, weight: .light))
-                                        .foregroundStyle(.white.opacity(0.6))
+                                        .foregroundStyle(AppColors.emerald.opacity(0.5))
                                 }
                         }
                         Text(plant.name)
-                            .font(.caption)
+                            .font(.system(.caption, design: .rounded))
                             .fontWeight(.medium)
                             .foregroundStyle(AppColors.textPrimary)
                             .lineLimit(1)
@@ -56,7 +59,7 @@ struct GardenCardView: View {
 
             if overflowCount > 0 {
                 Text(String(format: NSLocalizedString("+%d more", comment: "Overflow plant count"), overflowCount))
-                    .font(.subheadline)
+                    .font(.system(.subheadline, design: .rounded))
                     .foregroundStyle(AppColors.textSecondary)
             }
 
@@ -64,21 +67,21 @@ struct GardenCardView: View {
             HStack(spacing: 30) {
                 VStack {
                     Text("\(plants.count)")
-                        .font(.title2)
+                        .font(.system(.title2, design: .rounded))
                         .fontWeight(.bold)
-                        .foregroundStyle(AppColors.limeGreen)
+                        .foregroundStyle(AppColors.emerald)
                     Text("Plants")
-                        .font(.caption)
+                        .font(.system(.caption, design: .rounded))
                         .foregroundStyle(AppColors.textSecondary)
                 }
                 if maxStreak > 0 {
                     VStack {
                         Text("\(maxStreak)")
-                            .font(.title2)
+                            .font(.system(.title2, design: .rounded))
                             .fontWeight(.bold)
                             .foregroundStyle(.orange)
                         Text("Day Streak")
-                            .font(.caption)
+                            .font(.system(.caption, design: .rounded))
                             .foregroundStyle(AppColors.textSecondary)
                     }
                 }
@@ -87,26 +90,39 @@ struct GardenCardView: View {
             // Branding
             HStack(spacing: 4) {
                 Text("Made with")
-                    .font(.caption2)
+                    .font(.system(.caption2, design: .rounded))
                     .foregroundStyle(AppColors.textSecondary.opacity(0.7))
-                Text("Multi Plant")
-                    .font(.caption2)
+                Text("MultiPlant AI")
+                    .font(.system(.caption2, design: .rounded))
                     .fontWeight(.semibold)
-                    .foregroundStyle(AppColors.limeGreen.opacity(0.7))
+                    .foregroundStyle(AppColors.emerald.opacity(0.8))
                 Image(systemName: "leaf.fill")
                     .font(.caption2)
-                    .foregroundStyle(AppColors.limeGreen.opacity(0.7))
+                    .foregroundStyle(AppColors.emerald.opacity(0.8))
             }
         }
         .padding(30)
         .frame(width: 360, height: 480)
         .background(
-            LinearGradient(
-                colors: [AppColors.background, Color(red: 0.05, green: 0.12, blue: 0.05)],
-                startPoint: .top,
-                endPoint: .bottom
-            )
+            ZStack {
+                LinearGradient(
+                    colors: [AppColors.background, AppColors.deepForest],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                // Subtle ambient glow
+                RadialGradient(
+                    colors: [AppColors.emerald.opacity(0.06), .clear],
+                    center: .center,
+                    startRadius: 20,
+                    endRadius: 200
+                )
+            }
         )
         .clipShape(RoundedRectangle(cornerRadius: 24))
+        .overlay(
+            RoundedRectangle(cornerRadius: 24)
+                .stroke(PremiumGradient.cardStroke(opacity: 0.12), lineWidth: 0.5)
+        )
     }
 }

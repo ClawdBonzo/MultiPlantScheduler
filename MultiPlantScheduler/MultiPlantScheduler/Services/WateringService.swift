@@ -15,6 +15,9 @@ enum WateringService {
 
         try? context.save()
 
+        // Record global streak
+        StreakManager.shared.recordCareAction()
+
         Task {
             await NotificationManager.shared.scheduleReminder(for: plant)
         }
@@ -36,5 +39,8 @@ enum WateringService {
         plant.careLogs.append(careLog)
 
         try? context.save()
+
+        // Record global streak for all care types
+        StreakManager.shared.recordCareAction()
     }
 }

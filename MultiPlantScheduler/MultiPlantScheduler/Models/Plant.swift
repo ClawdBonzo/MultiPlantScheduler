@@ -40,6 +40,9 @@ final class Plant {
     @Relationship(deleteRule: .cascade, inverse: \PhotoEntry.plant)
     var photoEntries: [PhotoEntry] = []
 
+    @Relationship(deleteRule: .cascade, inverse: \DiagnosisEntry.plant)
+    var diagnosisEntries: [DiagnosisEntry] = []
+
     init(
         name: String,
         species: String? = nil,

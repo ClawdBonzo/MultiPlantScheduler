@@ -15,29 +15,41 @@ struct TodayChecklistView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Image(systemName: "checklist")
-                    .foregroundStyle(AppColors.limeGreen)
-                Text("Today's Watering")
-                    .font(.headline)
-                    .foregroundStyle(AppColors.textPrimary)
+                HStack(spacing: 6) {
+                    Image(systemName: "checklist")
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [AppColors.emerald, AppColors.limeGreen],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                    Text("Today's Watering")
+                        .font(.system(.headline, design: .rounded))
+                        .fontWeight(.bold)
+                        .foregroundStyle(AppColors.textPrimary)
+                }
+
                 Spacer()
+
                 Text("\(duePlants.count)")
-                    .font(.caption)
-                    .fontWeight(.semibold)
+                    .font(.system(.caption2, design: .rounded))
+                    .fontWeight(.bold)
                     .padding(.horizontal, 8)
                     .padding(.vertical, 4)
-                    .background(duePlants.isEmpty ? AppColors.forestGreen : Color.red)
-                    .clipShape(Capsule())
+                    .background(
+                        Capsule().fill(duePlants.isEmpty ? AppColors.emerald : AppColors.urgencyCritical)
+                    )
                     .foregroundStyle(.white)
             }
 
             if duePlants.isEmpty {
                 HStack(spacing: 8) {
                     Image(systemName: "checkmark.circle.fill")
-                        .foregroundStyle(AppColors.limeGreen)
+                        .foregroundStyle(AppColors.emerald)
                         .font(.title2)
                     Text("All caught up! No plants need water today.")
-                        .font(.subheadline)
+                        .font(.system(.subheadline, design: .rounded))
                         .foregroundStyle(AppColors.textSecondary)
                 }
                 .padding(.vertical, 8)
@@ -53,16 +65,14 @@ struct TodayChecklistView: View {
                 }
             }
         }
-        .padding()
-        .background(Color.white.opacity(0.05))
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .premiumGlass(cornerRadius: 18, strokeOpacity: 0.08, padding: 16)
     }
 
     private func waterPlant(_ plant: Plant) {
         let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
         impactFeedback.impactOccurred()
 
-        _ = withAnimation(.easeInOut(duration: 0.4)) {
+        _ = withAnimation(SpringPreset.smooth) {
             wateredPlantIDs.insert(plant.id)
         }
 
@@ -85,29 +95,32 @@ struct TodayPlantRow: View {
                     .scaledToFill()
                     .frame(width: 40, height: 40)
                     .clipShape(Circle())
+                    .overlay(
+                        Circle().stroke(Color.white.opacity(0.08), lineWidth: 0.5)
+                    )
             } else {
                 Circle()
-                    .fill(AppColors.forestGreen.opacity(0.3))
+                    .fill(AppColors.emerald.opacity(0.15))
                     .frame(width: 40, height: 40)
                     .overlay {
                         Image(systemName: "leaf.fill")
                             .font(.system(size: 14, weight: .light))
-                            .foregroundStyle(.white.opacity(0.6))
+                            .foregroundStyle(AppColors.emerald.opacity(0.6))
                     }
             }
 
             // Plant info
             VStack(alignment: .leading, spacing: 2) {
                 Text(plant.name)
-                    .font(.subheadline)
+                    .font(.system(.subheadline, design: .rounded))
                     .fontWeight(.medium)
                     .foregroundStyle(AppColors.textPrimary)
 
                 Text(plant.isOverdue
                     ? String(format: NSLocalizedString("Overdue by %dd", comment: "Overdue days"), abs(plant.daysUntilWatering))
                     : NSLocalizedString("Due today", comment: "Due today"))
-                    .font(.caption)
-                    .foregroundStyle(plant.isOverdue ? Color.red : Color.yellow)
+                    .font(.system(.caption, design: .rounded))
+                    .foregroundStyle(plant.isOverdue ? AppColors.urgencyCritical : AppColors.urgencyWarning)
             }
 
             Spacer()
@@ -116,7 +129,7 @@ struct TodayPlantRow: View {
             Button(action: onWater) {
                 Image(systemName: showCheck ? "checkmark.circle.fill" : "drop.circle.fill")
                     .font(.title2)
-                    .foregroundStyle(showCheck ? AppColors.limeGreen : .blue)
+                    .foregroundStyle(showCheck ? AppColors.emerald : .blue)
                     .symbolEffect(.bounce, value: showCheck)
             }
         }

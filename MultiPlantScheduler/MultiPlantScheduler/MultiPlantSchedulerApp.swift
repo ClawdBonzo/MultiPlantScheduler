@@ -17,7 +17,7 @@ struct MultiPlantSchedulerApp: App {
         logger.notice("App init starting")
 
         // Configure SwiftData container
-        let schema = Schema([Plant.self, CareLog.self, HealthEntry.self, PhotoEntry.self])
+        let schema = Schema([Plant.self, CareLog.self, HealthEntry.self, PhotoEntry.self, DiagnosisEntry.self, CommunityTip.self])
         var container: ModelContainer
         do {
             let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false, cloudKitDatabase: .none)

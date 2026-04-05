@@ -7,14 +7,13 @@ struct DashboardView: View {
     @EnvironmentObject var revenueCatManager: RevenueCatManager
 
     @State private var showAddPlant = false
-    @State private var showSettings = false
     @State private var showPaywall = false
     @State private var showShareGarden = false
     @State private var refreshTrigger = UUID()
 
     let columns = [
-        GridItem(.flexible(), spacing: 16),
-        GridItem(.flexible(), spacing: 16)
+        GridItem(.flexible(), spacing: 14),
+        GridItem(.flexible(), spacing: 14)
     ]
 
     var sortedPlants: [Plant] {
@@ -22,7 +21,6 @@ struct DashboardView: View {
             let urgency1 = plant1.urgencyColor
             let urgency2 = plant2.urgencyColor
 
-            // Sort by urgency: red > yellow > green
             let urgencyOrder: [Color] = [AppColors.urgencyRed, AppColors.urgencyYellow, AppColors.urgencyGreen]
             let index1 = urgencyOrder.firstIndex(of: urgency1) ?? 2
             let index2 = urgencyOrder.firstIndex(of: urgency2) ?? 2
@@ -31,7 +29,6 @@ struct DashboardView: View {
                 return index1 < index2
             }
 
-            // Then by days until watering
             return plant1.daysUntilWatering < plant2.daysUntilWatering
         }
     }
@@ -48,13 +45,31 @@ struct DashboardView: View {
         ZStack {
             AppColors.background.ignoresSafeArea()
 
+            // Subtle ambient glow behind content
+            VStack {
+                Circle()
+                    .fill(AppColors.emerald.opacity(0.06))
+                    .blur(radius: 80)
+                    .frame(width: 300, height: 300)
+                    .offset(x: -60, y: -120)
+                Spacer()
+            }
+            .ignoresSafeArea()
+            .allowsHitTesting(false)
+
             VStack(spacing: 0) {
                 // Header
-                VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 10) {
                     HStack {
                         HStack(spacing: 8) {
                             Image(systemName: "leaf.fill")
-                                .foregroundColor(AppColors.limeGreen)
+                                .foregroundStyle(
+                                    LinearGradient(
+                                        colors: [AppColors.emerald, AppColors.limeGreen],
+                                        startPoint: .top,
+                                        endPoint: .bottom
+                                    )
+                                )
                             Text("My Garden")
                         }
                             .font(.system(.title, design: .rounded))
@@ -68,14 +83,8 @@ struct DashboardView: View {
                                 Button(action: { showShareGarden = true }) {
                                     Image(systemName: "square.and.arrow.up")
                                         .font(.system(size: 16, weight: .semibold))
-                                        .foregroundColor(AppColors.limeGreen)
+                                        .foregroundColor(AppColors.emerald)
                                 }
-                            }
-
-                            Button(action: { showSettings = true }) {
-                                Image(systemName: "gear")
-                                    .font(.system(size: 18, weight: .semibold))
-                                    .foregroundColor(AppColors.limeGreen)
                             }
 
                             Button(action: {
@@ -86,8 +95,14 @@ struct DashboardView: View {
                                 }
                             }) {
                                 Image(systemName: "plus.circle.fill")
-                                    .font(.system(size: 20))
-                                    .foregroundColor(AppColors.limeGreen)
+                                    .font(.system(size: 22))
+                                    .foregroundStyle(
+                                        LinearGradient(
+                                            colors: [AppColors.emerald, AppColors.limeGreen],
+                                            startPoint: .topLeading,
+                                            endPoint: .bottomTrailing
+                                        )
+                                    )
                             }
                         }
                     }
@@ -95,28 +110,27 @@ struct DashboardView: View {
                     .padding(.top, 16)
 
                     // Summary badges
-                    HStack(spacing: 12) {
-                        Badge(
+                    HStack(spacing: 10) {
+                        DashboardBadge(
                             label: String(format: NSLocalizedString("%d plants", comment: "Plant count badge"), plants.count),
                             icon: "leaf.fill"
                         )
 
                         if plantsNeedingWaterToday > 0 {
-                            Badge(
+                            DashboardBadge(
                                 label: String(format: NSLocalizedString("%d need water", comment: "Plants needing water"), plantsNeedingWaterToday),
                                 icon: "droplet.fill",
                                 color: AppColors.urgencyRed
                             )
                         }
 
-                        // Cloud credits badge — show when low or empty
                         if !revenueCatManager.isPremium {
                             let credits = CloudIdentificationManager.shared.creditsRemaining
                             if credits <= 3 {
-                                Badge(
+                                DashboardBadge(
                                     label: String(format: NSLocalizedString("%d cloud IDs", comment: "Cloud credits badge"), credits),
                                     icon: "cloud.fill",
-                                    color: credits == 0 ? AppColors.urgencyRed : .orange
+                                    color: credits == 0 ? AppColors.urgencyRed : AppColors.urgencyWarning
                                 )
                             }
                         }
@@ -124,13 +138,13 @@ struct DashboardView: View {
                         Spacer()
                     }
                     .padding(.horizontal, 20)
-                    .padding(.bottom, 16)
+                    .padding(.bottom, 14)
                 }
 
                 // Watering streak banner
                 if maxWateringStreak > 0 {
                     HStack(spacing: 8) {
-                        HStack(spacing: 4) {
+                        HStack(spacing: 5) {
                             Image(systemName: "flame.fill")
                                 .foregroundColor(.orange)
                             Text(String(format: NSLocalizedString("%d day streak!", comment: "Watering streak"), maxWateringStreak))
@@ -141,29 +155,28 @@ struct DashboardView: View {
 
                         Spacer()
                     }
+                    .premiumGlass(cornerRadius: 12, strokeOpacity: 0.08, padding: 14)
                     .padding(.horizontal, 20)
-                    .padding(.vertical, 12)
-                    .background(AppColors.forestGreen.opacity(0.2))
-                    .cornerRadius(8)
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 16)
+                    .padding(.bottom, 14)
+                    .animatedEntrance(delay: 0.05)
                 }
 
                 // Today's watering checklist
                 if !plants.isEmpty {
                     TodayChecklistView(plants: plants)
                         .padding(.horizontal, 20)
-                        .padding(.bottom, 16)
+                        .padding(.bottom, 14)
+                        .animatedEntrance(delay: 0.1)
                 }
 
-                // Soft nudge when approaching plant limit
+                // Soft nudge
                 if !revenueCatManager.isPremium && plants.count >= 2 && plants.count < AppConfig.freePlantLimit {
                     Button {
                         showPaywall = true
                     } label: {
                         HStack(spacing: 8) {
                             Image(systemName: "sparkles")
-                                .foregroundColor(AppColors.limeGreen)
+                                .foregroundColor(AppColors.emerald)
 
                             Text(String(format: NSLocalizedString("You have %d/%d free plants — Upgrade for unlimited + Cloud AI", comment: "Soft upgrade nudge"), plants.count, AppConfig.freePlantLimit))
                                 .font(.system(.caption, design: .rounded))
@@ -179,18 +192,23 @@ struct DashboardView: View {
                         }
                         .padding(.horizontal, 12)
                         .padding(.vertical, 10)
-                        .background(AppColors.limeGreen.opacity(0.08))
-                        .cornerRadius(8)
+                        .background(AppColors.emerald.opacity(0.08))
+                        .cornerRadius(10)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 10)
+                                .stroke(AppColors.emerald.opacity(0.15), lineWidth: 0.5)
+                        )
                     }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 12)
                 }
 
-                // Free plan upgrade banner
+                // Premium upgrade banner
                 if !revenueCatManager.isPremium && plants.count >= AppConfig.freePlantLimit {
-                    HStack(spacing: 8) {
-                        Image(systemName: "star.fill")
+                    HStack(spacing: 10) {
+                        Image(systemName: "crown.fill")
                             .foregroundColor(.yellow)
+                            .font(.system(size: 16))
 
                         VStack(alignment: .leading, spacing: 2) {
                             Text("Upgrade to Premium")
@@ -206,28 +224,38 @@ struct DashboardView: View {
                         Spacer()
 
                         Image(systemName: "chevron.right")
+                            .font(.system(size: 11, weight: .semibold))
                             .foregroundColor(AppColors.textSecondary)
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 12)
-                    .background(AppColors.forestGreen.opacity(0.15))
-                    .cornerRadius(8)
+                    .premiumGlass(cornerRadius: 14, strokeOpacity: 0.1, padding: 14)
                     .padding(.horizontal, 20)
-                    .padding(.bottom, 16)
+                    .padding(.bottom, 14)
                     .onTapGesture {
                         showPaywall = true
                     }
                 }
 
                 if plants.isEmpty {
-                    // Empty state — invites user to AI-identify their first plant
-                    VStack(spacing: 24) {
+                    // Empty state
+                    VStack(spacing: 28) {
                         Spacer()
 
-                        VStack(spacing: 16) {
-                            Image(systemName: "camera.viewfinder")
-                                .font(.system(size: 56, weight: .ultraLight))
-                                .foregroundColor(AppColors.limeGreen)
+                        VStack(spacing: 18) {
+                            ZStack {
+                                Circle()
+                                    .fill(AppColors.emerald.opacity(0.08))
+                                    .frame(width: 100, height: 100)
+
+                                Image(systemName: "camera.viewfinder")
+                                    .font(.system(size: 44, weight: .ultraLight))
+                                    .foregroundStyle(
+                                        LinearGradient(
+                                            colors: [AppColors.emerald, AppColors.limeGreen],
+                                            startPoint: .top,
+                                            endPoint: .bottom
+                                        )
+                                    )
+                            }
 
                             Text("Your Garden Is Empty")
                                 .font(.system(.title2, design: .rounded))
@@ -247,11 +275,10 @@ struct DashboardView: View {
                             }
                                 .font(.system(.headline, design: .rounded))
                                 .fontWeight(.semibold)
-                                .foregroundColor(AppColors.background)
+                                .foregroundColor(.black)
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 14)
-                                .background(AppColors.limeGreen)
-                                .cornerRadius(12)
+                                .padding(.vertical, 15)
+                                .premiumButton()
                         }
                         .padding(.horizontal, 40)
 
@@ -261,15 +288,18 @@ struct DashboardView: View {
                 } else {
                     // Plant grid
                     ScrollView {
-                        LazyVGrid(columns: columns, spacing: 16) {
-                            ForEach(sortedPlants) { plant in
+                        LazyVGrid(columns: columns, spacing: 14) {
+                            ForEach(Array(sortedPlants.enumerated()), id: \.element.id) { index, plant in
                                 NavigationLink(value: plant) {
                                     PlantCardView(plant: plant)
+                                        .animatedEntrance(delay: 0.05 + Double(min(index, 10)) * 0.04)
                                 }
                                 .buttonStyle(.plain)
                             }
                         }
-                        .padding(20)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 4)
+                        .padding(.bottom, 20)
                     }
                     .refreshable {
                         refreshTrigger = UUID()
@@ -285,12 +315,6 @@ struct DashboardView: View {
             AddPlantView()
                 .presentationDetents([.large])
         }
-        .sheet(isPresented: $showSettings) {
-            NavigationStack {
-                SettingsView()
-            }
-            .presentationDetents([.large])
-        }
         .fullScreenCover(isPresented: $showPaywall) {
             PaywallView()
         }
@@ -300,15 +324,17 @@ struct DashboardView: View {
     }
 }
 
-struct Badge: View {
+// MARK: - Dashboard Badge
+
+struct DashboardBadge: View {
     let label: String
     let icon: String
-    var color: Color = AppColors.limeGreen
+    var color: Color = AppColors.emerald
 
     var body: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 5) {
             Image(systemName: icon)
-                .font(.system(size: 14, weight: .semibold))
+                .font(.system(size: 12, weight: .semibold))
 
             Text(label)
                 .font(.system(.caption, design: .rounded))
@@ -317,10 +343,15 @@ struct Badge: View {
         .foregroundColor(.white)
         .padding(.horizontal, 10)
         .padding(.vertical, 6)
-        .background(color)
-        .cornerRadius(8)
+        .background(
+            Capsule().fill(color)
+        )
+        .shadow(color: color.opacity(0.3), radius: 6, y: 2)
     }
 }
+
+// Keep the old Badge name working for any other references
+typealias Badge = DashboardBadge
 
 #Preview {
     DashboardView()

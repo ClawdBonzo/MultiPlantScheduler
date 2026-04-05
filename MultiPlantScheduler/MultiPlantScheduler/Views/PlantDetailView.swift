@@ -12,6 +12,8 @@ struct PlantDetailView: View {
     @State private var showPaywall = false
     @State private var showHealthCheck = false
     @State private var showHealthHistory = false
+    @State private var showDiagnosisHistory = false
+    @State private var showPlantAnalytics = false
     @State private var showWateringSheet = false
     @State private var isReidentifying = false
     @State private var reidentifyResult: String?
@@ -482,7 +484,68 @@ struct PlantDetailView: View {
                                 .background(Color(red: 0.118, green: 0.118, blue: 0.118))
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
                             }
+
+                            // Diagnosis History link
+                            Button {
+                                showDiagnosisHistory = true
+                            } label: {
+                                HStack(spacing: 12) {
+                                    Image(systemName: "microbe.fill")
+                                        .font(.system(size: 16, weight: .semibold))
+                                        .foregroundStyle(.purple)
+                                    Text("Diagnosis History")
+                                        .font(.system(.body, design: .rounded))
+                                        .fontWeight(.medium)
+                                        .foregroundStyle(AppColors.textPrimary)
+                                    Spacer()
+                                    if !plant.diagnosisEntries.isEmpty {
+                                        Text("\(plant.diagnosisEntries.count)")
+                                            .font(.system(.caption, design: .rounded))
+                                            .foregroundStyle(AppColors.textSecondary)
+                                    }
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 12, weight: .semibold))
+                                        .foregroundStyle(AppColors.textSecondary)
+                                }
+                                .padding(16)
+                                .background(Color(red: 0.118, green: 0.118, blue: 0.118))
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                            }
+
+                            // Plant Analytics link
+                            Button {
+                                showPlantAnalytics = true
+                            } label: {
+                                HStack(spacing: 12) {
+                                    Image(systemName: "chart.bar.fill")
+                                        .font(.system(size: 16, weight: .semibold))
+                                        .foregroundStyle(AppColors.limeGreen)
+                                    Text("Plant Analytics")
+                                        .font(.system(.body, design: .rounded))
+                                        .fontWeight(.medium)
+                                        .foregroundStyle(AppColors.textPrimary)
+                                    Spacer()
+                                    Image(systemName: "chevron.right")
+                                        .font(.system(size: 12, weight: .semibold))
+                                        .foregroundStyle(AppColors.textSecondary)
+                                }
+                                .padding(16)
+                                .background(Color(red: 0.118, green: 0.118, blue: 0.118))
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                            }
                         }
+                        .padding(.horizontal, 20)
+
+                        // MARK: - Share to Stories
+                        shareStorySection
+                            .padding(.horizontal, 20)
+
+                        // MARK: - Community Tips
+                        RelevantTipsView(
+                            plantName: plant.species ?? plant.name,
+                            diseaseName: nil,
+                            contextLabel: "Tips from \(plant.name) owners"
+                        )
                         .padding(.horizontal, 20)
 
                         // MARK: - Care History
@@ -626,6 +689,14 @@ struct PlantDetailView: View {
                     }
             }
         }
+        .sheet(isPresented: $showDiagnosisHistory) {
+            NavigationStack {
+                PlantDiagnosisHistoryView(plant: plant)
+            }
+        }
+        .sheet(isPresented: $showPlantAnalytics) {
+            PlantAnalyticsView(plant: plant)
+        }
         .sheet(isPresented: $showWateringSheet) {
             WateringSettingsSheet(plant: plant)
                 .presentationDetents([.medium])
@@ -641,6 +712,21 @@ struct PlantDetailView: View {
                 appeared = true
             }
         }
+    }
+
+    // MARK: - Share Story Section
+
+    private var shareStorySection: some View {
+        let healthLabel = plant.healthStatus ?? "Good"
+        let speciesLabel = plant.species ?? plant.name
+        let img: UIImage? = plant.photoData.flatMap { UIImage(data: $0) }
+        return ShareStoryRow(
+            plantName: plant.name,
+            subtitle: "Health Score: \(healthLabel)",
+            accentText: "🌿 \(speciesLabel)",
+            plantImage: img,
+            cardStyle: .plantShowcase
+        )
     }
 
     // MARK: - Photo Timeline Teaser Row

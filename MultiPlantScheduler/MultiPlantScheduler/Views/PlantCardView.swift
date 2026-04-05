@@ -22,8 +22,8 @@ struct PlantCardView: View {
             ZStack {
                 LinearGradient(
                     gradient: Gradient(colors: [
-                        AppColors.forestGreen.opacity(0.6),
-                        AppColors.limeGreen.opacity(0.4)
+                        AppColors.emerald.opacity(0.5),
+                        AppColors.forestGreen.opacity(0.3)
                     ]),
                     startPoint: .topLeading,
                     endPoint: .bottomTrailing
@@ -36,8 +36,14 @@ struct PlantCardView: View {
                         .clipped()
                 } else {
                     Image(systemName: "leaf.fill")
-                        .font(.system(size: 36, weight: .light))
-                        .foregroundStyle(.white.opacity(0.6))
+                        .font(.system(size: 36, weight: .ultraLight))
+                        .foregroundStyle(
+                            LinearGradient(
+                                colors: [AppColors.limeGreen.opacity(0.6), AppColors.emerald.opacity(0.4)],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
@@ -49,8 +55,9 @@ struct PlantCardView: View {
                         .fill(plant.currentHealth.color)
                         .frame(width: 12, height: 12)
                         .overlay(
-                            Circle().stroke(Color(red: 0.118, green: 0.118, blue: 0.118), lineWidth: 2)
+                            Circle().stroke(AppColors.surface2, lineWidth: 2)
                         )
+                        .shadow(color: plant.currentHealth.color.opacity(0.5), radius: 4)
                         .padding(8)
                 }
             }
@@ -73,12 +80,12 @@ struct PlantCardView: View {
                 if let room = plant.room, !room.isEmpty {
                     HStack(spacing: 4) {
                         Image(systemName: "location.fill")
-                            .font(.system(size: 10, weight: .semibold))
+                            .font(.system(size: 9, weight: .semibold))
 
                         Text(room)
                             .font(.system(.caption2, design: .rounded))
                     }
-                    .foregroundColor(AppColors.textSecondary)
+                    .foregroundColor(AppColors.textSecondary.opacity(0.8))
                     .lineLimit(1)
                 }
             }
@@ -86,24 +93,33 @@ struct PlantCardView: View {
             .padding(.horizontal, 12)
             .padding(.vertical, 10)
 
-            Divider()
-                .background(AppColors.textSecondary.opacity(0.2))
+            // Subtle divider
+            Rectangle()
+                .fill(
+                    LinearGradient(
+                        colors: [Color.clear, Color.white.opacity(0.06), Color.clear],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .frame(height: 0.5)
 
             // Urgency badge
             HStack {
                 HStack(spacing: 4) {
                     Image(systemName: "droplet.fill")
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.system(size: 11, weight: .semibold))
 
                     Text(urgencyText)
                         .font(.system(.caption, design: .rounded))
                         .fontWeight(.semibold)
                 }
                 .foregroundColor(.white)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 6)
-                .background(plant.urgencyColor)
-                .cornerRadius(6)
+                .padding(.horizontal, 9)
+                .padding(.vertical, 5)
+                .background(
+                    Capsule().fill(plant.urgencyColor)
+                )
 
                 Spacer()
             }
@@ -111,12 +127,23 @@ struct PlantCardView: View {
             .padding(.vertical, 10)
         }
         .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color(red: 0.118, green: 0.118, blue: 0.118)) // #1E1E1E
+            RoundedRectangle(cornerRadius: 18)
+                .fill(
+                    .ultraThinMaterial
+                        .shadow(.inner(color: .white.opacity(0.04), radius: 1, x: 0, y: 1))
+                )
+                .environment(\.colorScheme, .dark)
         )
-        .clipShape(RoundedRectangle(cornerRadius: 16))
-        .contentShape(RoundedRectangle(cornerRadius: 16))
-        .shadow(color: Color.black.opacity(0.3), radius: 8, x: 0, y: 4)
+        .clipShape(RoundedRectangle(cornerRadius: 18))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(
+                    PremiumGradient.cardStroke(opacity: 0.08),
+                    lineWidth: 0.5
+                )
+        )
+        .shadow(color: Color.black.opacity(0.35), radius: 12, x: 0, y: 6)
+        .contentShape(RoundedRectangle(cornerRadius: 18))
     }
 }
 

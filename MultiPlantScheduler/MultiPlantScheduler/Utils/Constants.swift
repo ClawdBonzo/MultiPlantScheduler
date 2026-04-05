@@ -7,14 +7,14 @@ enum Constants {
     enum Colors {
         static let forestGreen = Color(red: 0.133, green: 0.545, blue: 0.133) // #228B22
         static let limeGreen = Color(red: 0.196, green: 0.804, blue: 0.196)   // #32CD32
-        static let background = Color(red: 0.071, green: 0.071, blue: 0.071)  // #121212
-        static let textPrimary = Color(red: 0.961, green: 0.961, blue: 0.961) // #F5F5F5
-        static let textSecondary = Color(red: 0.627, green: 0.627, blue: 0.627) // #A0A0A0
+        static let background = Color(red: 0.059, green: 0.063, blue: 0.063)  // Deeper, cooler dark
+        static let textPrimary = Color(red: 0.95, green: 0.96, blue: 0.96)    // Slightly cool white
+        static let textSecondary = Color(red: 0.55, green: 0.58, blue: 0.60)  // Cooler grey
 
         // Urgency colors for watering status
         static let urgencyGood = forestGreen        // >2 days until watering
-        static let urgencyWarning = Color.yellow   // 1-2 days until watering
-        static let urgencyCritical = Color.red     // Overdue or due today
+        static let urgencyWarning = Color(red: 1.0, green: 0.82, blue: 0.28) // Warmer gold
+        static let urgencyCritical = Color(red: 1.0, green: 0.32, blue: 0.32) // Rich red
     }
 
     // MARK: - RevenueCat Configuration
@@ -39,6 +39,12 @@ enum Constants {
         static let markWateredAction = "MARK_WATERED_ACTION"
         static let dismissAction = "DISMISS_ACTION"
         static let wateringReminderTitle = NSLocalizedString("💧 Time to water!", comment: "Notification title for watering reminder")
+    }
+
+    // MARK: - Diagnosis Configuration
+    enum Diagnosis {
+        static let freeDiagnosisLimit = 3
+        static let premiumDescription = "Unlimited disease & pest scans"
     }
 
     // MARK: - App Configuration
