@@ -23,14 +23,101 @@ enum Constants {
         static let premiumEntitlementID = "premium"
     }
 
-    // MARK: - Subscription Limits
+    // MARK: - Subscription Limits & Tiers (4-Tier Modern System)
     enum Subscription {
         static let freeTierPlantLimit = 3
-        static let monthlyPrice = 3.99
-        static let yearlyPrice = 29.99
-        static let lifetimePrice = 49.99
-        static let freeTierDescription = String(format: NSLocalizedString("Track up to %d plants + 5 free cloud IDs", comment: "Free tier description"), freeTierPlantLimit)
-        static let premiumDescription = "Unlimited plants, advanced features"
+        static let freeTierDiagnosisLimit = 3
+
+        // Trial Configuration
+        static let trialDays = 3
+        static let trialPrice = 0.0
+
+        // Subscription Tiers
+        enum Tier: String {
+            case basic = "basic_monthly"
+            case pro = "pro_monthly"
+            case max = "max_monthly"
+            case premium = "premium_annual"
+
+            var displayName: String {
+                switch self {
+                case .basic: return "Basic"
+                case .pro: return "Pro"
+                case .max: return "Max"
+                case .premium: return "Premium+"
+                }
+            }
+
+            var price: String {
+                switch self {
+                case .basic: return "$2.99"
+                case .pro: return "$5.99"
+                case .max: return "$9.99"
+                case .premium: return "$79.99"
+                }
+            }
+
+            var period: String {
+                switch self {
+                case .basic, .pro, .max: return "/month"
+                case .premium: return "/year"
+                }
+            }
+
+            var features: [String] {
+                switch self {
+                case .basic:
+                    return [
+                        "Up to 5 plants",
+                        "Basic reminders",
+                        "Community access",
+                        "5 free AI scans/month"
+                    ]
+                case .pro:
+                    return [
+                        "Unlimited plants",
+                        "AI diagnosis (10/month)",
+                        "Advanced analytics",
+                        "Priority community"
+                    ]
+                case .max:
+                    return [
+                        "Everything in Pro",
+                        "Unlimited diagnosis",
+                        "Priority support",
+                        "Exclusive features"
+                    ]
+                case .premium:
+                    return [
+                        "Everything in Max",
+                        "2+ months free",
+                        "Annual discount",
+                        "Lifetime updates"
+                    ]
+                }
+            }
+
+            var plantLimit: Int {
+                switch self {
+                case .basic: return 5
+                case .pro, .max, .premium: return 999 // Unlimited
+                }
+            }
+
+            var diagnosisLimit: Int {
+                switch self {
+                case .basic: return 5
+                case .pro: return 10
+                case .max, .premium: return 999 // Unlimited
+                }
+            }
+        }
+
+        // Legacy aliases for compatibility
+        static let freeTierDescription = String(format: NSLocalizedString("Track up to %d plants + %d free diagnoses", comment: "Free tier description"), freeTierPlantLimit, freeTierDiagnosisLimit)
+        static let premiumDescription = "Premium features: unlimited plants, advanced analytics, priority support"
+        static let monthlyPrice = 5.99
+        static let yearlyPrice = 59.99
     }
 
     // MARK: - Notification Categories
