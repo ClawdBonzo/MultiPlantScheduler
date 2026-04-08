@@ -1,14 +1,26 @@
 import SwiftUI
 import RevenueCat
 
-/// Modernized paywall with 4 subscription tiers + 3-day trial
+/// Modernized paywall with 4 subscription tiers + 3-day free trial on monthly
 struct ModernPaywallView: View {
     @Environment(\.dismiss) var dismiss
-    @State private var selectedTier: String = "pro_monthly"
+    @State private var selectedTier: String = Constants.Subscription.ProductID.monthly
     @State private var isLoading = false
     @EnvironmentObject var revenueCatManager: RevenueCatManager
 
     let onComplete: (String) -> Void
+
+    private var ctaTitle: String {
+        selectedTier == Constants.Subscription.ProductID.monthly
+            ? "Start 3-Day Free Trial"
+            : "Continue"
+    }
+
+    private var footerText: String {
+        selectedTier == Constants.Subscription.ProductID.monthly
+            ? "3-day free trial, then $6.99/month. Cancel anytime."
+            : "Cancel anytime in Settings."
+    }
 
     var body: some View {
         ZStack {
@@ -31,11 +43,11 @@ struct ModernPaywallView: View {
                         Image(systemName: "crown.fill")
                             .font(.system(size: 24))
                             .foregroundColor(.yellow)
-                        Text("Premium")
+                        Text("Go Premium")
                             .font(.system(size: 32, weight: .bold, design: .rounded))
                             .foregroundColor(AppText.primary)
                     }
-                    Text("Unlimited power for plant lovers")
+                    Text("Unlimited plants, AI diagnosis & more")
                         .font(.body)
                         .foregroundColor(AppText.secondary)
                 }
@@ -46,59 +58,62 @@ struct ModernPaywallView: View {
                         // Trial offer banner
                         TrialOfferBanner()
 
-                        // Tier cards
+                        // Monthly — BEST VALUE (shown first, pre-selected)
                         TierCard(
-                            name: "Basic",
-                            price: "$2.99",
+                            name: "Monthly",
+                            price: "$6.99",
                             period: "/month",
                             features: [
-                                "Up to 5 plants",
-                                "Basic reminders",
-                                "Community access"
+                                "All premium features",
+                                "Unlimited plants & diagnosis",
+                                "3-day free trial included"
                             ],
-                            isSelected: selectedTier == "basic_monthly",
-                            onSelect: { selectedTier = "basic_monthly" }
+                            isSelected: selectedTier == Constants.Subscription.ProductID.monthly,
+                            onSelect: { selectedTier = Constants.Subscription.ProductID.monthly },
+                            isFeatured: true,
+                            isBestValue: true
                         )
 
+                        // Yearly — save ~40%
                         TierCard(
-                            name: "Pro",
-                            price: "$5.99",
-                            period: "/month",
-                            features: [
-                                "Unlimited plants",
-                                "AI diagnosis (10/mo)",
-                                "Advanced analytics"
-                            ],
-                            isSelected: selectedTier == "pro_monthly",
-                            onSelect: { selectedTier = "pro_monthly" },
-                            isFeatured: true
-                        )
-
-                        TierCard(
-                            name: "Max",
-                            price: "$9.99",
-                            period: "/month",
-                            features: [
-                                "Everything in Pro",
-                                "Unlimited diagnosis",
-                                "Priority support"
-                            ],
-                            isSelected: selectedTier == "max_monthly",
-                            onSelect: { selectedTier = "max_monthly" }
-                        )
-
-                        TierCard(
-                            name: "Premium+",
-                            price: "$79.99",
+                            name: "Yearly",
+                            price: "$49.99",
                             period: "/year",
                             features: [
-                                "Everything in Max",
-                                "2+ months free",
-                                "Exclusive features"
+                                "All premium features",
+                                "~$4.17/month billed annually",
+                                "Save ~40% vs monthly"
                             ],
-                            isSelected: selectedTier == "premium_annual",
-                            onSelect: { selectedTier = "premium_annual" },
-                            isBestValue: true
+                            isSelected: selectedTier == Constants.Subscription.ProductID.yearly,
+                            onSelect: { selectedTier = Constants.Subscription.ProductID.yearly }
+                        )
+
+                        // Lifetime — pay once
+                        TierCard(
+                            name: "Lifetime",
+                            price: "$79.99",
+                            period: "once",
+                            features: [
+                                "All premium features, forever",
+                                "Pay once, own forever",
+                                "All future updates included"
+                            ],
+                            isSelected: selectedTier == Constants.Subscription.ProductID.lifetime,
+                            onSelect: { selectedTier = Constants.Subscription.ProductID.lifetime }
+                        )
+
+                        // Weekly — flexible
+                        TierCard(
+                            name: "Weekly",
+                            price: "$4.99",
+                            period: "/week",
+                            features: [
+                                "All premium features",
+                                "Most flexible option",
+                                "Cancel anytime"
+                            ],
+                            isSelected: selectedTier == Constants.Subscription.ProductID.weekly,
+                            onSelect: { selectedTier = Constants.Subscription.ProductID.weekly }
                         )
                     }
                 }
@@ -111,7 +126,7 @@ struct ModernPaywallView: View {
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
                     } else {
-                        Text("Start Free Trial")
+                        Text(ctaTitle)
                             .font(.system(size: 18, weight: .semibold, design: .rounded))
                             .frame(maxWidth: .infinity)
                             .frame(height: 56)
@@ -124,15 +139,16 @@ struct ModernPaywallView: View {
 
                 // Footer
                 VStack(spacing: 8) {
-                    Text("Then $5.99/month. Cancel anytime in settings.")
+                    Text(footerText)
                         .font(.caption)
                         .foregroundColor(AppText.secondary)
+                        .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity, alignment: .center)
 
                     HStack(spacing: 4) {
                         Image(systemName: "lock.fill")
                             .font(.system(size: 10))
-                        Text("Secure payment with RevenueCat")
+                        Text("Secure payment via App Store")
                             .font(.caption2)
                     }
                     .foregroundColor(AppText.tertiary)

@@ -247,7 +247,7 @@ struct OnboardingGamificationScreen: View {
 
             // CTA Button
             Button(action: onContinue) {
-                Text("Continue"
+                Text("Continue")
                     .font(.system(size: 18, weight: .semibold, design: .rounded))
                     .frame(maxWidth: .infinity)
                     .frame(height: 56)

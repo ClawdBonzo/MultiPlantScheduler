@@ -27,9 +27,9 @@ struct SoftPaywallView: View {
 
     private var displayPrice: String {
         if freeTrialEnabled {
-            return monthlyPackage?.storeProduct.localizedPriceString ?? "$3.99"
+            return monthlyPackage?.storeProduct.localizedPriceString ?? "$6.99"
         } else {
-            return yearlyPackage?.storeProduct.localizedPriceString ?? "$29.99"
+            return yearlyPackage?.storeProduct.localizedPriceString ?? "$49.99"
         }
     }
 
@@ -38,8 +38,8 @@ struct SoftPaywallView: View {
     }
 
     private var originalPrice: String {
-        // Show a "was" price for the flash sale
-        "$59.99"
+        // "Was" price shown crossed out during flash sale (yearly at full monthly rate)
+        yearlyPackage != nil ? "$83.88" : "$83.88"  // 12 × $6.99
     }
 
     private var countdownMinutes: Int { Int(countdown) / 60 }

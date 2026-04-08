@@ -1,12 +1,12 @@
 import SwiftUI
 import RevenueCat
 
-/// Premium paywall — dark luxury design with 3-tier pricing and urgency elements
+/// Premium paywall — dark luxury design with 4-tier pricing and urgency elements
 struct PaywallView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var revenueCatManager: RevenueCatManager
 
-    @State private var selectedPlan: PlanType = .yearly
+    @State private var selectedPlan: PlanType = .monthly
     @State private var isLoading = false
     @State private var showError = false
     @State private var errorMessage = ""
@@ -15,8 +15,14 @@ struct PaywallView: View {
     @State private var timer: Timer?
     @State private var animateHero = false
 
-    enum PlanType { case monthly, yearly, lifetime }
+    enum PlanType { case weekly, monthly, yearly, lifetime }
 
+    private var weeklyPackage: Package? {
+        offerings?.current?.availablePackages.first {
+            $0.packageType == .weekly ||
+            $0.storeProduct.productIdentifier.contains("weekly")
+        }
+    }
     private var monthlyPackage: Package? { offerings?.current?.monthly }
     private var annualPackage: Package? { offerings?.current?.annual }
     private var lifetimePackage: Package? {
@@ -27,9 +33,10 @@ struct PaywallView: View {
         }
     }
 
-    private var monthlyPrice: String { monthlyPackage?.storeProduct.localizedPriceString ?? "$3.99" }
-    private var yearlyPrice: String { annualPackage?.storeProduct.localizedPriceString ?? "$29.99" }
-    private var lifetimePrice: String { lifetimePackage?.storeProduct.localizedPriceString ?? "$49.99" }
+    private var weeklyPrice: String  { weeklyPackage?.storeProduct.localizedPriceString   ?? "$4.99" }
+    private var monthlyPrice: String { monthlyPackage?.storeProduct.localizedPriceString  ?? "$6.99" }
+    private var yearlyPrice: String  { annualPackage?.storeProduct.localizedPriceString   ?? "$49.99" }
+    private var lifetimePrice: String { lifetimePackage?.storeProduct.localizedPriceString ?? "$79.99" }
 
     private var yearlyMonthlyEquivalent: String {
         if let product = annualPackage?.storeProduct {
@@ -37,14 +44,14 @@ struct PaywallView: View {
             let formatter = NumberFormatter()
             formatter.numberStyle = .currency
             formatter.locale = product.priceFormatter?.locale ?? .current
-            return formatter.string(from: monthly as NSDecimalNumber) ?? "$2.50"
+            return formatter.string(from: monthly as NSDecimalNumber) ?? "$4.17"
         }
-        return "$2.50"
+        return "$4.17"
     }
 
     private var savingsPercent: Int {
         guard let monthly = monthlyPackage?.storeProduct.price as Decimal?,
-              let yearly = annualPackage?.storeProduct.price as Decimal? else { return 37 }
+              let yearly = annualPackage?.storeProduct.price as Decimal? else { return 40 }
         let monthlyAnnual = monthly * 12
         guard monthlyAnnual > 0 else { return 0 }
         let savings = ((monthlyAnnual - yearly) / monthlyAnnual) * 100
@@ -53,6 +60,28 @@ struct PaywallView: View {
 
     private var countdownMinutes: Int { Int(countdown) / 60 }
     private var countdownSeconds: Int { Int(countdown) % 60 }
+
+    private var ctaButtonTitle: String {
+        switch selectedPlan {
+        case .lifetime: return NSLocalizedString("Buy Lifetime Access", comment: "Buy lifetime")
+        case .monthly:  return NSLocalizedString("Start Free Trial", comment: "Start trial")
+        case .weekly:   return NSLocalizedString("Subscribe Weekly", comment: "Subscribe weekly")
+        case .yearly:   return NSLocalizedString("Subscribe Now", comment: "Subscribe now")
+        }
+    }
+
+    private var legalFooterText: String {
+        switch selectedPlan {
+        case .lifetime:
+            return NSLocalizedString("One-time purchase. No subscription.", comment: "Lifetime legal")
+        case .monthly:
+            return NSLocalizedString("3-day free trial, then $6.99/month. Cancel anytime in Settings.", comment: "Monthly trial legal")
+        case .weekly:
+            return NSLocalizedString("$4.99/week. Auto-renewable. Cancel anytime in Settings.", comment: "Weekly legal")
+        case .yearly:
+            return NSLocalizedString("$49.99/year (~$4.17/month). Cancel anytime in Settings.", comment: "Yearly legal")
+        }
+    }
 
     var body: some View {
         ZStack {
@@ -165,39 +194,55 @@ struct PaywallView: View {
                                 )
                         )
 
-                        // 3-tier pricing
+                        // 4-tier pricing
                         VStack(spacing: 8) {
+                            // Monthly — BEST VALUE + 3-day trial (shown first / selected by default)
+                            PaywallPlanRow(
+                                title: "Monthly",
+                                price: monthlyPrice,
+                                period: "/month",
+                                detail: "3-day free trial included",
+                                badge: "BEST VALUE",
+                                badgeColor: AppColors.emerald,
+                                isSelected: selectedPlan == .monthly
+                            ) { selectedPlan = .monthly }
+
+                            // Yearly — save ~40%
                             PaywallPlanRow(
                                 title: "Yearly",
                                 price: yearlyPrice,
                                 period: "/year",
                                 detail: "\(yearlyMonthlyEquivalent)/mo · Save \(savingsPercent)%",
-                                badge: "MOST POPULAR",
-                                badgeColor: AppColors.emerald,
+                                badge: "SAVE \(savingsPercent)%",
+                                badgeColor: AppColors.teal,
                                 isSelected: selectedPlan == .yearly
                             ) { selectedPlan = .yearly }
 
+                            // Lifetime — pay once
                             if lifetimePackage != nil {
                                 PaywallPlanRow(
                                     title: "Lifetime",
                                     price: lifetimePrice,
                                     period: "once",
                                     detail: "Pay once, own forever",
-                                    badge: "BEST VALUE",
-                                    badgeColor: Color(red: 0.75, green: 0.55, blue: 0.15),
+                                    badge: nil,
+                                    badgeColor: nil,
                                     isSelected: selectedPlan == .lifetime
                                 ) { selectedPlan = .lifetime }
                             }
 
-                            PaywallPlanRow(
-                                title: "Monthly",
-                                price: monthlyPrice,
-                                period: "/month",
-                                detail: nil,
-                                badge: nil,
-                                badgeColor: nil,
-                                isSelected: selectedPlan == .monthly
-                            ) { selectedPlan = .monthly }
+                            // Weekly — flexible entry
+                            if weeklyPackage != nil {
+                                PaywallPlanRow(
+                                    title: "Weekly",
+                                    price: weeklyPrice,
+                                    period: "/week",
+                                    detail: "Most flexible",
+                                    badge: nil,
+                                    badgeColor: nil,
+                                    isSelected: selectedPlan == .weekly
+                                ) { selectedPlan = .weekly }
+                            }
                         }
 
                         // CTA
@@ -211,9 +256,7 @@ struct PaywallView: View {
                                     Image(systemName: "crown.fill")
                                         .font(.system(size: 15, weight: .semibold))
                                 }
-                                Text(selectedPlan == .lifetime
-                                     ? NSLocalizedString("Buy Lifetime Access", comment: "Buy lifetime")
-                                     : NSLocalizedString("Subscribe Now", comment: "Subscribe now"))
+                                Text(ctaButtonTitle)
                                     .font(.system(size: 18, weight: .bold, design: .rounded))
                             }
                             .foregroundStyle(.black)
@@ -238,16 +281,14 @@ struct PaywallView: View {
                         }
 
                         Button(action: { dismiss() }) {
-                            Text("Continue with Free (3 plants, 5 cloud IDs)")
+                            Text("Continue with Free (3 plants, 3 diagnoses)")
                                 .font(.system(size: 14, weight: .medium, design: .rounded))
                                 .foregroundStyle(AppColors.textSecondary)
                         }
 
                         // Legal
                         VStack(spacing: 4) {
-                            Text(selectedPlan == .lifetime
-                                 ? NSLocalizedString("One-time purchase. No subscription.", comment: "Lifetime legal")
-                                 : NSLocalizedString("Auto-renewable. Cancel anytime in Settings.", comment: "Subscription legal"))
+                            Text(legalFooterText)
                                 .font(.system(size: 11))
                                 .foregroundStyle(AppColors.textSecondary.opacity(0.6))
 
@@ -322,8 +363,9 @@ struct PaywallView: View {
     private func purchase() {
         let package: Package?
         switch selectedPlan {
-        case .monthly: package = monthlyPackage
-        case .yearly: package = annualPackage
+        case .weekly:   package = weeklyPackage
+        case .monthly:  package = monthlyPackage
+        case .yearly:   package = annualPackage
         case .lifetime: package = lifetimePackage
         }
         guard let package else {

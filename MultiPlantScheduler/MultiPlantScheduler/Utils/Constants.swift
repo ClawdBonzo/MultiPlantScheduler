@@ -32,92 +32,97 @@ enum Constants {
         static let trialDays = 3
         static let trialPrice = 0.0
 
+        // Subscription Product IDs (must match App Store Connect exactly)
+        enum ProductID {
+            static let weekly   = "com.clawdbonzo.multiplant.weekly"
+            static let monthly  = "com.clawdbonzo.multiplant.monthly"
+            static let yearly   = "com.clawdbonzo.multiplant.yearly"
+            static let lifetime = "com.clawdbonzo.multiplant.lifetime"
+        }
+
         // Subscription Tiers
         enum Tier: String {
-            case basic = "basic_monthly"
-            case pro = "pro_monthly"
-            case max = "max_monthly"
-            case premium = "premium_annual"
+            case weekly   = "com.clawdbonzo.multiplant.weekly"
+            case monthly  = "com.clawdbonzo.multiplant.monthly"
+            case yearly   = "com.clawdbonzo.multiplant.yearly"
+            case lifetime = "com.clawdbonzo.multiplant.lifetime"
 
             var displayName: String {
                 switch self {
-                case .basic: return "Basic"
-                case .pro: return "Pro"
-                case .max: return "Max"
-                case .premium: return "Premium+"
+                case .weekly:   return "Weekly"
+                case .monthly:  return "Monthly"
+                case .yearly:   return "Yearly"
+                case .lifetime: return "Lifetime"
                 }
             }
 
-            var price: String {
+            /// Fallback display price (real price comes from StoreKit / RevenueCat)
+            var fallbackPrice: String {
                 switch self {
-                case .basic: return "$2.99"
-                case .pro: return "$5.99"
-                case .max: return "$9.99"
-                case .premium: return "$79.99"
+                case .weekly:   return "$4.99"
+                case .monthly:  return "$6.99"
+                case .yearly:   return "$49.99"
+                case .lifetime: return "$79.99"
                 }
             }
 
             var period: String {
                 switch self {
-                case .basic, .pro, .max: return "/month"
-                case .premium: return "/year"
+                case .weekly:   return "/week"
+                case .monthly:  return "/month"
+                case .yearly:   return "/year"
+                case .lifetime: return "once"
                 }
+            }
+
+            var hasTrial: Bool {
+                self == .monthly
             }
 
             var features: [String] {
                 switch self {
-                case .basic:
+                case .weekly:
                     return [
-                        "Up to 5 plants",
-                        "Basic reminders",
-                        "Community access",
-                        "5 free AI scans/month"
-                    ]
-                case .pro:
-                    return [
+                        "All premium features",
                         "Unlimited plants",
-                        "AI diagnosis (10/month)",
-                        "Advanced analytics",
-                        "Priority community"
+                        "Unlimited AI diagnosis",
+                        "Full analytics & export"
                     ]
-                case .max:
+                case .monthly:
                     return [
-                        "Everything in Pro",
-                        "Unlimited diagnosis",
-                        "Priority support",
-                        "Exclusive features"
+                        "All premium features",
+                        "Unlimited plants",
+                        "Unlimited AI diagnosis",
+                        "3-day free trial included"
                     ]
-                case .premium:
+                case .yearly:
                     return [
-                        "Everything in Max",
-                        "2+ months free",
-                        "Annual discount",
-                        "Lifetime updates"
+                        "Everything in Monthly",
+                        "Save ~40% vs monthly",
+                        "Full year access",
+                        "All future updates"
+                    ]
+                case .lifetime:
+                    return [
+                        "Everything, forever",
+                        "Pay once, own forever",
+                        "All future updates included",
+                        "Priority support"
                     ]
                 }
             }
 
-            var plantLimit: Int {
-                switch self {
-                case .basic: return 5
-                case .pro, .max, .premium: return 999 // Unlimited
-                }
-            }
-
-            var diagnosisLimit: Int {
-                switch self {
-                case .basic: return 5
-                case .pro: return 10
-                case .max, .premium: return 999 // Unlimited
-                }
-            }
+            var plantLimit: Int { 999 }       // All paid tiers are unlimited
+            var diagnosisLimit: Int { 999 }   // All paid tiers are unlimited
         }
 
         // Legacy aliases for compatibility
         static let freeTierDescription = String(format: NSLocalizedString("Track up to %d plants + %d free diagnoses", comment: "Free tier description"), freeTierPlantLimit, freeTierDiagnosisLimit)
-        static let premiumDescription = "Premium features: unlimited plants, advanced analytics, priority support"
-        static let monthlyPrice = 5.99
-        static let yearlyPrice = 59.99
+        static let premiumDescription = "Unlimited plants, AI diagnosis, advanced analytics & more"
+        static let weeklyPrice   = 4.99
+        static let monthlyPrice  = 6.99
+        static let yearlyPrice   = 49.99
+        static let lifetimePrice = 79.99
     }
 
     // MARK: - Notification Categories

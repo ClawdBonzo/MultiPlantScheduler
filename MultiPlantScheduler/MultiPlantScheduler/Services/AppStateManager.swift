@@ -24,7 +24,7 @@ final class AppStateManager {
 
     var isTrialActive = false
     var trialRemainingDays: Int = 3
-    var selectedPlan: SubscriptionPlan = .basic
+    var selectedPlan: SubscriptionPlan = .monthly
 
     // MARK: - Gamification UI State
 
@@ -173,26 +173,26 @@ final class AppStateManager {
     // MARK: - Plan Selection
 
     enum SubscriptionPlan: String {
-        case basic = "basic_monthly"
-        case pro = "pro_monthly"
-        case max = "max_monthly"
-        case premium = "premium_annual"
+        case weekly   = "com.clawdbonzo.multiplant.weekly"
+        case monthly  = "com.clawdbonzo.multiplant.monthly"
+        case yearly   = "com.clawdbonzo.multiplant.yearly"
+        case lifetime = "com.clawdbonzo.multiplant.lifetime"
 
         var displayName: String {
             switch self {
-            case .basic: return "Basic"
-            case .pro: return "Pro"
-            case .max: return "Max"
-            case .premium: return "Premium"
+            case .weekly:   return "Weekly"
+            case .monthly:  return "Monthly"
+            case .yearly:   return "Yearly"
+            case .lifetime: return "Lifetime"
             }
         }
 
-        var monthlyPrice: String {
+        var displayPrice: String {
             switch self {
-            case .basic: return "$2.99"
-            case .pro: return "$5.99"
-            case .max: return "$9.99"
-            case .premium: return "$79.99/year"
+            case .weekly:   return "$4.99/week"
+            case .monthly:  return "$6.99/month"
+            case .yearly:   return "$49.99/year"
+            case .lifetime: return "$79.99 once"
             }
         }
     }

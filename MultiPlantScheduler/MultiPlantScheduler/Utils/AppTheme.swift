@@ -31,30 +31,30 @@ struct AppTheme {
         static let info = Color(red: 0.4, green: 0.84, blue: 0.97)             // Sky blue
     }
 
-    enum Gradient {
+    enum Gradients {
         static let premium = LinearGradient(
-            gradient: Gradient(colors: [
+            colors: [
                 Color(red: 0.196, green: 0.804, blue: 0.196),
                 Color(red: 0.15, green: 0.78, blue: 0.42)
-            ]),
+            ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
 
         static let levelUp = LinearGradient(
-            gradient: Gradient(colors: [
+            colors: [
                 Color(red: 1.0, green: 0.82, blue: 0.28),
                 Color(red: 1.0, green: 0.6, blue: 0.2)
-            ]),
+            ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
 
         static let streak = LinearGradient(
-            gradient: Gradient(colors: [
+            colors: [
                 Color(red: 1.0, green: 0.6, blue: 0.2),
                 Color(red: 1.0, green: 0.3, blue: 0.2)
-            ]),
+            ],
             startPoint: .topLeading,
             endPoint: .bottomTrailing
         )
