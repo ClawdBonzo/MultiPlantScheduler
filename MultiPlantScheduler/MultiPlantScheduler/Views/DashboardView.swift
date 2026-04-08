@@ -5,6 +5,7 @@ struct DashboardView: View {
     @Query(sort: \Plant.createdAt) var plants: [Plant]
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var revenueCatManager: RevenueCatManager
+    @EnvironmentObject var gamificationManager: GamificationManager
 
     @State private var showAddPlant = false
     @State private var showPaywall = false
@@ -139,6 +140,111 @@ struct DashboardView: View {
                     }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 14)
+                }
+
+                // Gamification info section
+                if let profile = gamificationManager.profile {
+                    VStack(alignment: .leading, spacing: 12) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 4) {
+                                Text("Level \(profile.currentLevel)")
+                                    .font(.system(.headline, design: .rounded))
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(AppColors.emerald)
+
+                                Text(profile.levelName)
+                                    .font(.system(.caption, design: .rounded))
+                                    .fontWeight(.medium)
+                                    .foregroundColor(AppColors.textSecondary)
+                            }
+
+                            Spacer()
+
+                            VStack(alignment: .trailing, spacing: 4) {
+                                Text("\(profile.currentXP)")
+                                    .font(.system(.headline, design: .monospaced))
+                                    .fontWeight(.bold)
+                                    .foregroundColor(AppColors.teal)
+
+                                Text("XP")
+                                    .font(.system(.caption2, design: .rounded))
+                                    .foregroundColor(AppColors.textSecondary)
+                            }
+                        }
+
+                        // XP progress bar
+                        let nextLevelXP = profile.nextLevelXP
+                        let currentLevelXP = profile.currentLevelXP
+                        let progress = Double(profile.currentXP - currentLevelXP) / Double(nextLevelXP - currentLevelXP)
+
+                        ZStack(alignment: .leading) {
+                            Capsule()
+                                .fill(Color.white.opacity(0.1))
+                                .frame(height: 6)
+
+                            Capsule()
+                                .fill(
+                                    LinearGradient(
+                                        gradient: Gradient(colors: [AppColors.emerald, AppColors.teal]),
+                                        startPoint: .leading,
+                                        endPoint: .trailing
+                                    )
+                                )
+                                .frame(width: max(CGFloat(progress) * 200, 2), height: 6)
+                        }
+                        .frame(width: 200)
+
+                        // Streak and quests
+                        HStack(spacing: 12) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "flame.fill")
+                                    .font(.system(size: 12, weight: .semibold))
+                                    .foregroundColor(.orange)
+
+                                Text("\(profile.dailyStreak)d")
+                                    .font(.system(.caption, design: .rounded))
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(AppColors.textPrimary)
+
+                                if profile.streakMultiplier > 1.0 {
+                                    Text("×\(String(format: "%.1f", profile.streakMultiplier))")
+                                        .font(.system(.caption2, design: .monospaced))
+                                        .fontWeight(.bold)
+                                        .foregroundColor(AppColors.emerald)
+                                        .padding(.horizontal, 4)
+                                        .padding(.vertical, 2)
+                                        .background(Color.white.opacity(0.1))
+                                        .cornerRadius(4)
+                                }
+                            }
+
+                            Spacer()
+
+                            let activeQuests = profile.quests.filter { !$0.isCompleted }
+                            HStack(spacing: 4) {
+                                Image(systemName: "checkmark.circle.fill")
+                                    .font(.system(size: 12, weight: .semibold))
+                                    .foregroundColor(AppColors.teal)
+
+                                Text("\(activeQuests.count) quest\(activeQuests.count == 1 ? "" : "s")")
+                                    .font(.system(.caption, design: .rounded))
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(AppColors.textPrimary)
+                            }
+                        }
+                    }
+                    .padding(14)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color.white.opacity(0.05))
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 12)
+                            .stroke(AppColors.emerald.opacity(0.2), lineWidth: 0.5)
+                    )
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 14)
+                    .animatedEntrance(delay: 0.08)
                 }
 
                 // Watering streak banner

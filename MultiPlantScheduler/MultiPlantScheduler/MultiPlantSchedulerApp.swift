@@ -8,6 +8,7 @@ private let logger = Logger(subsystem: "com.clawdbonzo.MultiPlantScheduler", cat
 struct MultiPlantSchedulerApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var revenueCatManager = RevenueCatManager.shared
+    @StateObject private var gamificationManager = GamificationManager.shared
     @State private var hasAppeared = false
     @Environment(\.scenePhase) private var scenePhase
 
@@ -16,8 +17,20 @@ struct MultiPlantSchedulerApp: App {
     init() {
         logger.notice("App init starting")
 
-        // Configure SwiftData container
-        let schema = Schema([Plant.self, CareLog.self, HealthEntry.self, PhotoEntry.self, DiagnosisEntry.self, CommunityTip.self])
+        // Configure SwiftData container — add gamification models
+        let schema = Schema([
+            Plant.self,
+            CareLog.self,
+            HealthEntry.self,
+            PhotoEntry.self,
+            DiagnosisEntry.self,
+            CommunityTip.self,
+            GamificationProfile.self,
+            Quest.self,
+            UnlockedBadge.self,
+            VisualProgression.self,
+            XPHistory.self
+        ])
         var container: ModelContainer
         do {
             let config = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false, cloudKitDatabase: .none)
@@ -43,12 +56,19 @@ struct MultiPlantSchedulerApp: App {
             ContentView()
             .modelContainer(modelContainer)
             .environmentObject(revenueCatManager)
+            .environmentObject(gamificationManager)
             .preferredColorScheme(.dark)
             .onAppear {
                 guard !hasAppeared else { return }
                 hasAppeared = true
-                logger.notice("App body appeared — configuring RevenueCat")
+                logger.notice("App body appeared — configuring RevenueCat & Gamification")
                 revenueCatManager.configure()
+                
+                // Initialize gamification with modelContext
+                if let context = modelContainer.mainContext {
+                    gamificationManager.initialize(with: context)
+                }
+                
                 Task {
                     let _ = await NotificationManager.shared.requestPermission()
                 }
@@ -56,6 +76,8 @@ struct MultiPlantSchedulerApp: App {
             .onChange(of: scenePhase) { _, newPhase in
                 if newPhase == .active {
                     NotificationManager.shared.clearBadgeCount()
+                    // Update daily streak on app resume
+                    gamificationManager.updateStreak()
                 }
             }
         }

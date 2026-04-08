@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ContentView: View {
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding = false
+    @EnvironmentObject var gamificationManager: GamificationManager
 
     @State private var showOnboarding: Bool
     @State private var launchAddPlant = false
@@ -9,7 +10,7 @@ struct ContentView: View {
     @State private var selectedTab: Tab = .garden
 
     enum Tab: String {
-        case garden, diagnose, community, analytics, settings
+        case garden, gamification, diagnose, community, analytics, settings
     }
 
     init() {
@@ -53,6 +54,12 @@ struct ContentView: View {
                     Label("Garden", systemImage: "leaf.fill")
                 }
 
+                GamificationDashboardView()
+                    .tag(Tab.gamification)
+                    .tabItem {
+                        Label("Quest", systemImage: "star.fill")
+                    }
+
                 DiagnoseTabView()
                     .tag(Tab.diagnose)
                     .tabItem {
@@ -89,6 +96,30 @@ struct ContentView: View {
                 .transition(.opacity)
                 .zIndex(1)
             }
+
+            // Celebration overlays
+            if gamificationManager.showLevelUpCelebration,
+               let level = gamificationManager.profile?.currentLevel,
+               let levelName = gamificationManager.profile?.levelName {
+                LevelUpCelebrationView(level: level, levelName: levelName)
+                    .transition(.opacity)
+                    .zIndex(2)
+            }
+
+            if gamificationManager.showBadgeUnlock.show {
+                BadgeUnlockView(badge: gamificationManager.showBadgeUnlock.badge)
+                    .transition(.opacity)
+                    .zIndex(2)
+            }
+
+            if gamificationManager.showStreakFlame {
+                StreakFlameView(
+                    currentStreak: gamificationManager.profile?.dailyStreak ?? 0,
+                    multiplier: gamificationManager.profile?.streakMultiplier ?? 1.0
+                )
+                .transition(.opacity)
+                .zIndex(2)
+            }
         }
         .sheet(isPresented: $launchAddPlant) {
             AddPlantView(isFromOnboarding: true, openCameraOnAppear: true, showCelebratory: $showCelebratory)
@@ -103,4 +134,5 @@ struct ContentView: View {
 #Preview {
     ContentView()
         .environmentObject(RevenueCatManager.shared)
+        .environmentObject(GamificationManager.shared)
 }

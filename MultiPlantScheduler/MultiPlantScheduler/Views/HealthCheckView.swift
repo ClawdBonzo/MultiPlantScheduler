@@ -6,6 +6,7 @@ struct HealthCheckView: View {
     @Bindable var plant: Plant
     @Environment(\.modelContext) var modelContext
     @Environment(\.dismiss) var dismiss
+    @EnvironmentObject var gamificationManager: GamificationManager
     @State private var selectedStatus: HealthStatus = .unknown
     @State private var notes: String = ""
 
@@ -111,6 +112,9 @@ struct HealthCheckView: View {
 
         let feedback = UINotificationFeedbackGenerator()
         feedback.notificationOccurred(.success)
+
+        // Track for gamification
+        gamificationManager.recordHealthCheck(plantId: plant.id)
 
         dismiss()
     }

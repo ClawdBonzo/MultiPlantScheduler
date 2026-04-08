@@ -5,6 +5,7 @@ import SwiftData
 struct TodayChecklistView: View {
     let plants: [Plant]
     @Environment(\.modelContext) var modelContext
+    @EnvironmentObject var gamificationManager: GamificationManager
     @State private var wateredPlantIDs: Set<UUID> = []
 
     private var duePlants: [Plant] {
@@ -77,6 +78,10 @@ struct TodayChecklistView: View {
         }
 
         WateringService.markAsWatered(plant: plant, context: modelContext)
+
+        // Track for gamification
+        gamificationManager.recordWatering(plantId: plant.id)
+        gamificationManager.updateStreak()
     }
 }
 

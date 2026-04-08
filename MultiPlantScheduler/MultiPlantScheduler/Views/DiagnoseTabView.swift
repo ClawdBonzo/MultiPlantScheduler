@@ -8,6 +8,7 @@ struct DiagnoseTabView: View {
     @Query(sort: \Plant.createdAt) var plants: [Plant]
     @Environment(\.modelContext) var modelContext
     @EnvironmentObject var revenueCatManager: RevenueCatManager
+    @EnvironmentObject var gamificationManager: GamificationManager
 
     @State private var selectedImage: UIImage?
     @State private var imageData: Data?
@@ -621,6 +622,11 @@ struct DiagnoseTabView: View {
         }
 
         try? modelContext.save()
+
+        // Track for gamification
+        if let plant = selectedPlant {
+            gamificationManager.addXP(amount: 20, source: .diagnosis)
+        }
     }
 }
 
