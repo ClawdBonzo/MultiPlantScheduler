@@ -5,7 +5,7 @@ import Foundation
 @Model
 final class UnlockedBadge {
     var id: UUID = UUID()
-    var badgeType: BadgeType = .firstPlant
+    var badgeType: BadgeType
     var unlockedDate: Date
     var displayName: String = ""
     var badgeDescription: String = ""

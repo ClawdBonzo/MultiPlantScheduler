@@ -625,7 +625,7 @@ struct DiagnoseTabView: View {
 
         // Track for gamification
         if let plant = selectedPlant {
-            gamificationManager.addXP(amount: 20, source: .diagnosis)
+            gamificationManager.addXP(20, source: .diagnosis)
         }
     }
 }

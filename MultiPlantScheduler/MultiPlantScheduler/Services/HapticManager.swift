@@ -1,3 +1,4 @@
+#if os(iOS) || os(tvOS)
 import UIKit
 import CoreHaptics
 
@@ -149,12 +150,12 @@ final class HapticManager {
             case .streakFlame:
                 // Fast escalating pulses for "on fire"
                 let pulses = (0..<4).map { index -> CHHapticEvent in
-                    let intensity = 0.6 + (Double(index) * 0.1)
+                    let intensity = Float(0.6 + (Double(index) * 0.1))
                     return CHHapticEvent(
                         eventType: .hapticTransient,
                         parameters: [
                             CHHapticEventParameter(parameterID: .hapticIntensity, value: intensity),
-                            CHHapticEventParameter(parameterID: .hapticSharpness, value: 0.7)
+                            CHHapticEventParameter(parameterID: .hapticSharpness, value: Float(0.7))
                         ],
                         relativeTime: Double(index) * 0.08
                     )
@@ -273,7 +274,9 @@ final class HapticManager {
         do {
             guard let hapticPattern = pattern.pattern() else { return }
             try engine.start()
-            try engine.playPattern(hapticPattern)
+            // Convert CHHapticPattern to Data for playPattern
+            let patternData = try NSKeyedArchiver.archivedData(withRootObject: hapticPattern, requiringSecureCoding: false)
+            try engine.playPattern(from: patternData)
         } catch {
             #if DEBUG
             print("❌ HapticManager — Failed to play pattern: \(error)")
@@ -281,3 +284,4 @@ final class HapticManager {
         }
     }
 }
+#endif

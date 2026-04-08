@@ -55,7 +55,7 @@ struct LevelUpCelebrationView: View {
                 // Confetti animation
                 ZStack {
                     ForEach(0..<12, id: \.self) { _ in
-                        ConfettiParticle()
+                        LevelUpConfettiParticle()
                     }
                 }
                 .frame(height: 200)
@@ -96,7 +96,7 @@ struct LevelUpCelebrationView: View {
 
 // MARK: - Confetti Particle
 
-struct ConfettiParticle: View {
+struct LevelUpConfettiParticle: View {
     @State private var position: CGFloat = 0
     @State private var rotation: Double = 0
 

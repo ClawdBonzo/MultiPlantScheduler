@@ -1,6 +1,8 @@
-import UIKit
 import UserNotifications
 import SwiftData
+
+#if os(iOS)
+import UIKit
 
 /// App delegate handling notification actions and lifecycle events
 class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDelegate {
@@ -72,3 +74,7 @@ class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCenterDele
         }
     }
 }
+#else
+/// Placeholder for macOS
+class AppDelegate: NSObject { }
+#endif

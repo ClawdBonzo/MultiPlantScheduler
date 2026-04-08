@@ -3,6 +3,10 @@
 
 import SwiftUI
 
+#if os(iOS)
+import UIKit
+#endif
+
 struct OnboardingView: View {
     @Binding var isPresented: Bool
     @Binding var launchAddPlant: Bool
@@ -176,7 +180,9 @@ private struct WelcomeScreen: View {
 
             // CTA
             Button {
+#if os(iOS)
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+#endif
                 onContinue()
             } label: {
                 Text("Continue")
@@ -364,7 +370,9 @@ private struct AIDemoScreen: View {
 
             // CTA
             Button {
+#if os(iOS)
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+#endif
                 onContinue()
             } label: {
                 Text("Continue")
@@ -416,7 +424,9 @@ private struct AIDemoScreen: View {
 
         // Result
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.8) {
+#if os(iOS)
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
+#endif
             phase = .result
 
             withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
@@ -477,7 +487,9 @@ private struct BenefitsScreen: View {
 
             // CTA
             Button {
+#if os(iOS)
                 UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+#endif
                 onContinue()
             } label: {
                 Text("Continue")
@@ -644,7 +656,9 @@ private struct ReadyToScanScreen: View {
             // Primary CTA — opens camera
             VStack(spacing: 14) {
                 Button {
+#if os(iOS)
                     UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
+#endif
                     withAnimation(.spring(response: 0.2, dampingFraction: 0.5)) {
                         ctaScale = 0.92
                     }

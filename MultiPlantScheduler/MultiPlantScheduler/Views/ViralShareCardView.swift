@@ -1,6 +1,9 @@
 import SwiftUI
 import CoreImage.CIFilterBuiltins
 
+#if os(iOS) || os(tvOS)
+import UIKit
+
 /// 9:16 vertical share card optimized for TikTok/Instagram Stories
 /// Renders a beautiful branded card with blurred background, plant info, and CTA
 struct ViralShareCardView: View {
@@ -304,3 +307,4 @@ struct ShareCardRenderer {
         )
     }
 }
+#endif

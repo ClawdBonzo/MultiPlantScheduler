@@ -173,9 +173,8 @@ struct DashboardView: View {
                         }
 
                         // XP progress bar
-                        let nextLevelXP = profile.nextLevelXP
-                        let currentLevelXP = profile.currentLevelXP
-                        let progress = Double(profile.currentXP - currentLevelXP) / Double(nextLevelXP - currentLevelXP)
+                        let nextLevelXP = profile.xpForNextLevel
+                        let progress = profile.xpProgress
 
                         ZStack(alignment: .leading) {
                             Capsule()

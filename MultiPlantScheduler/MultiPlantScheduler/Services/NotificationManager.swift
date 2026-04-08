@@ -1,6 +1,8 @@
-import UIKit
 import UserNotifications
+
+#if os(iOS)
 import UIKit
+#endif
 
 /// Manages local push notifications for watering reminders
 class NotificationManager {
@@ -41,7 +43,9 @@ class NotificationManager {
                 .requestAuthorization(options: [.alert, .sound, .badge])
             if granted {
                 await MainActor.run {
+#if os(iOS)
                     UIApplication.shared.registerForRemoteNotifications()
+#endif
                 }
             }
             return granted

@@ -1,6 +1,12 @@
+import Foundation
 import SwiftData
 import SwiftUI
-import Foundation
+
+#if os(iOS) || os(tvOS)
+import UIKit
+#else
+import AppKit
+#endif
 
 /// A community tip shared by users — hardcoded seeds + user-submitted via SwiftData
 @Model
@@ -44,9 +50,14 @@ final class CommunityTip {
     // MARK: - Computed
 
     var photoImage: Image? {
-        guard let photoData = photoData,
-              let uiImage = UIImage(data: photoData) else { return nil }
+        guard let photoData = photoData else { return nil }
+#if os(iOS) || os(tvOS)
+        guard let uiImage = UIImage(data: photoData) else { return nil }
         return Image(uiImage: uiImage)
+#else
+        guard let nsImage = NSImage(data: photoData) else { return nil }
+        return Image(nsImage: nsImage)
+#endif
     }
 
     var tipCategory: TipCategory {

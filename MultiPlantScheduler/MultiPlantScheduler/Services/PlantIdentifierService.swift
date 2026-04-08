@@ -1,4 +1,8 @@
+#if os(iOS) || os(tvOS)
 import UIKit
+#else
+import AppKit
+#endif
 import Vision
 import CoreML
 
@@ -51,6 +55,7 @@ final class PlantIdentifierService {
     // MARK: - Identification
 
     /// Identify a plant from a UIImage using the on-device CoreML model
+#if os(iOS) || os(tvOS)
     func identifyPlant(from image: UIImage) async -> IdentificationResult {
         guard let cgImage = image.cgImage else {
             return IdentificationResult(species: nil, confidence: 0, defaultInterval: 7, isLowConfidence: true, topSuggestions: [])
@@ -63,6 +68,7 @@ final class PlantIdentifierService {
             return await identifyWithVision(cgImage: cgImage)
         }
     }
+#endif
 
     // MARK: - CoreML Path (primary — 47 houseplant species, ~90% accuracy)
 

@@ -65,15 +65,13 @@ struct MultiPlantSchedulerApp: App {
                 revenueCatManager.configure()
                 
                 // Initialize gamification with modelContext
-                if let context = modelContainer.mainContext {
-                    gamificationManager.initialize(with: context)
-                }
+                gamificationManager.initialize(with: modelContainer.mainContext)
                 
                 Task {
                     let _ = await NotificationManager.shared.requestPermission()
                 }
             }
-            .onChange(of: scenePhase) { _, newPhase in
+            .onChange(of: scenePhase) { newPhase in
                 if newPhase == .active {
                     NotificationManager.shared.clearBadgeCount()
                     // Update daily streak on app resume

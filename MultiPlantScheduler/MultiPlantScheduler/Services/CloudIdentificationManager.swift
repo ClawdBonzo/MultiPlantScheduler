@@ -1,5 +1,10 @@
-import UIKit
 import Foundation
+
+#if os(iOS) || os(tvOS)
+import UIKit
+#else
+import AppKit
+#endif
 
 /// Manages Plant.id cloud API calls and free credit tracking.
 /// Every new user gets 5 free cloud IDs. Premium users get unlimited.
@@ -100,6 +105,7 @@ final class CloudIdentificationManager {
 
     /// Identify a plant using the Plant.id cloud API.
     /// Returns nil if API key not configured, no credits, or network error.
+#if os(iOS) || os(tvOS)
     func identifyPlant(from image: UIImage, isPremium: Bool) async -> CloudResult? {
         lastErrorMessage = nil
 
@@ -275,9 +281,10 @@ final class CloudIdentificationManager {
             return nil
         }
     }
+#endif
 
     /// Test the API connection without decrementing credits (DEBUG only)
-    #if DEBUG
+    #if DEBUG && (os(iOS) || os(tvOS))
     func debugTestAPICall() async -> String {
         let keyPreview = apiKey.isEmpty ? "(empty)" : String(apiKey.prefix(8)) + "..."
         var output = "=== Cloud API Debug ===\n"

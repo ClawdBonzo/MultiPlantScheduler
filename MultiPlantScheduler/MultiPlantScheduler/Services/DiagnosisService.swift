@@ -1,5 +1,8 @@
-import UIKit
 import Foundation
+
+#if os(iOS) || os(tvOS)
+import UIKit
+#endif
 
 /// Manages plant disease and pest detection using Plant.id Health Assessment API.
 /// Leverages the same API key and credit system as CloudIdentificationManager.
@@ -79,6 +82,7 @@ final class DiagnosisService {
     // MARK: - Health Assessment API Call
 
     /// Diagnose a plant image for diseases and pests using Plant.id Health Assessment API.
+#if os(iOS) || os(tvOS)
     func diagnose(image: UIImage, isPremium: Bool) async -> DiagnosisResult? {
         #if DEBUG
         print("🔬 DiagnosisService — diagnose called (isPremium: \(isPremium))")
@@ -273,6 +277,7 @@ final class DiagnosisService {
             return nil
         }
     }
+#endif
 
     // MARK: - Severity Estimation
 
