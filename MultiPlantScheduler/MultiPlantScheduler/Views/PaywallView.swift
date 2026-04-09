@@ -11,8 +11,6 @@ struct PaywallView: View {
     @State private var showError = false
     @State private var errorMessage = ""
     @State private var offerings: Offerings?
-    @State private var countdown: TimeInterval = 15 * 60
-    @State private var timer: Timer?
     @State private var animateHero = false
 
     enum PlanType { case weekly, monthly, yearly, lifetime }
@@ -57,9 +55,6 @@ struct PaywallView: View {
         let savings = ((monthlyAnnual - yearly) / monthlyAnnual) * 100
         return Int(truncating: savings as NSDecimalNumber)
     }
-
-    private var countdownMinutes: Int { Int(countdown) / 60 }
-    private var countdownSeconds: Int { Int(countdown) % 60 }
 
     private var ctaButtonTitle: String {
         switch selectedPlan {
@@ -129,7 +124,7 @@ struct PaywallView: View {
                                 .foregroundStyle(.white.opacity(0.75))
                         }
                     }
-                    .frame(height: 240)
+                    .frame(height: 160)
 
                     // Close button
                     Button { dismiss() } label: {
@@ -143,32 +138,6 @@ struct PaywallView: View {
                     .padding(.leading, 16)
                     .padding(.top, 12)
                 }
-
-                // Sale ribbon
-                HStack(spacing: 10) {
-                    Image(systemName: "tag.fill")
-                        .font(.system(size: 13, weight: .bold))
-                    Text("50% OFF")
-                        .font(.system(size: 15, weight: .black, design: .rounded))
-                    Text("·")
-                        .font(.system(size: 14, weight: .bold))
-                    HStack(spacing: 3) {
-                        Image(systemName: "hourglass")
-                            .font(.system(size: 11, weight: .semibold))
-                        Text(String(format: NSLocalizedString("Ends in %d:%02d", comment: "Sale countdown"), countdownMinutes, countdownSeconds))
-                            .font(.system(size: 13, weight: .bold, design: .monospaced))
-                    }
-                }
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-                .background(
-                    LinearGradient(
-                        colors: [Color(red: 0.85, green: 0.15, blue: 0.15), Color(red: 0.95, green: 0.45, blue: 0.15)],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                )
 
                 // MARK: - Content
                 ScrollView(showsIndicators: false) {
@@ -319,20 +288,12 @@ struct PaywallView: View {
         }
         .task { await loadOfferings() }
         .onAppear {
-            startTimer()
             withAnimation(.easeOut(duration: 1.0)) { animateHero = true }
         }
-        .onDisappear { timer?.invalidate() }
         .alert("Error", isPresented: $showError) {
             Button("OK") { }
         } message: {
             Text(errorMessage)
-        }
-    }
-
-    private func startTimer() {
-        timer = Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
-            if countdown > 0 { countdown -= 1 } else { countdown = 15 * 60 }
         }
     }
 
