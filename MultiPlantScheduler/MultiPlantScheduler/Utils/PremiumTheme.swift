@@ -181,15 +181,16 @@ extension View {
 
 struct AnimatedEntrance: ViewModifier {
     let delay: Double
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
     @State private var appeared = false
 
     func body(content: Content) -> some View {
         content
             .opacity(appeared ? 1 : 0)
-            .offset(y: appeared ? 0 : 18)
-            .scaleEffect(appeared ? 1 : 0.97)
+            .offset(y: appeared ? 0 : (reduceMotion ? 0 : 18))
+            .scaleEffect(appeared ? 1 : (reduceMotion ? 1 : 0.97))
             .animation(
-                SpringPreset.smooth.delay(delay),
+                reduceMotion ? nil : SpringPreset.smooth.delay(delay),
                 value: appeared
             )
             .onAppear {
@@ -207,30 +208,35 @@ extension View {
 // MARK: - Premium Shimmer Effect
 
 struct ShimmerEffect: ViewModifier {
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
     @State private var phase: CGFloat = 0
 
     func body(content: Content) -> some View {
-        content
-            .overlay(
-                LinearGradient(
-                    colors: [
-                        .clear,
-                        Color.white.opacity(0.05),
-                        Color.white.opacity(0.12),
-                        Color.white.opacity(0.05),
-                        .clear
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-                .offset(x: phase)
-                .onAppear {
-                    withAnimation(.linear(duration: 3).repeatForever(autoreverses: false)) {
-                        phase = 400
+        if reduceMotion {
+            content
+        } else {
+            content
+                .overlay(
+                    LinearGradient(
+                        colors: [
+                            .clear,
+                            Color.white.opacity(0.05),
+                            Color.white.opacity(0.12),
+                            Color.white.opacity(0.05),
+                            .clear
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                    .offset(x: phase)
+                    .onAppear {
+                        withAnimation(.linear(duration: 3).repeatForever(autoreverses: false)) {
+                            phase = 400
+                        }
                     }
-                }
-            )
-            .clipped()
+                )
+                .clipped()
+        }
     }
 }
 
@@ -244,6 +250,7 @@ extension View {
 
 /// Subtle floating glow particles for premium backgrounds
 struct ParticleGlowView: View {
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
     let particleCount: Int
     let color: Color
 
@@ -253,16 +260,22 @@ struct ParticleGlowView: View {
     }
 
     var body: some View {
-        GeometryReader { geo in
-            ForEach(0..<particleCount, id: \.self) { i in
-                GlowParticle(
-                    index: i,
-                    bounds: geo.size,
-                    color: color
-                )
+        if reduceMotion {
+            // Static subtle glow instead of animated particles
+            color.opacity(0.06)
+                .allowsHitTesting(false)
+        } else {
+            GeometryReader { geo in
+                ForEach(0..<particleCount, id: \.self) { i in
+                    GlowParticle(
+                        index: i,
+                        bounds: geo.size,
+                        color: color
+                    )
+                }
             }
+            .allowsHitTesting(false)
         }
-        .allowsHitTesting(false)
     }
 }
 
@@ -342,7 +355,8 @@ struct SuccessBurstView: View {
                     ring2Opacity = 0
                 }
 
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                Task {
+                    try? await Task.sleep(for: .seconds(1.0))
                     trigger = false
                 }
             }

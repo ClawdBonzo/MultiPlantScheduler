@@ -19,6 +19,7 @@ enum Constants {
 
     // MARK: - RevenueCat Configuration
     enum RevenueCat {
+        // TODO: Replace with live appl_... key before App Store submission
         static let apiKey = "appl_iwUIsFniEdnILPWkxeuJvgzLpuJ"
         static let premiumEntitlementID = "premium"
     }

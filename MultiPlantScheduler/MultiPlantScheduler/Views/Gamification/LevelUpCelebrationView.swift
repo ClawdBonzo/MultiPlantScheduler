@@ -4,7 +4,7 @@ import SwiftUI
 struct LevelUpCelebrationView: View {
     let level: Int
     let levelName: String
-    @State private var isPresented = true
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
     @State private var scale: CGFloat = 0.5
     @State private var opacity: Double = 1.0
 
@@ -14,13 +14,13 @@ struct LevelUpCelebrationView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 20) {
-                // Animated emoji sequence
                 HStack(spacing: 8) {
                     ForEach([0, 1, 2], id: \.self) { index in
                         Text("🎉")
                             .font(.system(size: 32))
                             .scaleEffect(scale)
                             .animation(
+                                reduceMotion ? nil :
                                 Animation.easeInOut(duration: 0.6)
                                     .delay(Double(index) * 0.1),
                                 value: scale
@@ -28,7 +28,6 @@ struct LevelUpCelebrationView: View {
                     }
                 }
 
-                // Level up text
                 VStack(spacing: 8) {
                     Text("LEVEL UP!")
                         .font(.system(size: 40, weight: .bold, design: .default))
@@ -47,18 +46,20 @@ struct LevelUpCelebrationView: View {
                 }
                 .scaleEffect(scale)
                 .animation(
+                    reduceMotion ? nil :
                     Animation.spring(response: 0.6, dampingFraction: 0.7, blendDuration: 0.3)
                         .delay(0.1),
                     value: scale
                 )
 
-                // Confetti animation
-                ZStack {
-                    ForEach(0..<12, id: \.self) { _ in
-                        LevelUpConfettiParticle()
+                if !reduceMotion {
+                    ZStack {
+                        ForEach(0..<12, id: \.self) { _ in
+                            LevelUpConfettiParticle()
+                        }
                     }
+                    .frame(height: 200)
                 }
-                .frame(height: 200)
             }
             .padding(32)
             .background(
@@ -83,9 +84,9 @@ struct LevelUpCelebrationView: View {
         }
         .onAppear {
             scale = 1.0
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.5) {
-                withAnimation(.easeInOut(duration: 0.3)) {
+            Task {
+                try? await Task.sleep(for: .seconds(2.5))
+                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.3)) {
                     opacity = 0
                     scale = 1.2
                 }

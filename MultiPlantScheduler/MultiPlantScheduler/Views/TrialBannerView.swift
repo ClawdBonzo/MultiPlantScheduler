@@ -35,15 +35,18 @@ struct TrialBannerView: View {
             }
 
             // Progress bar
-            ZStack(alignment: .leading) {
-                Capsule()
-                    .fill(AppSurface.tertiary)
-                    .frame(height: 6)
+            GeometryReader { geo in
+                ZStack(alignment: .leading) {
+                    Capsule()
+                        .fill(AppSurface.tertiary)
+                        .frame(height: 6)
 
-                Capsule()
-                    .fill(AppBrand.primary)
-                    .frame(width: CGFloat(remainingDays) / 3.0 * UIScreen.main.bounds.width - 48, height: 6)
+                    Capsule()
+                        .fill(AppBrand.primary)
+                        .frame(width: max(0, CGFloat(remainingDays) / 3.0 * (geo.size.width)), height: 6)
+                }
             }
+            .frame(height: 6)
 
             Button(action: onTapUpgrade) {
                 Text("Upgrade to Premium")

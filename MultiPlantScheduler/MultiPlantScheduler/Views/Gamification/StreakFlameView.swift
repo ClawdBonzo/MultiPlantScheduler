@@ -4,6 +4,7 @@ import SwiftUI
 struct StreakFlameView: View {
     let currentStreak: Int
     let multiplier: Float
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
     @State private var scale: CGFloat = 0.5
     @State private var opacity: Double = 1.0
     @State private var flameRotation: Double = 0
@@ -14,17 +15,18 @@ struct StreakFlameView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 16) {
-                // Flame emoji with rotation
                 Text("🔥")
                     .font(.system(size: 64))
                     .scaleEffect(scale)
                     .rotationEffect(.degrees(flameRotation))
                     .animation(
+                        reduceMotion ? nil :
                         Animation.spring(response: 0.6, dampingFraction: 0.6, blendDuration: 0.3),
                         value: scale
                     )
                     .onAppear {
                         scale = 1.0
+                        guard !reduceMotion else { return }
                         withAnimation(.linear(duration: 1.5).repeatForever(autoreverses: true)) {
                             flameRotation = 5
                         }
@@ -91,8 +93,9 @@ struct StreakFlameView: View {
             .opacity(opacity)
         }
         .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.8) {
-                withAnimation(.easeInOut(duration: 0.3)) {
+            Task {
+                try? await Task.sleep(for: .seconds(2.8))
+                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.3)) {
                     opacity = 0
                     scale = 0.8
                 }

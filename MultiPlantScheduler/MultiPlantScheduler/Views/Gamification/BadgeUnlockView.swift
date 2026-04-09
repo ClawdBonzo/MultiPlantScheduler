@@ -3,6 +3,7 @@ import SwiftUI
 /// Celebration animation when user unlocks a badge
 struct BadgeUnlockView: View {
     let badge: UnlockedBadge
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
     @State private var scale: CGFloat = 0.1
     @State private var opacity: Double = 1.0
     @State private var rotation: Double = -10
@@ -13,22 +14,12 @@ struct BadgeUnlockView: View {
                 .ignoresSafeArea()
 
             VStack(spacing: 24) {
-                // Top sparkles
                 HStack(spacing: 16) {
-                    Text("✨")
-                        .font(.system(size: 28))
-                        .scaleEffect(scale)
-
-                    Text("✨")
-                        .font(.system(size: 32))
-                        .scaleEffect(scale)
-
-                    Text("✨")
-                        .font(.system(size: 28))
-                        .scaleEffect(scale)
+                    Text("✨").font(.system(size: 28)).scaleEffect(scale)
+                    Text("✨").font(.system(size: 32)).scaleEffect(scale)
+                    Text("✨").font(.system(size: 28)).scaleEffect(scale)
                 }
 
-                // Badge emoji - large and animated
                 Text(badge.emoji)
                     .font(.system(size: 80))
                     .scaleEffect(scale)
@@ -37,12 +28,12 @@ struct BadgeUnlockView: View {
                         axis: (x: 0, y: 1, z: 0)
                     )
                     .animation(
+                        reduceMotion ? nil :
                         Animation.spring(response: 0.8, dampingFraction: 0.6, blendDuration: 0.3)
                             .delay(0.1),
                         value: scale
                     )
 
-                // Badge text
                 VStack(spacing: 8) {
                     Text("BADGE UNLOCKED!")
                         .font(.system(size: 20, weight: .bold))
@@ -61,6 +52,7 @@ struct BadgeUnlockView: View {
                 }
                 .scaleEffect(scale)
                 .animation(
+                    reduceMotion ? nil :
                     Animation.spring(response: 0.7, dampingFraction: 0.7, blendDuration: 0.3)
                         .delay(0.15),
                     value: scale
@@ -90,9 +82,9 @@ struct BadgeUnlockView: View {
         .onAppear {
             scale = 1.0
             rotation = 0
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.8) {
-                withAnimation(.easeInOut(duration: 0.3)) {
+            Task {
+                try? await Task.sleep(for: .seconds(2.8))
+                withAnimation(reduceMotion ? nil : .easeInOut(duration: 0.3)) {
                     opacity = 0
                     scale = 0.8
                 }

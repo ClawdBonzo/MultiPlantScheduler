@@ -3,6 +3,7 @@ import SwiftUI
 /// Full-screen celebration shown after saving the first plant from onboarding
 struct CelebratoryView: View {
     @Environment(\.dismiss) var dismiss
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
     @State private var showContent = false
     @State private var checkScale: CGFloat = 0.05
     @State private var checkRotation: Double = -90
@@ -116,63 +117,54 @@ struct CelebratoryView: View {
             }
         }
         .onAppear {
+            UINotificationFeedbackGenerator().notificationOccurred(.success)
+
+            if reduceMotion {
+                // Instant static state
+                checkScale = 1.0
+                checkRotation = 0
+                showContent = true
+                ringOpacity = 0
+                Task { try? await Task.sleep(for: .seconds(2.0)); dismiss() }
+                return
+            }
+
             generateConfetti()
 
-            // Strong haptic
-            let notification = UINotificationFeedbackGenerator()
-            notification.notificationOccurred(.success)
-
-            // Checkmark: dramatic spring with rotation
             withAnimation(.spring(response: 0.6, dampingFraction: 0.45)) {
                 checkScale = 1.15
                 checkRotation = 10
             }
-            // Settle
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
+            Task {
+                try? await Task.sleep(for: .milliseconds(350))
                 withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
                     checkScale = 1.0
                     checkRotation = 0
                 }
             }
 
-            // Expanding rings — staggered
-            withAnimation(.easeOut(duration: 1.2)) {
-                ring1Scale = 2.0
-            }
-            withAnimation(.easeOut(duration: 1.4).delay(0.1)) {
-                ring2Scale = 3.0
-            }
-            withAnimation(.easeOut(duration: 1.6).delay(0.2)) {
-                ring3Scale = 4.0
-            }
-            withAnimation(.easeOut(duration: 1.5)) {
-                ringOpacity = 0
-            }
+            withAnimation(.easeOut(duration: 1.2)) { ring1Scale = 2.0 }
+            withAnimation(.easeOut(duration: 1.4).delay(0.1)) { ring2Scale = 3.0 }
+            withAnimation(.easeOut(duration: 1.6).delay(0.2)) { ring3Scale = 4.0 }
+            withAnimation(.easeOut(duration: 1.5)) { ringOpacity = 0 }
 
-            // Glow pulse
             withAnimation(.easeInOut(duration: 1.0).repeatForever(autoreverses: true)) {
                 glowPulse = true
             }
 
-            // Confetti burst
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                withAnimation {
-                    confettiLaunched = true
-                }
-                // Second haptic on confetti
-                let impact = UIImpactFeedbackGenerator(style: .heavy)
-                impact.impactOccurred()
+            Task {
+                try? await Task.sleep(for: .milliseconds(150))
+                withAnimation { confettiLaunched = true }
+                UIImpactFeedbackGenerator(style: .heavy).impactOccurred()
             }
 
-            // Text appears
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                withAnimation(.spring(response: 0.5, dampingFraction: 0.65)) {
-                    showContent = true
-                }
+            Task {
+                try? await Task.sleep(for: .milliseconds(300))
+                withAnimation(.spring(response: 0.5, dampingFraction: 0.65)) { showContent = true }
             }
 
-            // Auto-dismiss
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+            Task {
+                try? await Task.sleep(for: .seconds(2.0))
                 dismiss()
             }
         }

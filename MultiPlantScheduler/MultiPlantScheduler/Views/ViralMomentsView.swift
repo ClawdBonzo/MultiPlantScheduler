@@ -2,11 +2,11 @@ import SwiftUI
 
 /// "Viral Moments" section for Community tab — showcases the best shared results
 struct ViralMomentsSection: View {
+    @Environment(\.accessibilityReduceMotion) var reduceMotion
     @State private var animateEntrance = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            // Header
             PremiumSectionHeader(
                 icon: "flame.fill",
                 iconColor: .orange,
@@ -15,14 +15,14 @@ struct ViralMomentsSection: View {
                 trailingColor: .orange
             )
 
-            // Horizontal scroll of viral cards
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 12) {
                     ForEach(Array(ViralMoment.seeds.enumerated()), id: \.element.id) { index, moment in
                         ViralMomentCard(moment: moment)
                             .opacity(animateEntrance ? 1 : 0)
-                            .offset(x: animateEntrance ? 0 : 30)
+                            .offset(x: animateEntrance ? 0 : (reduceMotion ? 0 : 30))
                             .animation(
+                                reduceMotion ? nil :
                                 .spring(response: 0.5, dampingFraction: 0.8)
                                     .delay(Double(index) * 0.08),
                                 value: animateEntrance
@@ -32,8 +32,13 @@ struct ViralMomentsSection: View {
             }
         }
         .onAppear {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+            if reduceMotion {
                 animateEntrance = true
+            } else {
+                Task {
+                    try? await Task.sleep(for: .milliseconds(200))
+                    animateEntrance = true
+                }
             }
         }
     }
