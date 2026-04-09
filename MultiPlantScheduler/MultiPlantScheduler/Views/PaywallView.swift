@@ -1,7 +1,7 @@
 import SwiftUI
 import RevenueCat
 
-/// Premium paywall — dark luxury design with 4-tier pricing and urgency elements
+/// Premium paywall — dark glassmorphism design, 4-tier pricing, correct trial info
 struct PaywallView: View {
     @Environment(\.dismiss) var dismiss
     @EnvironmentObject var revenueCatManager: RevenueCatManager
@@ -13,23 +13,27 @@ struct PaywallView: View {
     @State private var offerings: Offerings?
     @State private var animateHero = false
 
-    enum PlanType { case weekly, monthly, yearly, lifetime }
+    enum PlanType: CaseIterable { case monthly, yearly, lifetime, weekly }
+
+    // MARK: - Package Resolution
 
     private var weeklyPackage: Package? {
         offerings?.current?.availablePackages.first {
             $0.packageType == .weekly ||
-            $0.storeProduct.productIdentifier.contains("weekly")
+            $0.storeProduct.productIdentifier == Constants.Subscription.ProductID.weekly
         }
     }
     private var monthlyPackage: Package? { offerings?.current?.monthly }
     private var annualPackage: Package? { offerings?.current?.annual }
     private var lifetimePackage: Package? {
         if let pkg = offerings?.current?.lifetime { return pkg }
-        return offerings?.current?.availablePackages.first { pkg in
-            pkg.packageType == .lifetime ||
-            pkg.storeProduct.productIdentifier.lowercased().contains("lifetime")
+        return offerings?.current?.availablePackages.first {
+            $0.packageType == .lifetime ||
+            $0.storeProduct.productIdentifier == Constants.Subscription.ProductID.lifetime
         }
     }
+
+    // MARK: - Derived Prices (RevenueCat → fallback)
 
     private var weeklyPrice: String  { weeklyPackage?.storeProduct.localizedPriceString   ?? "$4.99" }
     private var monthlyPrice: String { monthlyPackage?.storeProduct.localizedPriceString  ?? "$6.99" }
@@ -48,248 +52,211 @@ struct PaywallView: View {
     }
 
     private var savingsPercent: Int {
-        guard let monthly = monthlyPackage?.storeProduct.price as Decimal?,
-              let yearly = annualPackage?.storeProduct.price as Decimal? else { return 40 }
-        let monthlyAnnual = monthly * 12
-        guard monthlyAnnual > 0 else { return 0 }
-        let savings = ((monthlyAnnual - yearly) / monthlyAnnual) * 100
-        return Int(truncating: savings as NSDecimalNumber)
+        guard let monthlyProduct = monthlyPackage?.storeProduct,
+              let annualProduct = annualPackage?.storeProduct else { return 40 }
+        let monthlyPerYear = Double(truncating: monthlyProduct.price as NSDecimalNumber) * 12
+        let yearly = Double(truncating: annualProduct.price as NSDecimalNumber)
+        guard monthlyPerYear > 0 else { return 40 }
+        return Int(((monthlyPerYear - yearly) / monthlyPerYear) * 100)
     }
+
+    // MARK: - CTA & Legal (trial-aware)
 
     private var ctaButtonTitle: String {
         switch selectedPlan {
-        case .lifetime: return NSLocalizedString("Buy Lifetime Access", comment: "Buy lifetime")
-        case .monthly:  return NSLocalizedString("Start Free Trial", comment: "Start trial")
-        case .weekly:   return NSLocalizedString("Subscribe Weekly", comment: "Subscribe weekly")
-        case .yearly:   return NSLocalizedString("Subscribe Now", comment: "Subscribe now")
+        case .monthly:  return "Start 3-Day Free Trial"
+        case .yearly:   return "Start 3-Day Free Trial"
+        case .weekly:   return "Subscribe Weekly"
+        case .lifetime: return "Buy Lifetime Access"
         }
     }
 
     private var legalFooterText: String {
         switch selectedPlan {
-        case .lifetime:
-            return NSLocalizedString("One-time purchase. No subscription.", comment: "Lifetime legal")
         case .monthly:
-            return NSLocalizedString("3-day free trial, then $6.99/month. Cancel anytime in Settings.", comment: "Monthly trial legal")
-        case .weekly:
-            return NSLocalizedString("$4.99/week. Auto-renewable. Cancel anytime in Settings.", comment: "Weekly legal")
+            return "3-day free trial, then \(monthlyPrice)/month. Cancel anytime."
         case .yearly:
-            return NSLocalizedString("$49.99/year (~$4.17/month). Cancel anytime in Settings.", comment: "Yearly legal")
+            return "3-day free trial, then \(yearlyPrice)/year. Cancel anytime."
+        case .weekly:
+            return "\(weeklyPrice)/week. Auto-renews. Cancel anytime."
+        case .lifetime:
+            return "One-time purchase of \(lifetimePrice). No subscription."
         }
     }
 
+    // MARK: - Body
+
     var body: some View {
         ZStack {
-            // Deep dark background
             AppColors.background.ignoresSafeArea()
 
             VStack(spacing: 0) {
-                // MARK: - Hero Section
+                // MARK: Hero
                 ZStack(alignment: .topLeading) {
-                    // Gradient hero with ambient glow
                     ZStack {
                         PremiumGradient.paywallHero
 
-                        // Floating ambient particles
-                        ParticleGlowView(count: 6, color: AppColors.limeGreen)
-                            .opacity(animateHero ? 0.8 : 0)
+                        ParticleGlowView(count: 5, color: AppColors.limeGreen)
+                            .opacity(animateHero ? 0.7 : 0)
 
-                        VStack(spacing: 12) {
+                        HStack(spacing: 10) {
                             ZStack {
-                                // Glow ring
                                 Circle()
-                                    .fill(AppColors.limeGreen.opacity(0.12))
-                                    .frame(width: 90, height: 90)
-                                    .scaleEffect(animateHero ? 1.1 : 0.9)
+                                    .fill(Color.yellow.opacity(0.10))
+                                    .frame(width: 52, height: 52)
+                                    .scaleEffect(animateHero ? 1.08 : 0.92)
                                     .animation(.easeInOut(duration: 2).repeatForever(autoreverses: true), value: animateHero)
 
                                 Image(systemName: "crown.fill")
-                                    .font(.system(size: 40, weight: .light))
+                                    .font(.system(size: 26))
                                     .foregroundStyle(
-                                        LinearGradient(
-                                            colors: [.yellow, .orange],
-                                            startPoint: .top,
-                                            endPoint: .bottom
-                                        )
+                                        LinearGradient(colors: [.yellow, .orange],
+                                                       startPoint: .top, endPoint: .bottom)
                                     )
-                                    .shadow(color: .yellow.opacity(0.3), radius: 8)
+                                    .shadow(color: .yellow.opacity(0.3), radius: 6)
                             }
 
                             Text("Go Premium")
-                                .font(.system(size: 28, weight: .bold, design: .rounded))
+                                .font(.system(size: 24, weight: .bold, design: .rounded))
                                 .foregroundStyle(.white)
-
-                            Text("Unlimited plants, Cloud AI & more")
-                                .font(.system(size: 14, weight: .medium, design: .rounded))
-                                .foregroundStyle(.white.opacity(0.75))
                         }
                     }
-                    .frame(height: 160)
+                    .frame(height: 90)
 
-                    // Close button
                     Button { dismiss() } label: {
                         Image(systemName: "xmark")
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundStyle(.white.opacity(0.8))
-                            .frame(width: 32, height: 32)
-                            .background(.ultraThinMaterial.opacity(0.5))
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundStyle(.white.opacity(0.7))
+                            .frame(width: 28, height: 28)
+                            .background(.ultraThinMaterial.opacity(0.4))
                             .clipShape(Circle())
                     }
-                    .padding(.leading, 16)
-                    .padding(.top, 12)
+                    .padding(.leading, 14)
+                    .padding(.top, 10)
                 }
 
-                // MARK: - Content
-                ScrollView(showsIndicators: false) {
-                    VStack(spacing: 22) {
-                        // Feature benefits
-                        VStack(spacing: 14) {
-                            PaywallBenefitRow(icon: "leaf.fill", title: "Unlimited Plants", subtitle: "Track your entire collection", iconColor: AppColors.emerald)
-                            PaywallBenefitRow(icon: "cloud.fill", title: "Unlimited Cloud AI IDs", subtitle: "Precise identification powered by Plant.id", iconColor: AppColors.teal)
-                            PaywallBenefitRow(icon: "photo.on.rectangle.angled", title: "Photo Timeline", subtitle: "Track growth over time with photos", iconColor: AppColors.jade)
-                            PaywallBenefitRow(icon: "calendar", title: "Seasonal Auto-Adjust", subtitle: "Smart watering by season", iconColor: AppColors.forestGreen)
-                            PaywallBenefitRow(icon: "microbe.fill", title: "Disease & Pest Detection", subtitle: "Unlimited AI health scans", iconColor: .purple)
-                            PaywallBenefitRow(icon: "chart.bar.fill", title: "Advanced Analytics", subtitle: "Charts, streaks, and insights", iconColor: .blue)
-                            PaywallBenefitRow(icon: "person.2.fill", title: "Community Tips & Tricks", subtitle: "Learn from thousands of plant parents", iconColor: .orange)
-                            PaywallBenefitRow(icon: "square.and.arrow.up", title: "Full Data Export", subtitle: "CSV export of all plants and care logs", iconColor: AppColors.mint)
-                        }
-                        .padding(16)
-                        .background(
-                            RoundedRectangle(cornerRadius: 16)
-                                .fill(Color.white.opacity(0.04))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 16)
-                                        .stroke(Color.white.opacity(0.06), lineWidth: 0.5)
-                                )
-                        )
+                // MARK: Content
+                VStack(spacing: 12) {
+                    // Features
+                    HStack(spacing: 0) {
+                        FeatureChip(icon: "leaf.fill", text: "Unlimited Plants", color: AppColors.emerald)
+                        FeatureChip(icon: "microbe.fill", text: "AI Diagnosis", color: .purple)
+                        FeatureChip(icon: "chart.bar.fill", text: "Analytics", color: .blue)
+                        FeatureChip(icon: "calendar", text: "Smart Care", color: AppColors.forestGreen)
+                    }
+                    .padding(.horizontal, 12)
 
-                        // 4-tier pricing
-                        VStack(spacing: 8) {
-                            // Monthly — BEST VALUE + 3-day trial (shown first / selected by default)
-                            PaywallPlanRow(
-                                title: "Monthly",
-                                price: monthlyPrice,
-                                period: "/month",
-                                detail: "3-day free trial included",
-                                badge: "BEST VALUE",
-                                badgeColor: AppColors.emerald,
-                                isSelected: selectedPlan == .monthly
-                            ) { selectedPlan = .monthly }
+                    // MARK: Plan Cards
+                    VStack(spacing: 6) {
+                        // Monthly — BEST VALUE + 3-day trial
+                        PlanCard(
+                            title: "Monthly",
+                            price: monthlyPrice,
+                            period: "/mo",
+                            trialText: "3-day free trial",
+                            badge: "BEST VALUE",
+                            badgeColors: (Color(red: 1.0, green: 0.82, blue: 0.28), Color(red: 0.15, green: 0.12, blue: 0.0)),
+                            isSelected: selectedPlan == .monthly
+                        ) { selectedPlan = .monthly }
 
-                            // Yearly — save ~40%
-                            PaywallPlanRow(
-                                title: "Yearly",
-                                price: yearlyPrice,
-                                period: "/year",
-                                detail: "\(yearlyMonthlyEquivalent)/mo · Save \(savingsPercent)%",
-                                badge: "SAVE \(savingsPercent)%",
-                                badgeColor: AppColors.teal,
-                                isSelected: selectedPlan == .yearly
-                            ) { selectedPlan = .yearly }
+                        // Yearly — 3-day trial + savings
+                        PlanCard(
+                            title: "Yearly",
+                            price: yearlyPrice,
+                            period: "/yr",
+                            trialText: "3-day free trial · \(yearlyMonthlyEquivalent)/mo",
+                            badge: "SAVE \(savingsPercent)%",
+                            badgeColors: (AppColors.teal, .white),
+                            isSelected: selectedPlan == .yearly
+                        ) { selectedPlan = .yearly }
 
-                            // Lifetime — pay once
-                            if lifetimePackage != nil {
-                                PaywallPlanRow(
-                                    title: "Lifetime",
-                                    price: lifetimePrice,
-                                    period: "once",
-                                    detail: "Pay once, own forever",
-                                    badge: nil,
-                                    badgeColor: nil,
-                                    isSelected: selectedPlan == .lifetime
-                                ) { selectedPlan = .lifetime }
+                        // Lifetime — no trial
+                        PlanCard(
+                            title: "Lifetime",
+                            price: lifetimePrice,
+                            period: " once",
+                            trialText: "Pay once, own forever",
+                            badge: nil, badgeColors: nil,
+                            isSelected: selectedPlan == .lifetime
+                        ) { selectedPlan = .lifetime }
+
+                        // Weekly — no trial
+                        PlanCard(
+                            title: "Weekly",
+                            price: weeklyPrice,
+                            period: "/wk",
+                            trialText: "Most flexible, no commitment",
+                            badge: nil, badgeColors: nil,
+                            isSelected: selectedPlan == .weekly
+                        ) { selectedPlan = .weekly }
+                    }
+                    .padding(.horizontal, 14)
+
+                    // MARK: CTA
+                    Button(action: purchase) {
+                        HStack(spacing: 8) {
+                            if isLoading {
+                                ProgressView().tint(.black).scaleEffect(0.8)
+                            } else {
+                                Image(systemName: selectedPlan == .monthly || selectedPlan == .yearly
+                                      ? "gift.fill" : "crown.fill")
+                                    .font(.system(size: 15, weight: .semibold))
                             }
-
-                            // Weekly — flexible entry
-                            if weeklyPackage != nil {
-                                PaywallPlanRow(
-                                    title: "Weekly",
-                                    price: weeklyPrice,
-                                    period: "/week",
-                                    detail: "Most flexible",
-                                    badge: nil,
-                                    badgeColor: nil,
-                                    isSelected: selectedPlan == .weekly
-                                ) { selectedPlan = .weekly }
-                            }
+                            Text(ctaButtonTitle)
+                                .font(.system(size: 17, weight: .bold, design: .rounded))
                         }
+                        .foregroundStyle(.black)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 15)
+                        .premiumButton()
+                    }
+                    .disabled(isLoading)
+                    .opacity(isLoading ? 0.7 : 1)
+                    .padding(.horizontal, 14)
 
-                        // CTA
-                        Button(action: { purchase() }) {
-                            HStack(spacing: 8) {
-                                if isLoading {
-                                    ProgressView()
-                                        .tint(.black)
-                                        .scaleEffect(0.8)
-                                } else {
-                                    Image(systemName: "crown.fill")
-                                        .font(.system(size: 15, weight: .semibold))
-                                }
-                                Text(ctaButtonTitle)
-                                    .font(.system(size: 18, weight: .bold, design: .rounded))
-                            }
-                            .foregroundStyle(.black)
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 16)
-                            .premiumButton()
-                        }
-                        .disabled(isLoading)
-                        .opacity(isLoading ? 0.7 : 1)
-
-                        // Restore
-                        Button(action: { restorePurchases() }) {
-                            Text("Restore Purchases")
-                                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    // MARK: Footer
+                    HStack {
+                        Button(action: restorePurchases) {
+                            Text("Restore")
+                                .font(.system(size: 12, weight: .medium, design: .rounded))
                                 .foregroundStyle(AppColors.emerald)
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 12)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 12)
-                                        .stroke(AppColors.emerald.opacity(0.4), lineWidth: 1.5)
-                                )
                         }
-
+                        Spacer()
                         Button(action: { dismiss() }) {
-                            Text("Continue with Free (3 plants, 3 diagnoses)")
-                                .font(.system(size: 14, weight: .medium, design: .rounded))
+                            Text("Continue Free")
+                                .font(.system(size: 12, weight: .medium, design: .rounded))
                                 .foregroundStyle(AppColors.textSecondary)
                         }
-
-                        // Legal
-                        VStack(spacing: 4) {
-                            Text(legalFooterText)
-                                .font(.system(size: 11))
-                                .foregroundStyle(AppColors.textSecondary.opacity(0.6))
-
-                            HStack(spacing: 4) {
-                                Link("Privacy Policy", destination: URL(string: "https://www.apple.com/legal/privacy/")!)
-                                Text("•").foregroundStyle(AppColors.textSecondary.opacity(0.4))
-                                Link("Terms of Service", destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
-                            }
-                            .font(.system(size: 11))
-                            .foregroundStyle(AppColors.textSecondary.opacity(0.5))
-                        }
                     }
-                    .padding(20)
+                    .padding(.horizontal, 16)
+
+                    VStack(spacing: 1) {
+                        Text(legalFooterText)
+                            .font(.system(size: 9))
+                            .foregroundStyle(AppColors.textSecondary.opacity(0.5))
+                            .multilineTextAlignment(.center)
+
+                        HStack(spacing: 4) {
+                            Link("Privacy", destination: URL(string: "https://www.apple.com/legal/privacy/")!)
+                            Text("·").foregroundStyle(AppColors.textSecondary.opacity(0.3))
+                            Link("Terms", destination: URL(string: "https://www.apple.com/legal/internet-services/itunes/dev/stdeula/")!)
+                        }
+                        .font(.system(size: 9))
+                        .foregroundStyle(AppColors.textSecondary.opacity(0.4))
+                    }
+                    .padding(.bottom, 4)
                 }
+                .padding(.top, 8)
             }
 
+            // Loading overlay
             if isLoading {
                 Color.black.opacity(0.5).ignoresSafeArea()
-                VStack(spacing: 16) {
-                    ProgressView()
-                        .tint(.white)
-                        .scaleEffect(1.3)
-                    Text("Processing...")
-                        .font(.system(size: 15, weight: .medium, design: .rounded))
-                        .foregroundStyle(.white)
-                }
+                ProgressView().tint(.white).scaleEffect(1.3)
             }
         }
         .task { await loadOfferings() }
-        .onAppear {
-            withAnimation(.easeOut(duration: 1.0)) { animateHero = true }
-        }
+        .onAppear { withAnimation(.easeOut(duration: 0.8)) { animateHero = true } }
         .alert("Error", isPresented: $showError) {
             Button("OK") { }
         } message: {
@@ -297,26 +264,23 @@ struct PaywallView: View {
         }
     }
 
+    // MARK: - Actions
+
     private func loadOfferings() async {
         do {
-            let fetchedOfferings = try await Purchases.shared.offerings()
-            await MainActor.run { self.offerings = fetchedOfferings }
+            let fetched = try await Purchases.shared.offerings()
+            await MainActor.run { self.offerings = fetched }
             #if DEBUG
-            if let offering = fetchedOfferings.current {
-                print("💰 RevenueCat — offering '\(offering.identifier)' loaded with \(offering.availablePackages.count) packages:")
+            if let offering = fetched.current {
+                print("💰 Offering '\(offering.identifier)': \(offering.availablePackages.count) packages")
                 for pkg in offering.availablePackages {
-                    print("  💰 Package: \(pkg.identifier) | type: \(pkg.packageType) | product: \(pkg.storeProduct.productIdentifier) | price: \(pkg.storeProduct.localizedPriceString)")
+                    print("  💰 \(pkg.identifier) → \(pkg.storeProduct.productIdentifier) @ \(pkg.storeProduct.localizedPriceString)")
                 }
-                print("  💰 .monthly: \(offering.monthly?.storeProduct.productIdentifier ?? "nil")")
-                print("  💰 .annual: \(offering.annual?.storeProduct.productIdentifier ?? "nil")")
-                print("  💰 .lifetime: \(offering.lifetime?.storeProduct.productIdentifier ?? "nil")")
-            } else {
-                print("💰 RevenueCat — no current offering found")
             }
             #endif
         } catch {
             #if DEBUG
-            print("💰 RevenueCat — failed to load offerings: \(error)")
+            print("💰 Failed to load offerings: \(error)")
             #endif
         }
     }
@@ -341,7 +305,7 @@ struct PaywallView: View {
                 if success { dismiss() }
             } catch {
                 if let rcError = error as? RevenueCat.ErrorCode, rcError == .purchaseCancelledError {
-                    // cancelled
+                    // user cancelled
                 } else {
                     errorMessage = error.localizedDescription
                     showError = true
@@ -366,100 +330,105 @@ struct PaywallView: View {
     }
 }
 
-// MARK: - Subviews
+// MARK: - Feature Chip (horizontal row)
 
-private struct PaywallBenefitRow: View {
+private struct FeatureChip: View {
     let icon: String
-    let title: String
-    let subtitle: String
-    var iconColor: Color = AppColors.emerald
+    let text: String
+    let color: Color
 
     var body: some View {
-        HStack(spacing: 12) {
+        VStack(spacing: 4) {
             Image(systemName: icon)
-                .font(.system(size: 16, weight: .semibold))
-                .foregroundStyle(
-                    LinearGradient(
-                        colors: [iconColor, iconColor.opacity(0.7)],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
-                .frame(width: 32, height: 32)
-                .background(iconColor.opacity(0.12))
-                .clipShape(RoundedRectangle(cornerRadius: 8))
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                    .foregroundStyle(AppColors.textPrimary)
-                Text(subtitle)
-                    .font(.system(size: 12, design: .rounded))
-                    .foregroundStyle(AppColors.textSecondary)
-            }
-            Spacer()
-
-            Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 16))
-                .foregroundStyle(iconColor.opacity(0.6))
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(color)
+                .frame(width: 26, height: 26)
+                .background(color.opacity(0.12))
+                .clipShape(RoundedRectangle(cornerRadius: 6))
+            Text(text)
+                .font(.system(size: 9, weight: .medium, design: .rounded))
+                .foregroundStyle(AppColors.textSecondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
         }
+        .frame(maxWidth: .infinity)
     }
 }
 
-private struct PaywallPlanRow: View {
+// MARK: - Plan Card
+
+private struct PlanCard: View {
     let title: String
     let price: String
     let period: String
-    let detail: String?
+    let trialText: String
     let badge: String?
-    let badgeColor: Color?
+    let badgeColors: (bg: Color, fg: Color)?
     let isSelected: Bool
     let onTap: () -> Void
 
     var body: some View {
         Button(action: onTap) {
-            HStack {
-                VStack(alignment: .leading, spacing: 3) {
+            HStack(spacing: 10) {
+                // Radio
+                ZStack {
+                    Circle()
+                        .stroke(isSelected ? AppColors.emerald : Color.white.opacity(0.15), lineWidth: 2)
+                        .frame(width: 20, height: 20)
+                    if isSelected {
+                        Circle()
+                            .fill(AppColors.emerald)
+                            .frame(width: 10, height: 10)
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 2) {
                     HStack(spacing: 6) {
                         Text(title)
                             .font(.system(size: 15, weight: .semibold, design: .rounded))
                             .foregroundStyle(AppColors.textPrimary)
-                        if let badge {
+                        if let badge, let colors = badgeColors {
                             Text(badge)
-                                .font(.system(size: 9, weight: .bold, design: .rounded))
-                                .foregroundStyle(.white)
+                                .font(.system(size: 8, weight: .heavy, design: .rounded))
+                                .foregroundStyle(colors.fg)
                                 .padding(.horizontal, 6)
                                 .padding(.vertical, 2)
-                                .background(badgeColor ?? AppColors.emerald)
-                                .clipShape(RoundedRectangle(cornerRadius: 4))
+                                .background(
+                                    Capsule().fill(colors.bg)
+                                )
                         }
                     }
-                    if let detail {
-                        Text(detail)
-                            .font(.system(size: 12, design: .rounded))
-                            .foregroundStyle(AppColors.textSecondary)
-                    }
+                    Text(trialText)
+                        .font(.system(size: 11, design: .rounded))
+                        .foregroundStyle(AppColors.textSecondary)
                 }
+
                 Spacer()
-                HStack(alignment: .firstTextBaseline, spacing: 2) {
+
+                HStack(alignment: .firstTextBaseline, spacing: 1) {
                     Text(price)
-                        .font(.system(size: 17, weight: .bold, design: .rounded))
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
                         .foregroundStyle(AppColors.textPrimary)
                     Text(period)
-                        .font(.system(size: 12, design: .rounded))
+                        .font(.system(size: 11, weight: .medium, design: .rounded))
                         .foregroundStyle(AppColors.textSecondary)
                 }
             }
-            .padding(14)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 12)
             .background(
-                RoundedRectangle(cornerRadius: 14)
-                    .fill(isSelected ? AppColors.emerald.opacity(0.08) : Color.white.opacity(0.03))
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(isSelected ? AppColors.emerald.opacity(0.06) : Color.white.opacity(0.025))
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 14)
-                    .stroke(isSelected ? AppColors.emerald.opacity(0.5) : Color.white.opacity(0.06), lineWidth: isSelected ? 1.5 : 0.5)
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(
+                        isSelected ? AppColors.emerald.opacity(0.5) : Color.white.opacity(0.06),
+                        lineWidth: isSelected ? 1.5 : 0.5
+                    )
             )
         }
+        .buttonStyle(.plain)
     }
 }
 

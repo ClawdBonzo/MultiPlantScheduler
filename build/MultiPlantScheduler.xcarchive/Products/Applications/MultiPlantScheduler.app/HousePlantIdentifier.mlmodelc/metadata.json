@@ -1,0 +1,134 @@
+[
+  {
+    "metadataOutputVersion" : "3.0",
+    "userDefinedMetadata" : {
+      "com.github.apple.coremltools.conversion_date" : "2026-03-29",
+      "com.github.apple.coremltools.source" : "torch==2.8.0",
+      "com.github.apple.coremltools.version" : "9.0",
+      "com.github.apple.coremltools.source_dialect" : "TorchScript"
+    },
+    "classLabels" : [
+      "African Violet (Saintpaulia ionantha)",
+      "Aloe Vera",
+      "Anthurium (Anthurium andraeanum)",
+      "Areca Palm (Dypsis lutescens)",
+      "Asparagus Fern (Asparagus setaceus)",
+      "Begonia (Begonia spp.)",
+      "Bird of Paradise (Strelitzia reginae)",
+      "Birds Nest Fern (Asplenium nidus)",
+      "Boston Fern (Nephrolepis exaltata)",
+      "Calathea",
+      "Cast Iron Plant (Aspidistra elatior)",
+      "Chinese Money Plant (Pilea peperomioides)",
+      "Chinese evergreen (Aglaonema)",
+      "Christmas Cactus (Schlumbergera bridgesii)",
+      "Chrysanthemum",
+      "Ctenanthe",
+      "Daffodils (Narcissus spp.)",
+      "Dracaena",
+      "Dumb Cane (Dieffenbachia spp.)",
+      "Elephant Ear (Alocasia spp.)",
+      "English Ivy (Hedera helix)",
+      "Hyacinth (Hyacinthus orientalis)",
+      "Iron Cross begonia (Begonia masoniana)",
+      "Jade plant (Crassula ovata)",
+      "Kalanchoe",
+      "Lilium (Hemerocallis)",
+      "Lily of the valley (Convallaria majalis)",
+      "Money Tree (Pachira aquatica)",
+      "Monstera Deliciosa (Monstera deliciosa)",
+      "Orchid",
+      "Parlor Palm (Chamaedorea elegans)",
+      "Peace lily",
+      "Poinsettia (Euphorbia pulcherrima)",
+      "Polka Dot Plant (Hypoestes phyllostachya)",
+      "Ponytail Palm (Beaucarnea recurvata)",
+      "Pothos (Ivy arum)",
+      "Prayer Plant (Maranta leuconeura)",
+      "Rattlesnake Plant (Calathea lancifolia)",
+      "Rubber Plant (Ficus elastica)",
+      "Sago Palm (Cycas revoluta)",
+      "Schefflera",
+      "Snake plant (Sanseviera)",
+      "Tradescantia",
+      "Tulip",
+      "Venus Flytrap",
+      "Yucca",
+      "ZZ Plant (Zamioculcas zamiifolia)"
+    ],
+    "availability" : {
+      "macOS" : "13.0",
+      "tvOS" : "16.0",
+      "visionOS" : "1.0",
+      "watchOS" : "9.0",
+      "iOS" : "16.0",
+      "macCatalyst" : "16.0"
+    },
+    "inputSchema" : [
+      {
+        "height" : "224",
+        "colorspace" : "RGB",
+        "isOptional" : "0",
+        "width" : "224",
+        "isColor" : "1",
+        "formattedType" : "Image (Color 224 × 224)",
+        "hasSizeFlexibility" : "0",
+        "type" : "Image",
+        "shortDescription" : "",
+        "name" : "image"
+      }
+    ],
+    "outputSchema" : [
+      {
+        "isOptional" : "0",
+        "formattedType" : "String",
+        "type" : "String",
+        "name" : "classLabel",
+        "shortDescription" : ""
+      },
+      {
+        "isOptional" : "0",
+        "keyType" : "String",
+        "formattedType" : "Dictionary (String → Double)",
+        "type" : "Dictionary",
+        "name" : "classLabel_probs",
+        "shortDescription" : ""
+      }
+    ],
+    "modelParameters" : [
+
+    ],
+    "storagePrecision" : "Mixed (Float16, Int8)",
+    "method" : "predict",
+    "version" : "1.0",
+    "isUpdatable" : "0",
+    "specificationVersion" : 7,
+    "stateSchema" : [
+
+    ],
+    "computePrecision" : "Mixed (Float16, Float32, Float64, Int32)",
+    "mlProgramOperationTypeHistogram" : {
+      "Concat" : 1,
+      "Ios16.cast" : 2,
+      "Ios16.mul" : 13,
+      "Ios16.layerNorm" : 25,
+      "SliceByIndex" : 1,
+      "Ios16.constexprAffineDequantize" : 75,
+      "Transpose" : 49,
+      "Ios16.linear" : 73,
+      "Ios16.add" : 26,
+      "Ios16.conv" : 1,
+      "Ios16.matmul" : 24,
+      "Ios16.softmax" : 12,
+      "Ios16.gelu" : 12,
+      "Ios16.reshape" : 49
+    },
+    "shortDescription" : "Identifies 47 common houseplant species from photos. ViT-Base fine-tuned on houseplant dataset.",
+    "license" : "Apache 2.0",
+    "generatedClassName" : "HousePlantIdentifier",
+    "author" : "dima806 (HuggingFace)",
+    "modelType" : {
+      "name" : "MLModelType_mlProgram"
+    }
+  }
+]

@@ -10,16 +10,24 @@ struct ModernPaywallView: View {
 
     let onComplete: (String) -> Void
 
+    private var hasTrial: Bool {
+        selectedTier == Constants.Subscription.ProductID.monthly ||
+        selectedTier == Constants.Subscription.ProductID.yearly
+    }
+
     private var ctaTitle: String {
-        selectedTier == Constants.Subscription.ProductID.monthly
-            ? "Start 3-Day Free Trial"
-            : "Continue"
+        hasTrial ? "Start 3-Day Free Trial" : "Continue"
     }
 
     private var footerText: String {
-        selectedTier == Constants.Subscription.ProductID.monthly
-            ? "3-day free trial, then $6.99/month. Cancel anytime."
-            : "Cancel anytime in Settings."
+        switch selectedTier {
+        case Constants.Subscription.ProductID.monthly:
+            return "3-day free trial, then $6.99/month. Cancel anytime."
+        case Constants.Subscription.ProductID.yearly:
+            return "3-day free trial, then $49.99/year. Cancel anytime."
+        default:
+            return "Cancel anytime in Settings."
+        }
     }
 
     var body: some View {

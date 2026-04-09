@@ -76,7 +76,7 @@ enum Constants {
             }
 
             var hasTrial: Bool {
-                self == .monthly
+                self == .monthly || self == .yearly
             }
 
             var features: [String] {
@@ -98,8 +98,8 @@ enum Constants {
                 case .yearly:
                     return [
                         "Everything in Monthly",
+                        "3-day free trial included",
                         "Save ~40% vs monthly",
-                        "Full year access",
                         "All future updates"
                     ]
                 case .lifetime:

@@ -6,19 +6,47 @@
 	<dict>
 		<key>AppIcon60x60@2x.png</key>
 		<data>
-		KBOhdygfi7p8AeS5qksOAeqhkQk=
+		1EOmp9Wdm7+Mu3uRVv8Txo/X+iE=
 		</data>
 		<key>AppIcon76x76@2x~ipad.png</key>
 		<data>
-		fHfm+eWtQ1scTTk6vD95cqV2GTY=
+		DyxUTluJFuUCD0tnKrYSQ+Xn7z8=
 		</data>
 		<key>Assets.car</key>
 		<data>
-		v7/iizEjbRtbeJ8CGilMatVCn1U=
+		27Phrw6f6R2Pp4BuKw6DFcdagt8=
+		</data>
+		<key>HousePlantIdentifier.mlmodelc/analytics/coremldata.bin</key>
+		<data>
+		7XQBxJnPP7e0pQ0tiCnDZMF+pCU=
+		</data>
+		<key>HousePlantIdentifier.mlmodelc/coremldata.bin</key>
+		<data>
+		xHxn+UnqeZ48Urand/fXI7DVW68=
+		</data>
+		<key>HousePlantIdentifier.mlmodelc/metadata.json</key>
+		<data>
+		IHkEJy0fapck3dlEIhKP3l6RXhI=
+		</data>
+		<key>HousePlantIdentifier.mlmodelc/model.mil</key>
+		<data>
+		CuR2xuArXukkcV54yPoeQ2409KM=
+		</data>
+		<key>HousePlantIdentifier.mlmodelc/weights/weight.bin</key>
+		<data>
+		aAa1JKj7prfM+uzREoqT1bkDuXU=
 		</data>
 		<key>Info.plist</key>
 		<data>
-		PXcTTyFJfj9UBtXhNP0qaTdXUjE=
+		zebtjHxnkzI4cI9et1o4lU3z/bU=
+		</data>
+		<key>Metadata.appintents/extract.actionsdata</key>
+		<data>
+		jqY1bsoO58OnZBYLPafIaYkGMQg=
+		</data>
+		<key>Metadata.appintents/version.json</key>
+		<data>
+		7w1Ll5l26LJ1LppWC0B6iejWorY=
 		</data>
 		<key>PkgInfo</key>
 		<data>
@@ -26,16 +54,61 @@
 		</data>
 		<key>RevenueCat_RevenueCat.bundle/Info.plist</key>
 		<data>
-		Bx9fYvnU9qW/zRlWnHlvSGBy+gk=
+		0olmiXZSOZwIjk1IRZ3qRpHvxzg=
 		</data>
 		<key>RevenueCat_RevenueCat.bundle/PrivacyInfo.xcprivacy</key>
 		<data>
 		uqRDkW3s33psRj8H+jal4YSzsvk=
 		</data>
+		<key>de.lproj/Localizable.strings</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			cHG3oogTl9Z5eng2L/JAs68Q1vU=
+			</data>
+			<key>optional</key>
+			<true/>
+		</dict>
 		<key>embedded.mobileprovision</key>
 		<data>
-		b3lysE9FgEDGqCbNYMPLUc3gc3c=
+		hh7m8N9VB661W7vB5W+h9HhomNs=
 		</data>
+		<key>en.lproj/Localizable.strings</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			luSELy6vv9MuTZGtr1U0hVYJI0M=
+			</data>
+			<key>optional</key>
+			<true/>
+		</dict>
+		<key>es.lproj/Localizable.strings</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			D+sy10C/t+zDyWSJBfgRADcMeP8=
+			</data>
+			<key>optional</key>
+			<true/>
+		</dict>
+		<key>fr.lproj/Localizable.strings</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			RzAh4i9o/g8VbyQaF59mDKZXGEE=
+			</data>
+			<key>optional</key>
+			<true/>
+		</dict>
+		<key>pt-BR.lproj/Localizable.strings</key>
+		<dict>
+			<key>hash</key>
+			<data>
+			tveP/NbGQlayci6MxIfG7fzinAE=
+			</data>
+			<key>optional</key>
+			<true/>
+		</dict>
 	</dict>
 	<key>files2</key>
 	<dict>
@@ -43,28 +116,77 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			ONm/wxrdkzG6TSNOh6alzmObBJUcZwS2Fy5qwsKlqAQ=
+			KB2UHpoUL8Sk+yQX0EbM+SDgfHylktzxGEn/Irrdd0o=
 			</data>
 		</dict>
 		<key>AppIcon76x76@2x~ipad.png</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			xlA7p2R6sIiwh5vZbuAQ+zaJB4cFbf6Sazth1s2C4zk=
+			PVkn7duSt8KJUtcVeQxdM8RqPpCBSs4EYBdX+Eolw4k=
 			</data>
 		</dict>
 		<key>Assets.car</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			42wIHdTBHgUupgq843hImxxmP5yue2Gk2I8RHmmFNC0=
+			XIlGazFDJjLBbRo9ZRCuQ96Wbdty010wVUvn/q1bAsY=
+			</data>
+		</dict>
+		<key>HousePlantIdentifier.mlmodelc/analytics/coremldata.bin</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			dy7UXGK2H5Bl5BF0x3XU64EmHXGPcYN4eUsqHufxPQI=
+			</data>
+		</dict>
+		<key>HousePlantIdentifier.mlmodelc/coremldata.bin</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			ld9MCU+RbIvT0syXSHveDMopEtb4hGkY19EW4Y62mqM=
+			</data>
+		</dict>
+		<key>HousePlantIdentifier.mlmodelc/metadata.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			aDfQEU9xLCSsDBLlK36AwjKnaZaGRc8vWG5lEaZKEAg=
+			</data>
+		</dict>
+		<key>HousePlantIdentifier.mlmodelc/model.mil</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			MGKSTxlwkPWWQT48C7m37ESMUTxC8hbtHzLuhiGwXi0=
+			</data>
+		</dict>
+		<key>HousePlantIdentifier.mlmodelc/weights/weight.bin</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			c6uhhZ7uRqwijU57FPiVPA5LZkyp2iRgLyHPHzYMkZE=
+			</data>
+		</dict>
+		<key>Metadata.appintents/extract.actionsdata</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			mrzULVOMbAqT8onbKVkButsChklCf5+35wCK8vACTA8=
+			</data>
+		</dict>
+		<key>Metadata.appintents/version.json</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			y1TAcXNcDbD2aIxNWsc0P2Vcl711IsZl2N4OtFadFYc=
 			</data>
 		</dict>
 		<key>RevenueCat_RevenueCat.bundle/Info.plist</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			5fMPtYkEAqUMpHHdODZ11NmcaaLoNJmf50OLTFG0cSQ=
+			QrOlUE8bCuhl6vbtP+1+cvEu/KIu8H+h/Gdy8yj0lm8=
 			</data>
 		</dict>
 		<key>RevenueCat_RevenueCat.bundle/PrivacyInfo.xcprivacy</key>
@@ -74,12 +196,57 @@
 			dsh2xzvzfWOylE0EkeTZpD1CDeeLZlEvzKJ6SErpLnk=
 			</data>
 		</dict>
+		<key>de.lproj/Localizable.strings</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			fFjrbg2GVYmMHhjbRtJWiXXhCXJpB7GujyBoIbQuZq4=
+			</data>
+			<key>optional</key>
+			<true/>
+		</dict>
 		<key>embedded.mobileprovision</key>
 		<dict>
 			<key>hash2</key>
 			<data>
-			uVK4f0UUvyBZ1dhMY1GbnW01ymt1kk0DBLXvpWBY8hg=
+			qPcJMbaAVH0nPRsdkromE8kouAtHMw+WKaUalruxE08=
 			</data>
+		</dict>
+		<key>en.lproj/Localizable.strings</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			ilVEsWBhY8YpBWItm3EkcyXhAc5Yyiv3UnXkjREA4LU=
+			</data>
+			<key>optional</key>
+			<true/>
+		</dict>
+		<key>es.lproj/Localizable.strings</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			jg+A9S+aSqF/qAxEUSl5l3o1udpwPprio3Qr9FQhZ/A=
+			</data>
+			<key>optional</key>
+			<true/>
+		</dict>
+		<key>fr.lproj/Localizable.strings</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			QHL4gcAhwf9goP0n1CZEDFfYVVfx+yZm1IRVGum4zUE=
+			</data>
+			<key>optional</key>
+			<true/>
+		</dict>
+		<key>pt-BR.lproj/Localizable.strings</key>
+		<dict>
+			<key>hash2</key>
+			<data>
+			HeJH6G+E4fYhK39zkA7ogtrU/Odn2O1X+ZasFO9kbw8=
+			</data>
+			<key>optional</key>
+			<true/>
 		</dict>
 	</dict>
 	<key>rules</key>
